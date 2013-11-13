@@ -7,6 +7,7 @@
 		android:orientation="vertical"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent">
+		
 		<TabWidget
 			android:id="@android:id/tabs"
 			android:layout_width="fill_parent"
@@ -15,29 +16,18 @@
 			<TextView
 				android:tag="tab0"
 				android:text="@string/tab1"
-				android:background="@android:drawable/ic_dialog_info"
 				android:layout_width="wrap_content"
 				android:layout_height="fill_parent"
-				/>
-			<TextView
-				android:tag="tab1"
-				android:text="@string/tab2"
-				android:background="@android:drawable/ic_menu_add"
-				android:layout_width="wrap_content"
-				android:layout_height="fill_parent"
-				/>
-			<TextView
-				android:tag="tab2"
-				android:text="@string/tab3"
-				android:layout_width="wrap_content"
-				android:layout_height="fill_parent"
-				/>
+				android:drawableBottom="@drawable/checkbox">
+			
+				</TextView>
+			
 			<TextView
 				android:tag="tab2"
 				android:text="@string/tab4"
 				android:layout_width="wrap_content"
 				android:layout_height="fill_parent"
-				/>
+				android:drawableBottom="@drawable/config"/>
 		
 		</TabWidget>
 			
@@ -45,42 +35,23 @@
 			android:id="@android:id/tabcontent"
 			android:layout_width="fill_parent"
 			android:layout_height="fill_parent">
-		<ImageView
-		        android:id="@+id/imageView1"
-		        android:layout_width="300dp"
-		        android:layout_height="300dp"
-		        android:layout_above="@+id/textView1"
-		        android:layout_centerHorizontal="true"
-		        android:layout_marginBottom="38dp"
-		        android:src="@drawable/hd" 
-		        android:background="#00000000"/>
-		      
 			<TextView
-				android:text="@string/hello_world"
+				android:id="@+id/textview"
+				android:text="@string/epilepsia"
+				android:typeface="monospace"
+				android:textColor="#ff0000ff"
+				android:textSize="12sp"
+				android:textAlignment="viewEnd"				
 				android:layout_width="fill_parent"
-				android:layout_height="fill_parent" />
-			<TextView
-				android:text="@string/hello_world"
-				android:layout_width="fill_parent"
-				android:layout_height="fill_parent" />		
-			
-				<ListView 
-				    android:id="@android:id/list"
-				    android:layout_width="fill_parent"
-				    android:layout_height="fill_parent">
-				    
-				</ListView>
-			
-		   <!--   <Spinner
-		        android:id="@+id/spinner1"
-		        android:text="@string/alerta"
-		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content"
-		        android:prompt="@string/spinner_prompt"
-		        android:entries="@array/itens_spinner">
-
-			</Spinner>  -->
-			
+				android:layout_height="fill_parent"
+				android:drawableTop="@drawable/hd"> 								   
+			</TextView>
+					
+			<ListView 
+			    android:id="@+id/list1"
+			    android:layout_width="fill_parent"
+			    android:layout_height="fill_parent">   
+			</ListView>
 		</FrameLayout>
 	</LinearLayout>
 </TabHost>

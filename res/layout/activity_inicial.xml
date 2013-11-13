@@ -15,22 +15,10 @@
 			<TextView
 				android:tag="tab0"
 				android:text="@string/tab1"
-				android:background="@android:drawable/btn_star_big_on"
 				android:layout_width="wrap_content"
 				android:layout_height="fill_parent"
 				/>
-			<TextView
-				android:tag="tab1"
-				android:text="@string/tab2"
-				android:layout_width="wrap_content"
-				android:layout_height="fill_parent"
-				/>
-			<TextView
-				android:tag="tab2"
-				android:text="@string/tab3"
-				android:layout_width="wrap_content"
-				android:layout_height="fill_parent"
-				/>
+						
 			<TextView
 				android:tag="tab2"
 				android:text="@string/tab4"
@@ -46,38 +34,17 @@
 			android:layout_height="fill_parent">
 			<ImageView
 		        android:id="@+id/imageView1"
-		        android:layout_width="300dp"
-		        android:layout_height="300dp"
-		        android:layout_above="@+id/textView1"
-		        android:layout_centerHorizontal="true"
-		        android:layout_marginBottom="38dp"
-		        android:src="@drawable/hd" />
-			<TextView
-				android:text="@string/hello_world"
-				android:layout_width="fill_parent"
-				android:layout_height="fill_parent" />
-			<TextView
-				android:text="@string/hello_world"
-				android:layout_width="fill_parent"
-				android:layout_height="fill_parent" />		
-			
-				<ListView 
-				    android:id="@android:id/list"
-				    android:layout_width="fill_parent"
-				    android:layout_height="fill_parent">
-				    
-				</ListView>
-			
-		   <!--   <Spinner
-		        android:id="@+id/spinner1"
-		        android:text="@string/alerta"
-		        android:layout_width="match_parent"
+		         android:src="@drawable/hd"
+		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
-		        android:prompt="@string/spinner_prompt"
-		        android:entries="@array/itens_spinner">
-
-			</Spinner>  -->
-			
+		        android:layout_gravity="top"		        
+		       />
+		    <TextView				
+				android:text="@string/epilepsia"
+				android:layout_width="wrap_content"
+				android:layout_height="fill_parent">
+				
+				</TextView>										
 		</FrameLayout>
 	</LinearLayout>
 </TabHost>

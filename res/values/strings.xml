@@ -15,12 +15,28 @@
     <string name="alerta">Alertas</string>
 
     <string-array name="itens_spinner">
-        <item>5</item>
-        <item>10</item>
-        <item>15</item>
+        <item>5 segundos</item>
+        <item>10 segundos</item>
+        <item>15 segundos</item>
     </string-array>
 
-    <string name="title_activity_list_view">ListView</string>
-    <string name="title_activity_config__alertas">Config_AlertasActivity</string>
-
+    <string name="title_activity_config__alertas">Configurações</string><string name="title_activity_list_view">ListView</string>
+    
+    <string name="salvar">Salvar</string>
+    <string name="title_activity_alertas">Alertas</string><string name="title_activity_contatos">Contatos</string><string name="tempo">Selecione o tempo de espera do alerta:</string>
+    
+    
+	
+    <string name="title">Contatos</string>
+    <string name="abrir_contatos">Abrir Contatos</string>
+    <string name="query">Via Query</string>
+    <string name="nome">Nome:</string>
+    <string name="telefone">Telefone:</string>
+    <string name="email">Email:</string>
+    <string name="mensagem_instatanea">Mensagem instatânea:</string>
+    <string name="organizacao">Organização:</string>
+    <string name="endereco">Endereco:</string>
+    <string name="notas">Notas:</string>
+    
+    <string name="epilepsia"> Epilepsia é uma alteração temporária e reversível do funcionamento do cérebro.Em um dos principais sintomas, o paciente primeiro perde a consciência e cai, ficando com o corpo rígido; depois, as extremidades do corpo tremem e contraem-se.</string>
 </resources>

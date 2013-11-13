@@ -1,35 +1,68 @@
 package com.promobile.epilepticdetector;
 
 
+
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-
+import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabContentFactory;
 import android.widget.TabHost.TabSpec;
 import android.widget.TabWidget;
 import android.widget.TextView;
  
-public class MainActivity extends Activity {
- 
-
+public class MainActivity<ListViewAdapterSessions, TechnicalSession> extends Activity {
+	
+	ListView listview;
+	String[] itens_config = {"Alertas", "Gerenciador de contatos"};
+	
+	Intent intent;
+	
+	public Context context;
+	private ArrayAdapter<String> mAdaptador;
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.activity_main);
-		//startActivity(new Intent(this, InicialActivity.class));
-		startActivity(new Intent(this, ListView_Config.class));
+		
+		listview = (ListView)findViewById(R.id.list1);				
+		 mAdaptador = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, itens_config);
+	     listview.setAdapter(mAdaptador);	         
+	    
+	     listview.setOnItemClickListener(new OnItemClickListener() {  
+	    	  
+	         @Override  
+	         public void onItemClick(AdapterView<?> adapter, View view,  
+	                 int position, long id) {  
+	             int pos = position;  
+	             if (pos == 0) {  
+	                 Intent intent = new Intent(MainActivity.this, AlertasActivity.class);  
+	                 startActivity(intent);  
+	             }
+	             else if(pos == 1){
+	            	 Intent intent = new Intent(MainActivity.this, ContatosActivity.class);  
+	                 startActivity(intent); 
+	             }
+	         }  
+	     });  
+	      
+	    
 		TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
 		tabHost.setup();
 		
 		final TabWidget tabWidget = tabHost.getTabWidget();
 		final FrameLayout tabContent = tabHost.getTabContentView();
-		
+	
 		// Get the original tab textviews and remove them from the viewgroup.
 		TextView[] originalTextViews = new TextView[tabWidget.getTabCount()];
 		for (int index = 0; index < tabWidget.getTabCount(); index++) {
@@ -63,5 +96,7 @@ public class MainActivity extends Activity {
 		}	
 	
 	}
+	
+	
 	
 }

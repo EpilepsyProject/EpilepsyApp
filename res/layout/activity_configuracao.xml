@@ -43,23 +43,19 @@
 		<FrameLayout
 			android:id="@android:id/tabcontent"
 			android:layout_width="fill_parent"
-			android:layout_height="fill_parent">
-			
-			<TextView
-				android:text="@string/hello_world"
-				android:layout_width="fill_parent"
-				android:layout_height="fill_parent" />
-			<TextView
-				android:text="@string/hello_world"
-				android:layout_width="fill_parent"
-				android:layout_height="fill_parent" />
-			<TextView
-				android:text="@string/hello_world"
-				android:layout_width="fill_parent"
-				android:layout_height="fill_parent" />		
+			android:layout_height="fill_parent">			
+		<ImageView
+			        android:id="@+id/imageView1"
+			        android:layout_width="300dp"
+			        android:layout_height="300dp"
+			        android:layout_above="@+id/textView1"
+			        android:layout_centerHorizontal="true"
+			        android:layout_marginBottom="38dp"
+			        android:src="@drawable/hd" 
+			        android:background="#00000000"/>
 			
 				<ListView
-				    android:id="@android:id/list"
+				    android:id="@+id/list2"
 				    android:layout_width="fill_parent"
 				    android:layout_height="fill_parent">
 				    

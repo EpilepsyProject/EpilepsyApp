@@ -2,7 +2,7 @@
     android:id="@+id/widget27"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#ff000000" >
+    android:background="#00000000" >
 
     <Gallery
         android:id="@+id/widget30"
@@ -11,33 +11,22 @@
         android:layout_above="@+id/textView1"
         android:layout_centerHorizontal="true" >
     </Gallery>
+    
 
     <ImageView
         android:id="@+id/imageView1"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_above="@+id/textView1"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="38dp"
-        android:src="@drawable/hd" />
-
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_centerHorizontal="true"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/imageView1"
-        android:textSize="12sp"   
-        android:text="@string/presentation"
-        android:textColor="#ffffffff" />
+        android:layout_width="600dp"
+        android:layout_height="600dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/splash_tela" />
 
     <ProgressBar
         android:id="@+id/progressBar1"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="150dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/imageView1"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="88dp" />
 
 </RelativeLayout>
