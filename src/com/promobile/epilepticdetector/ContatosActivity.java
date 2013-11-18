@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import br.com.promobile.epilepticdetector.banco.ContatoBanco;
 import br.com.promobile.epilepticdetector.banco.ContatoDao;
 import br.com.wcabralti.contatos.ContatosUtil;
@@ -64,6 +65,8 @@ public class ContatosActivity extends Activity {
 				ContatoDao dao = new ContatoDao(ContatosActivity.this);
 				dao.inserir(contatoBanco);
 				dao.close();
+				Toast.makeText(getApplicationContext(), "Novo contato salvo!",
+						Toast.LENGTH_SHORT).show();		
 				
 			}
 		});
@@ -77,7 +80,7 @@ public class ContatosActivity extends Activity {
 	
 	public void contatosQuery() {
 		// Pega os contatos via Query
-		List<Contato> contatos = mContatos.getContatosFromQuery();
+		//List<Contato> contatos = mContatos.getContatosFromQuery();
 	}
 
 	@Override
