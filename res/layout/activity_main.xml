@@ -17,17 +17,17 @@
 				android:tag="tab0"
 				android:text="@string/tab1"
 				android:layout_width="wrap_content"
-				android:layout_height="fill_parent"
-				android:drawableBottom="@drawable/checkbox">
-			
+				android:layout_height="fill_parent">			
 				</TextView>
 			
 			<TextView
 				android:tag="tab2"
 				android:text="@string/tab4"
 				android:layout_width="wrap_content"
-				android:layout_height="fill_parent"
-				android:drawableBottom="@drawable/config"/>
+				android:layout_height="fill_parent">
+			    
+			</TextView>
+
 		
 		</TabWidget>
 			
@@ -35,22 +35,17 @@
 			android:id="@android:id/tabcontent"
 			android:layout_width="fill_parent"
 			android:layout_height="fill_parent">
-			<TextView
-				android:id="@+id/textview"
-				android:text="@string/epilepsia"
-				android:typeface="monospace"
-				android:textColor="#ff0000ff"
-				android:textSize="12sp"
-				android:textAlignment="viewEnd"				
-				android:layout_width="fill_parent"
-				android:layout_height="fill_parent"
-				android:drawableTop="@drawable/hd"> 								   
-			</TextView>
-					
-			<ListView 
-			    android:id="@+id/list1"
-			    android:layout_width="fill_parent"
-			    android:layout_height="fill_parent">   
+			<Button  
+			     android:id="@+id/btnShowDialog"  
+			     android:layout_width="wrap_content"  
+			     android:layout_height="wrap_content"  			   
+			     android:onClick="showDialogClick"  
+			     android:text="@string/show" />  
+						
+			<ListView
+				 android:id="@+id/list1"
+				 android:layout_width="fill_parent"
+				 android:layout_height="fill_parent">   
 			</ListView>
 		</FrameLayout>
 	</LinearLayout>
