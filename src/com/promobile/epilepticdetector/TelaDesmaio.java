@@ -17,7 +17,7 @@ public class TelaDesmaio extends Activity {
 		@Override
 		protected void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
-			setContentView(R.layout.activity_main);
+			setContentView(R.layout.activity_tela_desmaio);
 		}
 
 		public void showDialogClick(View v) {
@@ -25,7 +25,7 @@ public class TelaDesmaio extends Activity {
 			// Prepara o Dialog informando o título, mensagem e cria o Positive Button        
 			AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
 	        alertBuilder.setTitle(R.string.title);
-	        alertBuilder.setMessage(R.string.message);
+	        alertBuilder.setMessage("Um possível demaio foi detectado! Enviando SMS ao fim da contagem...");
 	        
 	        // Aqui você pode definir a ação de clique do botão
 	        alertBuilder.setPositiveButton("OK", null);
