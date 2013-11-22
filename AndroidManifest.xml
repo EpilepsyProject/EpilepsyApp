@@ -64,6 +64,10 @@
             android:name="com.promobile.epilepticdetector.TelaDesmaio"
             android:label="@string/title_activity_tela_desmaio" >
         </activity>
+        <activity
+            android:name="com.promobile.epilepticdetector.AcelerometroActivity"
+            android:label="@string/title_activity_acelerometro" >
+        </activity>
     </application>
 
 </manifest>

@@ -79,6 +79,14 @@ public class MainActivity extends Activity {
              startActivity(intent); //chama a TelaDesmaio			 
 		}
 	});
+	findViewById(R.id.btnUsarAcelerometro).setOnClickListener(new View.OnClickListener() {
+		
+		@Override
+		public void onClick(View arg0) {
+			Intent intent = new Intent(MainActivity.this, AcelerometroActivity.class);
+			startActivity(intent);
+		}
+	});
 	// listview aponta para o id list1 do tipo ListView
 	listview = (ListView)findViewById(R.id.list1);		
 	//aqui é usado um ArrayAdapter para poder fazer com que telas diferentes sejam chamadas

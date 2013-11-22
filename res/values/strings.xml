@@ -25,7 +25,7 @@
     <string name="salvar">Salvar</string>
     <string name="title_activity_alertas">Alertas</string>
     <string name="title_activity_contatos">Contatos</string>
-    <string name="tempo">Selecione o tempo de espera do alerta:</string>    
+    <string name="tempo">Selecione o tempo de espera do alerta:</string>
     <string name="abrir_contatos">Abrir Contatos</string>
     <string name="query">Via Query</string>
     <string name="nome">Nome:</string>
@@ -35,10 +35,12 @@
     <string name="organizacao">Organização:</string>
     <string name="endereco">Endereco:</string>
     <string name="notas">Notas:</string>
-    <string name="mostrar">mostrar alertdialog</string><string name="epilepsia"> Epilepsia é uma alteração temporária e reversível do funcionamento do cérebro.Em um dos principais sintomas, o paciente primeiro perde a consciência e cai, ficando com o corpo rígido; depois, as extremidades do corpo tremem e contraem-se.</string>
-    <string name="title_activity_tela_desmaio">TelaDesmaio</string>  
-    <string name="title">Desmaio Detectado!</string>  
-	<string name="show">abrir tela de teste do alertdialog</string>
-	<string name="message">Um possível demaio foi detectado! Enviando SMS ao fim da contagem&#8230;</string>
- 
+    <string name="mostrar">mostrar alertdialog</string>
+    <string name="epilepsia"> Epilepsia é uma alteração temporária e reversível do funcionamento do cérebro.Em um dos principais sintomas, o paciente primeiro perde a consciência e cai, ficando com o corpo rígido; depois, as extremidades do corpo tremem e contraem-se.</string>
+    <string name="title_activity_tela_desmaio">TelaDesmaio</string>
+    <string name="title">Desmaio Detectado!</string>
+    <string name="show">abrir tela de teste do alertdialog</string>
+    <string name="message">Um possível demaio foi detectado! Enviando SMS ao fim da contagem&#8230;</string>
+    <string name="title_activity_acelerometro">Acelerometro</string>
+
 </resources>
