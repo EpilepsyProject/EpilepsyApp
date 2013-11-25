@@ -22,6 +22,8 @@ import android.widget.TextView;
 
 public class AcelerometroActivity extends Activity implements SensorEventListener{
 
+	private long miliTimeInicial;
+
 	private TextView textViewX;
     private TextView textViewY;
     private TextView textViewZ;
@@ -46,6 +48,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         
+        /**TODO: RAWLINSON - NÌO PRECISA DESSE BOTAO...
         Button btnCriarArquivo = (Button) findViewById(R.id.btnGerarArquivo);
         btnCriarArquivo.setOnClickListener(new View.OnClickListener() {
 			
@@ -54,13 +57,16 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 				CriaArquivosLog(x, y, z);
 			}
 		});
-         
+		**/
+        
+        // Obtendo instante inicial do log...
+        miliTimeInicial = System.currentTimeMillis();
     }
        
     @Override
     protected void onResume() {
         super.onResume();
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
     }
      
     @Override
@@ -79,15 +85,17 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         y = event.values[1];
         z = event.values[2];
         
+        /**TODO: Rawlinson - Comentado tempor‡riamente...
         Log.d(TAG, "X: "+x.toString());
         Log.d(TAG, "Y: "+y.toString());
         Log.d(TAG, "Z: "+z.toString());
+        **/
           
-        textViewX.setText("Posição X: " + x.intValue() + " Float: " + x);
-        textViewY.setText("Posição Y: " + y.intValue() + " Float: " + y);
-        textViewZ.setText("Posição Z: " + z.intValue() + " Float: " + z);
+        textViewX.setText("Posicao X: " + x.intValue() + " Float: " + x);
+        textViewY.setText("Posicao Y: " + y.intValue() + " Float: " + y);
+        textViewZ.setText("Posicao Z: " + z.intValue() + " Float: " + z);
          
-        if(y < 0) { // O dispositivo esta de cabeça pra baixo
+        if(y < 0) { // O dispositivo esta de cabeca pra baixo
             if(x > 0)  
                 textViewDetail.setText("Virando para ESQUERDA ficando INVERTIDO");
             if(x < 0)  
@@ -98,24 +106,48 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
             if(x < 0)  
                 textViewDetail.setText("Virando para DIREITA ");
         }
+        
         CriaArquivosLog(x, y, z);
     }
-    public void CriaArquivosLog(Float x, Float y, Float z ){
-    	try {
+
+    public void CriaArquivosLog(Float x, Float y, Float z )
+    {
+    	try
+    	{
+    		/** BEGIN: Salvando os dados do acelerometro em um log dentro do CARD SD... **/
     		File arq = new File(Environment.getExternalStorageDirectory(), "logs.txt");
-			FileOutputStream escrever = new FileOutputStream(arq,true);
+			FileOutputStream escrever = new FileOutputStream(arq, true);
 			
 			escrever.write(x.toString().getBytes());
-			escrever.write(",".getBytes());
-			escrever.write(y.toString().getBytes());
-			escrever.write(",".getBytes());
-			escrever.write(z.toString().getBytes());
 			escrever.write(";".getBytes());
+			escrever.write(y.toString().getBytes());
+			escrever.write(";".getBytes());
+			escrever.write(z.toString().getBytes());
 			escrever.write("\n".getBytes());
 			escrever.flush();
 			escrever.close();
+    		/** END: Salvando os dados do acelerometro em um log dentro do CARD SD... **/
 			
-		} catch (IOException e) {
+    		/** BEGIN: Gerando grafico de analise do acelerometro **/
+    		File arqLog = new File(Environment.getExternalStorageDirectory(), "logGraficoAcelerometro.txt");
+			FileOutputStream escreverLog = new FileOutputStream(arqLog, true);
+			
+			// Instante de tempo que o log foi gerado...
+			long miliTimeAtual = System.currentTimeMillis();
+			escreverLog.write(Long.toString(miliTimeAtual - miliTimeInicial).getBytes());
+			escreverLog.write(";".getBytes());
+			
+			// Calculando os modulos resultantes dos eixos x, y e z
+			double moduloVetorAceleracao = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
+			escreverLog.write(Double.toString(moduloVetorAceleracao).getBytes());
+			escreverLog.write("\n".getBytes());
+			
+			escreverLog.flush();
+			escreverLog.close();
+    		/** END: Gerando grafico de analise do acelerometro **/
+		}
+    	catch (IOException e)
+    	{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
