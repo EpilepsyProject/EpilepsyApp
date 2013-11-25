@@ -34,4 +34,10 @@
         android:id="@+id/text_view_detail"
         />
 
+      <Button
+          android:id="@+id/btnGerarArquivo"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="gerar arquivo" />
+
 </LinearLayout>
