@@ -24,6 +24,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 
 	private long miliTimeInicial;
 
+	private TextView textViewTimer;
 	private TextView textViewX;
     private TextView textViewY;
     private TextView textViewZ;
@@ -40,6 +41,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_acelerometro);
          
+        textViewTimer = (TextView) findViewById(R.id.txtValorTimer);
         textViewX = (TextView) findViewById(R.id.txtValorX);
         textViewY = (TextView) findViewById(R.id.txtValorY);
         textViewZ = (TextView) findViewById(R.id.txtValorZ);
@@ -66,7 +68,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
     @Override
     protected void onResume() {
         super.onResume();
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
     }
      
     @Override
@@ -84,13 +86,17 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         x = event.values[0];
         y = event.values[1];
         z = event.values[2];
+		
+		// Instante de tempo que o log foi gerado...
+		double miliTimeAtual = (System.currentTimeMillis() - miliTimeInicial) / 1000.0;
         
         /**TODO: Rawlinson - Comentado tempor‡riamente...
         Log.d(TAG, "X: "+x.toString());
         Log.d(TAG, "Y: "+y.toString());
         Log.d(TAG, "Z: "+z.toString());
         **/
-          
+         
+        textViewTimer.setText("Timer: " + miliTimeAtual);
         textViewX.setText("Posicao X: " + x.intValue() + " Float: " + x);
         textViewY.setText("Posicao Y: " + y.intValue() + " Float: " + y);
         textViewZ.setText("Posicao Z: " + z.intValue() + " Float: " + z);
@@ -107,10 +113,10 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
                 textViewDetail.setText("Virando para DIREITA ");
         }
         
-        CriaArquivosLog(x, y, z);
+        CriaArquivosLog(miliTimeAtual, x, y, z);
     }
 
-    public void CriaArquivosLog(Float x, Float y, Float z )
+    public void CriaArquivosLog(Double miliTimeAtual, Float x, Float y, Float z )
     {
     	try
     	{
@@ -133,10 +139,9 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 			FileOutputStream escreverLog = new FileOutputStream(arqLog, true);
 			
 			// Instante de tempo que o log foi gerado...
-			long miliTimeAtual = System.currentTimeMillis();
-			escreverLog.write(Long.toString(miliTimeAtual - miliTimeInicial).getBytes());
+			escreverLog.write(Double.toString(miliTimeAtual).getBytes());
 			escreverLog.write(";".getBytes());
-			
+
 			// Calculando os modulos resultantes dos eixos x, y e z
 			double moduloVetorAceleracao = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
 			escreverLog.write(Double.toString(moduloVetorAceleracao).getBytes());
