@@ -52,12 +52,13 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         textViewX = (TextView) findViewById(R.id.txtValorX);
         textViewY = (TextView) findViewById(R.id.txtValorY);
         textViewZ = (TextView) findViewById(R.id.txtValorZ);
+        textViewVetor = (TextView) findViewById(R.id.txtValorVetor);
         textViewDetail = (TextView) findViewById(R.id.text_view_detail);
          
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         
-        /**TODO: RAWLINSON - NÃO PRECISA DESSE BOTAO...
+        /**TODO: RAWLINSON - NÔøΩO PRECISA DESSE BOTAO...
         Button btnCriarArquivo = (Button) findViewById(R.id.btnGerarArquivo);
         btnCriarArquivo.setOnClickListener(new View.OnClickListener() {
 			
@@ -69,7 +70,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 		**/
         
         /********************************************************************************
-         *						HEURISTICA DE DETECÇÃO DE DESMAIO						*
+         *						HEURISTICA DE DETECÔøΩÔøΩO DE DESMAIO						*
          ********************************************************************************/
         // Inicializando constantes...
         flagEstagio1 = false;
@@ -109,7 +110,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 		// Calculando os modulos resultantes dos eixos x, y e z
 		double moduloVetorAceleracao = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
         
-        /**TODO: Rawlinson - Comentado temporáriamente...
+        /**TODO: Rawlinson - Comentado temporÔøΩriamente...
         Log.d(TAG, "X: "+x.toString());
         Log.d(TAG, "Y: "+y.toString());
         Log.d(TAG, "Z: "+z.toString());
@@ -119,7 +120,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         textViewX.setText("Posicao X: " + x.intValue() + " Float: " + x);
         textViewY.setText("Posicao Y: " + y.intValue() + " Float: " + y);
         textViewZ.setText("Posicao Z: " + z.intValue() + " Float: " + z);
-        textViewVetor.setText("Vetor Aceleração: " + moduloVetorAceleracao);
+        textViewVetor.setText("Vetor Aceleracao: " + Double.toString(moduloVetorAceleracao));
          
         if(y < 0) { // O dispositivo esta de cabeca pra baixo
             if(x > 0)  
@@ -134,7 +135,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         }
         
         /********************************************************************************
-         *						HEURISTICA DE DETECÇÃO DE DESMAIO						*
+         *						HEURISTICA DE DETECCAO DE DESMAIO						*
          ********************************************************************************/
         if(moduloVetorAceleracao <= 6.0)
         {
