@@ -24,10 +24,18 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 
 	private long miliTimeInicial;
 
+	private TextView textViewTimer;
 	private TextView textViewX;
     private TextView textViewY;
     private TextView textViewZ;
+    private TextView textViewVetor;
     private TextView textViewDetail;
+    
+    // Estagios da deteccao de desmaio
+    private Boolean flagEstagio1;
+    private Boolean flagEstagio2;
+    private Boolean flagEstagio3;
+    private Integer contPrecisao;
      
     Float x, y, z;
     private SensorManager mSensorManager;
@@ -40,6 +48,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_acelerometro);
          
+        textViewTimer = (TextView) findViewById(R.id.txtValorTimer);
         textViewX = (TextView) findViewById(R.id.txtValorX);
         textViewY = (TextView) findViewById(R.id.txtValorY);
         textViewZ = (TextView) findViewById(R.id.txtValorZ);
@@ -59,6 +68,15 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 		});
 		**/
         
+        /********************************************************************************
+         *						HEURISTICA DE DETECÇÃO DE DESMAIO						*
+         ********************************************************************************/
+        // Inicializando constantes...
+        flagEstagio1 = false;
+        flagEstagio2 = false;
+        flagEstagio3 = false;
+        contPrecisao = 0;
+         
         // Obtendo instante inicial do log...
         miliTimeInicial = System.currentTimeMillis();
     }
@@ -66,7 +84,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
     @Override
     protected void onResume() {
         super.onResume();
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
     }
      
     @Override
@@ -84,16 +102,24 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         x = event.values[0];
         y = event.values[1];
         z = event.values[2];
+		
+		// Instante de tempo que o log foi gerado...
+		double miliTimeAtual = (System.currentTimeMillis() - miliTimeInicial) / 1000.0;
+		
+		// Calculando os modulos resultantes dos eixos x, y e z
+		double moduloVetorAceleracao = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
         
         /**TODO: Rawlinson - Comentado temporáriamente...
         Log.d(TAG, "X: "+x.toString());
         Log.d(TAG, "Y: "+y.toString());
         Log.d(TAG, "Z: "+z.toString());
         **/
-          
+         
+        textViewTimer.setText("Timer: " + miliTimeAtual);
         textViewX.setText("Posicao X: " + x.intValue() + " Float: " + x);
         textViewY.setText("Posicao Y: " + y.intValue() + " Float: " + y);
         textViewZ.setText("Posicao Z: " + z.intValue() + " Float: " + z);
+        textViewVetor.setText("Vetor Aceleração: " + moduloVetorAceleracao);
          
         if(y < 0) { // O dispositivo esta de cabeca pra baixo
             if(x > 0)  
@@ -107,10 +133,53 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
                 textViewDetail.setText("Virando para DIREITA ");
         }
         
-        CriaArquivosLog(x, y, z);
+        /********************************************************************************
+         *						HEURISTICA DE DETECÇÃO DE DESMAIO						*
+         ********************************************************************************/
+        if(moduloVetorAceleracao <= 6.0)
+        {
+            flagEstagio1 = true;
+            
+            // Obter tempo em milisegundos... para estimar com mais precisao o processo de queda...
+            //mintime = System.currentTimeMillis();
+        }
+
+        if(flagEstagio1 == true)
+        {
+        	contPrecisao++;
+        	if(moduloVetorAceleracao >= 13.5)
+        	{
+        		flagEstagio2 = true;
+        	}
+        }
+        
+        if(flagEstagio1 == true && flagEstagio2 == true)
+        {
+        	// Verificar se o cara apagou... atraves de uma margem de erro em relacao a normal 9,8 
+        	
+        	flagEstagio3 = true;
+        	// exibir alert da larissa...
+        	textViewDetail.setText("***************** DESMAIO DETECTADO *****************");
+	        
+        	contPrecisao = 0;
+        	flagEstagio1 = false;
+        	flagEstagio2 = false;
+        	flagEstagio3 = false;
+        }
+
+		if( contPrecisao > 10)
+		{
+		    contPrecisao = 0;
+		    flagEstagio1 = false;
+		    flagEstagio2 = false;
+		    flagEstagio3 = false;
+		}
+        
+        // Gerando os logs do sistema...
+        CriaArquivosLog(miliTimeAtual, x, y, z, moduloVetorAceleracao);
     }
 
-    public void CriaArquivosLog(Float x, Float y, Float z )
+    public void CriaArquivosLog(Double miliTimeAtual, Float x, Float y, Float z, Double moduloVetorAceleracao)
     {
     	try
     	{
@@ -133,12 +202,10 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 			FileOutputStream escreverLog = new FileOutputStream(arqLog, true);
 			
 			// Instante de tempo que o log foi gerado...
-			long miliTimeAtual = System.currentTimeMillis();
-			escreverLog.write(Long.toString(miliTimeAtual - miliTimeInicial).getBytes());
+			escreverLog.write(Double.toString(miliTimeAtual).getBytes());
 			escreverLog.write(";".getBytes());
-			
+
 			// Calculando os modulos resultantes dos eixos x, y e z
-			double moduloVetorAceleracao = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
 			escreverLog.write(Double.toString(moduloVetorAceleracao).getBytes());
 			escreverLog.write("\n".getBytes());
 			
