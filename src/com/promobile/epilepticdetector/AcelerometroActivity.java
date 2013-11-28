@@ -30,6 +30,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
     private TextView textViewZ;
     private TextView textViewVetor;
     private TextView textViewDetail;
+    private TextView textViewDesmaio;
     
     // Estagios da deteccao de desmaio
     private Boolean flagEstagio1;
@@ -54,6 +55,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         textViewZ = (TextView) findViewById(R.id.txtValorZ);
         textViewVetor = (TextView) findViewById(R.id.txtValorVetor);
         textViewDetail = (TextView) findViewById(R.id.text_view_detail);
+        textViewDesmaio = (TextView) findViewById(R.id.text_view_desmaio);
          
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -147,6 +149,8 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 
         if(flagEstagio1 == true)
         {
+        	textViewDesmaio.setText("");
+        	
         	contPrecisao++;
         	if(moduloVetorAceleracao >= 13.5)
         	{
@@ -160,7 +164,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         	
         	flagEstagio3 = true;
         	// exibir alert da larissa...
-        	textViewDetail.setText("***************** DESMAIO DETECTADO *****************");
+        	textViewDesmaio.setText("***************** DESMAIO DETECTADO *****************");
 	        
         	contPrecisao = 0;
         	flagEstagio1 = false;
