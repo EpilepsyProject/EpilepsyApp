@@ -69,6 +69,19 @@
             android:name="com.promobile.epilepticdetector.AcelerometroActivity"
             android:label="@string/title_activity_acelerometro" >
         </activity>
+
+        <service
+            android:name="com.promobile.epilepticdetector.AcelerometroActivity"
+            android:enabled="true" />
+
+        <activity
+            android:name="com.promobile.epilepticdetector.ConfiguracoesActivity"
+            android:label="@string/title_activity_configuracoes" >
+        </activity>
+        <activity
+            android:name="com.promobile.epilepticdetector.AtivarAPPActivity"
+            android:label="@string/title_activity_ativar_app" >
+        </activity>
        <activity android:name="org.achartengine.GraphicalActivity" />     
     </application>
     
