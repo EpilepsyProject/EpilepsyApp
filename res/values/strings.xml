@@ -41,6 +41,16 @@
     <string name="title">Desmaio Detectado!</string>
     <string name="show">abrir tela de teste do alertdialog</string>
     <string name="message">Um possível demaio foi detectado! Enviando SMS ao fim da contagem&#8230;</string>
+    <string name="backgroundOn">On</string>
+    <string name="backgroundOff">Off</string>
+    <string name="textoAtivarBack">Deseja ativar aplicação?</string>
     <string name="title_activity_acelerometro">Acelerometro</string>
+    <string name="inicio">Início</string>
+    <string name="config">Configurações</string>
+    <string name="title_activity_configuracoes">ConfiguracoesActivity</string>
+    <string name="tempo15">15 seg</string><string name="tempo5">5 seg</string><string name="title_activity_ativar_app">Ativar aplicação</string>
+    
+    
+    <string name="tempo10">10 seg</string>
 
 </resources>
