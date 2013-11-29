@@ -32,8 +32,8 @@ public class InicialActivity extends Activity {
          super.onCreate(savedInstanceState);
          setContentView(R.layout.activity_inicial);
          
-         start=(Button)findViewById(R.id.btnBackgroundOn); //botão ligar
-         stop=(Button)findViewById(R.id.btnBackgroundOff); //botão desligar
+         start=(Button)findViewById(R.id.btnBackgroundOn); //botï¿½o ligar
+         stop=(Button)findViewById(R.id.btnBackgroundOff); //botï¿½o desligar
          start.setOnClickListener(new View.OnClickListener() {
              @Override
              public void onClick(View v) {                
@@ -50,9 +50,9 @@ public class InicialActivity extends Activity {
 }
 
 private void toggleService(){
-   Intent intent=new Intent(getApplicationContext(), AcelerometroActivity_.class);
+   Intent intent=new Intent(getApplicationContext(), AcelerometroActivity.class);
    // Try to stop the service if it is already running
-   intent.addCategory(AcelerometroActivity_.TAG);
+   intent.addCategory(AcelerometroActivity.TAG);
    if(!stopService(intent)){
        startService(intent);
    }
@@ -65,8 +65,8 @@ public void startSensing(){
 }
 
 private void stopSensing(){
-	Intent intent=new Intent(getApplicationContext(), AcelerometroActivity_.class);
-	intent.addCategory(AcelerometroActivity_.TAG);
+	Intent intent=new Intent(getApplicationContext(), AcelerometroActivity.class);
+	intent.addCategory(AcelerometroActivity.TAG);
 	stopService(intent);
 	mNotifyManager =
 	        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -77,7 +77,7 @@ private void stopSensing(){
 public void showNotification(){
 	mBuilder = new NotificationCompat.Builder(this);
 	mBuilder.setContentTitle("Epileptic Detector")
-	    .setContentText("Monitorando possível ataque")
+	    .setContentText("Monitorando possï¿½vel ataque")
 	    .setSmallIcon(R.drawable.hd);
 	Intent resultIntent = new Intent(this, MainActivity.class);
 	TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
