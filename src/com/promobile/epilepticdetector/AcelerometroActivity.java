@@ -1,130 +1,142 @@
 package com.promobile.epilepticdetector;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Bundle;
 import android.os.Environment;
-import android.app.Activity;
-import android.app.Dialog;
-import android.content.Context;
+import android.os.IBinder;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
-public class AcelerometroActivity extends Activity implements SensorEventListener{
+public class AcelerometroActivity extends Service implements SensorEventListener{
 
-	private long miliTimeInicial;
-
-	private TextView textViewTimer;
 	private TextView textViewX;
     private TextView textViewY;
     private TextView textViewZ;
-    private TextView textViewVetor;
     private TextView textViewDetail;
-    private TextView textViewDesmaio;
+    private long miliTimeInicial;
     
-    // Estagios da deteccao de desmaio
-    private Boolean flagEstagio1;
-    private Boolean flagEstagio2;
-    private Boolean flagEstagio3;
-    private Integer contPrecisao;
-     
-    Float x, y, z;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     
-    private String TAG = "logs";
- 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_acelerometro);
+    static String TAG = "AcelerometroActivity";
+    
+    private long initialTime;
+	
+	private SensorManager sensorManager;
+	static String file1,file2,file3;
+	static FileOutputStream fout1, fout2, fout3;
+	public static File FILEPATH;
+	private float[] mGravs = new float[3];
+
+
+	public volatile Thread pauseThread;
+	public static boolean alive;
+
+	public IBinder onBind(Intent i) {
+		return null;
+	}
+
+    
+    public void onCreate() {
+        super.onCreate();
+        initialTime = System.currentTimeMillis();
+		Log.e(TAG, "onCreate");
+
+		FILEPATH = new File(Environment.getExternalStorageDirectory().getPath()+"/TeddySensing/");
+		FILEPATH.mkdirs();
+		Log.e(TAG, "Path is :" +FILEPATH);
+		alive = true;
+		prepareFiles();
+		 miliTimeInicial = System.currentTimeMillis();
+      //  setContentView(R.layout.activity_acelerometro);
          
-        textViewTimer = (TextView) findViewById(R.id.txtValorTimer);
-        textViewX = (TextView) findViewById(R.id.txtValorX);
-        textViewY = (TextView) findViewById(R.id.txtValorY);
-        textViewZ = (TextView) findViewById(R.id.txtValorZ);
-        textViewVetor = (TextView) findViewById(R.id.txtValorVetor);
-        textViewDetail = (TextView) findViewById(R.id.text_view_detail);
-        textViewDesmaio = (TextView) findViewById(R.id.text_view_desmaio);
-         
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        
-        /**TODO: RAWLINSON - N�O PRECISA DESSE BOTAO...
-        Button btnCriarArquivo = (Button) findViewById(R.id.btnGerarArquivo);
-        btnCriarArquivo.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				CriaArquivosLog(x, y, z);
-			}
-		});
-		**/
-        
-        /********************************************************************************
-         *						HEURISTICA DE DETEC��O DE DESMAIO						*
-         ********************************************************************************/
-        // Inicializando constantes...
-        flagEstagio1 = false;
-        flagEstagio2 = false;
-        flagEstagio3 = false;
-        contPrecisao = 0;
-         
-        // Obtendo instante inicial do log...
-        miliTimeInicial = System.currentTimeMillis();
+      //  textViewX = (TextView) findViewById(R.id.txtValorX);
+      //  textViewY = (TextView) findViewById(R.id.txtValorY);
+      //  textViewZ = (TextView) findViewById(R.id.txtValorZ);
+     //   textViewDetail = (TextView) findViewById(R.id.text_view_detail);
+      
     }
-       
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
-    }
-     
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mSensorManager.unregisterListener(this);
-    }
-     
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-    }
- 
+    public void prepareFiles(){
+		//create a new file for gyro
+		sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);	
+		sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),  SensorManager.SENSOR_DELAY_FASTEST);		
+
+		//create a new file for accelorometer
+		try {
+			Log.e("Log","Write");
+			file1 = FILEPATH+"/"+getCurrentTimeStamp()+"-accl.txt";
+			fout1 = new FileOutputStream(file1,true);
+		} catch (IOException e) {
+			Log.e("IOError",e.toString());
+		}
+		//set up recorder
+/*		bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,RECORDER_CHANNELS,RECORDER_AUDIO_ENCODING);
+		AUDIO_RECORDER_FILE_EXT_WAV = FILEPATH+"/"+getCurrentTimeStamp()+".wav";
+		AUDIO_RECORDER_TEMP_FILE = FILEPATH+"/"+getCurrentTimeStamp()+"-temp.raw"; 			
+		startRecording();*/
+	}
+          
+   
     @Override
     public void onSensorChanged(SensorEvent event) {
-        x = event.values[0];
-        y = event.values[1];
-        z = event.values[2];
+    	float[] values_accel = new float[3];		
 		
-		// Instante de tempo que o log foi gerado...
-		double miliTimeAtual = (System.currentTimeMillis() - miliTimeInicial) / 1000.0;
-		
-		// Calculando os modulos resultantes dos eixos x, y e z
-		double moduloVetorAceleracao = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
+		//long pastTime = actualTime - initialTime;
+		long pastTime = initialTime;
+		String string;
+		 double miliTimeAtual = (System.currentTimeMillis() - miliTimeInicial) / 1000.0;
+		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+			values_accel = event.values;
+			for (int i=0;i<3;i++) mGravs[i] = event.values[i];
+			float x = values_accel[0]; //Acceleration force along the x axis (including gravity).
+			float y = values_accel[1]; //Acceleration force along the y axis (including gravity).
+			float z = values_accel[2]; //Acceleration force along the z axis (including gravity).
+			try {
+				string = ""+pastTime+" "+x+" "+y+" "+z+"\n";
+				fout1.write(string.getBytes());
+				fout1.flush();
+			} catch (IOException e) {
+				Log.e("IOError",e.toString());
+			}
+			   CriaArquivosLog(miliTimeAtual, x, y, z);
+		}
+       /*  Float x = event.values[0];
+        Float y = event.values[1];
+        Float z = event.values[2];
         
-        /**TODO: Rawlinson - Comentado tempor�riamente...
-        Log.d(TAG, "X: "+x.toString());
+       Log.d(TAG, "X: "+x.toString());
         Log.d(TAG, "Y: "+y.toString());
-        Log.d(TAG, "Z: "+z.toString());
-        **/
-         
-        textViewTimer.setText("Timer: " + miliTimeAtual);
-        textViewX.setText("Posicao X: " + x.intValue() + " Float: " + x);
-        textViewY.setText("Posicao Y: " + y.intValue() + " Float: " + y);
-        textViewZ.setText("Posicao Z: " + z.intValue() + " Float: " + z);
-        textViewVetor.setText("Vetor Aceleracao: " + Double.toString(moduloVetorAceleracao));
-         
-        if(y < 0) { // O dispositivo esta de cabeca pra baixo
+        Log.d(TAG, "Z: "+z.toString());*/
+        
+         /*
+        Os valores ocilam de -10 a 10.
+        Quanto maior o valor de X mais ele ta caindo para a esquerda - Positivo Esqueda 
+        Quanto menor o valor de X mais ele ta caindo para a direita  - Negativo Direita
+        Se o valor de  X for 0 ent�o o celular ta em p� - Nem Direita Nem Esquerda
+        Se o valor de Y for 0 ent�o o cel ta "deitado"
+         Se o valor de Y for negativo ent�o ta de cabe�a pra baixo, ent�o quanto menor y mais ele ta inclinando pra ir pra baixo
+        Se o valor de Z for 0 ent�o o dispositivo esta reto na horizontal.
+        Quanto maioro o valor de Z Mais ele esta inclinado para frente
+        Quanto menor o valor de Z Mais ele esta inclinado para traz.
+        */
+    /*    textViewX.setText("Posi��o X: " + x.intValue() + " Float: " + x);
+        textViewY.setText("Posi��o Y: " + y.intValue() + " Float: " + y);
+        textViewZ.setText("Posi��o Z: " + z.intValue() + " Float: " + z);
+        long pastTime = initialTime;
+		String string;
+		
+        if(y < 0) { // O dispositivo esta de cabe�a pra baixo
             if(x > 0)  
                 textViewDetail.setText("Virando para ESQUERDA ficando INVERTIDO");
             if(x < 0)  
@@ -134,94 +146,128 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
                 textViewDetail.setText("Virando para ESQUERDA ");
             if(x < 0)  
                 textViewDetail.setText("Virando para DIREITA ");
-        }
         
-        /********************************************************************************
-         *						HEURISTICA DE DETECCAO DE DESMAIO						*
-         ********************************************************************************/
-        if(moduloVetorAceleracao <= 6.0)
-        {
-            flagEstagio1 = true;
-            
-            // Obter tempo em milisegundos... para estimar com mais precisao o processo de queda...
-            //mintime = System.currentTimeMillis();
-        }
-
-        if(flagEstagio1 == true)
-        {
-        	textViewDesmaio.setText("");
-        	
-        	contPrecisao++;
-        	if(moduloVetorAceleracao >= 13.5)
-        	{
-        		flagEstagio2 = true;
-        	}
-        }
+	        try {
+				string = ""+pastTime+" "+x+" "+y+" "+z+"\n";
+				fout1.write(string.getBytes());
+				fout1.flush();
+			} catch (IOException e) {
+				Log.e("IOError",e.toString());
+			}
+        }*/
+    }
+    
+   /* protected void onResume() {
         
-        if(flagEstagio1 == true && flagEstagio2 == true)
-        {
-        	// Verificar se o cara apagou... atraves de uma margem de erro em relacao a normal 9,8 
-        	
-        	flagEstagio3 = true;
-        	// exibir alert da larissa...
-        	textViewDesmaio.setText("***************** DESMAIO DETECTADO *****************");
-	        
-        	contPrecisao = 0;
-        	flagEstagio1 = false;
-        	flagEstagio2 = false;
-        	flagEstagio3 = false;
-        }
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+     
+    protected void onPause() {
+        
+        mSensorManager.unregisterListener(this);
+    }
+    */
+ 
 
-		if( contPrecisao > 10)
-		{
-		    contPrecisao = 0;
-		    flagEstagio1 = false;
-		    flagEstagio2 = false;
-		    flagEstagio3 = false;
+public void CriaArquivosLog(Double miliTimeAtual, Float x, Float y, Float z )
+{
+        try
+        {
+                /** BEGIN: Salvando os dados do acelerometro em um log dentro do CARD SD... **/
+                File arq = new File(Environment.getExternalStorageDirectory(), "logs.txt");
+                    FileOutputStream escrever = new FileOutputStream(arq, true);
+                    
+                    escrever.write(x.toString().getBytes());
+                    escrever.write(";".getBytes());
+                    escrever.write(y.toString().getBytes());
+                    escrever.write(";".getBytes());
+                    escrever.write(z.toString().getBytes());
+                    escrever.write("\n".getBytes());
+                    escrever.flush();
+                    escrever.close();
+                /** END: Salvando os dados do acelerometro em um log dentro do CARD SD... **/
+                    
+                /** BEGIN: Gerando grafico de analise do acelerometro **/
+                File arqLog = new File(Environment.getExternalStorageDirectory(), "logGraficoAcelerometro.txt");
+                    FileOutputStream escreverLog = new FileOutputStream(arqLog, true);
+                    
+                    // Instante de tempo que o log foi gerado...
+                    escreverLog.write(Double.toString(miliTimeAtual).getBytes());
+                    escreverLog.write(";".getBytes());
+
+                    // Calculando os modulos resultantes dos eixos x, y e z
+                    double moduloVetorAceleracao = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
+                    escreverLog.write(Double.toString(moduloVetorAceleracao).getBytes());
+                    escreverLog.write("\n".getBytes());
+                    
+                    escreverLog.flush();
+                    escreverLog.close();
+                /** END: Gerando grafico de analise do acelerometro **/
+            }
+        catch (IOException e)
+        {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+            }
+}
+    @Override
+	public void onDestroy() {
+		Log.e(TAG, "onDestroy");
+		alive=false;
+		finishFiles();
+		pauseThread = null;
+
+	}
+
+	public void finishFiles(){
+		
+		sensorManager.unregisterListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));				
+
+		try{
+			//	fout2.flush();
+			fout2.close();
+			//	fout1.flush();
+			fout1.close();
+			//	fout3.flush();
+			fout3.close();
+		}catch(IOException e){
+			Log.e("IOException","Error on closing files");
 		}
-        
-        // Gerando os logs do sistema...
-        CriaArquivosLog(miliTimeAtual, x, y, z, moduloVetorAceleracao);
+
+	//	stopRecording();
+	}
+
+	public void onStart(Intent intent, int startid) {
+		Log.e(TAG, "onStart");
+		if(pauseThread == null){
+			pauseThread = new Thread(new Runnable() {
+				public void run() {
+					while(alive){
+						try {
+							Thread.sleep(60000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						finishFiles();
+						prepareFiles();
+					}
+					finishFiles();
+				}
+			});
+			pauseThread.start();
+		}
+	}
+
+     
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
-    public void CriaArquivosLog(Double miliTimeAtual, Float x, Float y, Float z, Double moduloVetorAceleracao)
-    {
-    	try
-    	{
-    		/** BEGIN: Salvando os dados do acelerometro em um log dentro do CARD SD... **/
-    		File arq = new File(Environment.getExternalStorageDirectory(), "logs.txt");
-			FileOutputStream escrever = new FileOutputStream(arq, true);
-			
-			escrever.write(x.toString().getBytes());
-			escrever.write(";".getBytes());
-			escrever.write(y.toString().getBytes());
-			escrever.write(";".getBytes());
-			escrever.write(z.toString().getBytes());
-			escrever.write("\n".getBytes());
-			escrever.flush();
-			escrever.close();
-    		/** END: Salvando os dados do acelerometro em um log dentro do CARD SD... **/
-			
-    		/** BEGIN: Gerando grafico de analise do acelerometro **/
-    		File arqLog = new File(Environment.getExternalStorageDirectory(), "logGraficoAcelerometro.txt");
-			FileOutputStream escreverLog = new FileOutputStream(arqLog, true);
-			
-			// Instante de tempo que o log foi gerado...
-			escreverLog.write(Double.toString(miliTimeAtual).getBytes());
-			escreverLog.write(";".getBytes());
-
-			// Calculando os modulos resultantes dos eixos x, y e z
-			escreverLog.write(Double.toString(moduloVetorAceleracao).getBytes());
-			escreverLog.write("\n".getBytes());
-			
-			escreverLog.flush();
-			escreverLog.close();
-    		/** END: Gerando grafico de analise do acelerometro **/
-		}
-    	catch (IOException e)
-    	{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
+	public static String getCurrentTimeStamp() {
+		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+		Date now = new Date();
+		String strDate = sdfDate.format(now);
+		return strDate;
+	}
 }
