@@ -50,9 +50,9 @@ public class InicialActivity extends Activity {
 }
 
 private void toggleService(){
-   Intent intent=new Intent(getApplicationContext(), AcelerometroActivity_.class);
+   Intent intent=new Intent(getApplicationContext(), AcelerometroActivity.class);
    // Try to stop the service if it is already running
-   intent.addCategory(AcelerometroActivity_.TAG);
+   intent.addCategory(AcelerometroActivity.TAG);
    if(!stopService(intent)){
        startService(intent);
    }
@@ -65,8 +65,8 @@ public void startSensing(){
 }
 
 private void stopSensing(){
-	Intent intent=new Intent(getApplicationContext(), AcelerometroActivity_.class);
-	intent.addCategory(AcelerometroActivity_.TAG);
+	Intent intent=new Intent(getApplicationContext(), AcelerometroActivity.class);
+	intent.addCategory(AcelerometroActivity.TAG);
 	stopService(intent);
 	mNotifyManager =
 	        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

@@ -86,17 +86,17 @@ public class GiroscopioActivity extends Activity implements SensorEventListener{
         }
         timestamp = event.timestamp;
         float[] deltaRotationMatrix = new float[9];
-        SensorManager.getRotationMatrixFromVector(deltaRotationMatrix, deltaRotationVector);
-        // User code should concatenate the delta rotation we computed with the current rotation
-        // in order to get the updated rotation.
-        // rotationCurrent = rotationCurrent * deltaRotationMatrix;
+       //SensorManager.getRotationMatrixFromVector(deltaRotationMatrix, deltaRotationVector);
+       //User code should concatenate the delta rotation we computed with the current rotation
+       //in order to get the updated rotation.
+       //rotationCurrent = rotationCurrent * deltaRotationMatrix;
 		x = event.values[0];
         y = event.values[1];
         z = event.values[2];
 
-        txtValorX.setText("Posicao X: " + Float.toString(axisX));
+        /*txtValorX.setText("Posicao X: " + Float.toString(axisX));
         txtValorY.setText("Posicao Y: " + axisY);
-        txtValorZ.setText("Posicao Z: " + axisZ);
+        txtValorZ.setText("Posicao Z: " + axisZ);*/
 		
 		//CriaArquivosLog(event.values[0], event.values[1], event.values[2]);
 		
