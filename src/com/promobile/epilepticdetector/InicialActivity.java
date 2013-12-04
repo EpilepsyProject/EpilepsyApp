@@ -32,8 +32,8 @@ public class InicialActivity extends Activity {
          super.onCreate(savedInstanceState);
          setContentView(R.layout.activity_inicial);
          
-         start=(Button)findViewById(R.id.btnBackgroundOn); //bot�o ligar
-         stop=(Button)findViewById(R.id.btnBackgroundOff); //bot�o desligar
+         start=(Button)findViewById(R.id.btnBackgroundOn); //botao ligar
+         stop=(Button)findViewById(R.id.btnBackgroundOff); //botao desligar
          start.setOnClickListener(new View.OnClickListener() {
              @Override
              public void onClick(View v) {                
@@ -47,12 +47,20 @@ public class InicialActivity extends Activity {
              public void onClick(View v) { 
              	stopSensing();}
              });        
+         
+         findViewById(R.id.btnUsarAcelerometro).setOnClickListener(new View.OnClickListener() {
+    		@Override
+        		public void onClick(View arg0) {
+        			Intent intent = new Intent(InicialActivity.this, AcelerometroActivity.class);
+        			startActivity(intent);
+        		}
+        	});
 }
 
 private void toggleService(){
-   Intent intent=new Intent(getApplicationContext(), AcelerometroActivity.class);
+   Intent intent=new Intent(getApplicationContext(), EpilepsyHeuristicService.class);
    // Try to stop the service if it is already running
-   intent.addCategory(AcelerometroActivity.TAG);
+   intent.addCategory(EpilepsyHeuristicService.TAG);
    if(!stopService(intent)){
        startService(intent);
    }
@@ -65,8 +73,8 @@ public void startSensing(){
 }
 
 private void stopSensing(){
-	Intent intent=new Intent(getApplicationContext(), AcelerometroActivity.class);
-	intent.addCategory(AcelerometroActivity.TAG);
+	Intent intent=new Intent(getApplicationContext(), EpilepsyHeuristicService.class);
+	intent.addCategory(EpilepsyHeuristicService.TAG);
 	stopService(intent);
 	mNotifyManager =
 	        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -77,7 +85,7 @@ private void stopSensing(){
 public void showNotification(){
 	mBuilder = new NotificationCompat.Builder(this);
 	mBuilder.setContentTitle("Epileptic Detector")
-	    .setContentText("Monitorando poss�vel ataque")
+	    .setContentText("Monitorando possível ataque")
 	    .setSmallIcon(R.drawable.hd);
 	Intent resultIntent = new Intent(this, MainActivity.class);
 	TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);

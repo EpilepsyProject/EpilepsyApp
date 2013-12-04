@@ -11,9 +11,9 @@
     tools:context=".AcelerometroActivity" >
 
     <TextView        
+        android:id="@+id/txtValorTimer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/txtValorTimer"
         android:text="Timer" />
 
     <TextView
@@ -43,20 +43,20 @@
     <TextView
         android:id="@+id/text_view_detail"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="text_view_detail" />
 
     <TextView
         android:id="@+id/text_view_desmaio"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <LinearLayout
-        android:id="@+id/chart_container"
-        android:layout_width="297dp"
         android:layout_height="wrap_content"
-        android:layout_weight="0.90"
-        android:orientation="vertical" >
+        android:text="text_view_desmaio" />
 
-    </LinearLayout>
+    <TextView
+        android:id="@+id/text_view_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30px"
+        android:text="text_view_status" />
 
 </LinearLayout>

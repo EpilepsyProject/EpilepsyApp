@@ -9,8 +9,8 @@ import android.widget.TabHost.TabSpec;
 public class MainActivity extends TabActivity {
 
     // TabSpec Names
-        private static final String TAB1 = "Início";
-        private static final String TAB2 = "Configurações";
+        private static final String TAB1 = "InÃ­cio";
+        private static final String TAB2 = "ConfiguraÃ§Ãµes";
       //  private static final String TAB3 = "Tab3";
 
         @Override

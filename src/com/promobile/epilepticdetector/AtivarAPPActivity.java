@@ -25,9 +25,9 @@ public class AtivarAPPActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_ativar_app);
-		   //botões de ativar e desativar o app
-  		start=(Button)findViewById(R.id.btnBackgroundOn); //botão ligar
-          stop=(Button)findViewById(R.id.btnBackgroundOff); //botão desligar
+		   //botï¿½es de ativar e desativar o app
+  		start=(Button)findViewById(R.id.btnBackgroundOn); //botï¿½o ligar
+          stop=(Button)findViewById(R.id.btnBackgroundOff); //botï¿½o desligar
           start.setOnClickListener(new View.OnClickListener() {
               @Override
               public void onClick(View v) {                
@@ -44,9 +44,9 @@ public class AtivarAPPActivity extends Activity {
 }
 
 private void toggleService(){
-    Intent intent=new Intent(getApplicationContext(), AcelerometroActivity.class);
+    Intent intent=new Intent(getApplicationContext(), EpilepsyHeuristicService.class);
     // Try to stop the service if it is already running
-    intent.addCategory(AcelerometroActivity.TAG);
+    intent.addCategory(EpilepsyHeuristicService.TAG);
     if(!stopService(intent)){
         startService(intent);
     }
@@ -59,8 +59,8 @@ public void startSensing(){
 }
 
 private void stopSensing(){
-	Intent intent=new Intent(getApplicationContext(), AcelerometroActivity.class);
-	intent.addCategory(AcelerometroActivity.TAG);
+	Intent intent=new Intent(getApplicationContext(), EpilepsyHeuristicService.class);
+	intent.addCategory(EpilepsyHeuristicService.TAG);
 	stopService(intent);
 	mNotifyManager =
 	        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -71,7 +71,7 @@ private void stopSensing(){
 public void showNotification(){
 	mBuilder = new NotificationCompat.Builder(this);
 	mBuilder.setContentTitle("Epileptic Detector")
-	    .setContentText("Monitorando possível ataque")
+	    .setContentText("Monitorando possï¿½vel ataque")
 	    .setSmallIcon(R.drawable.hd);
 	Intent resultIntent = new Intent(this, MainActivity.class);
 	TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);

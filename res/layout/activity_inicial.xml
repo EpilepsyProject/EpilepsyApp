@@ -41,5 +41,14 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textSize="16sp"
         android:textStyle="bold" />
-    
+
+	<Button
+	    android:id="@+id/btnUsarAcelerometro"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentLeft="true"
+	    android:layout_below="@+id/btnBackgroundOn"
+	    android:layout_marginTop="27dp"
+	    android:text="Usar o Acelerômetro" />
+	 
 </RelativeLayout>
