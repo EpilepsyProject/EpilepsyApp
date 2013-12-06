@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.TabHost;
 import android.widget.TabHost.TabContentFactory;
 import android.widget.TabHost.TabSpec;
@@ -23,7 +24,7 @@ public class InicialActivity extends Activity {
 	NotificationCompat.Builder mBuilder;
 	NotificationManager mNotifyManager;
 	String TAG = "MainActivity";
-	Button start, stop;
+	RadioButton start, stop;
 	int ID = 101;
 	
 	 @Override
@@ -32,22 +33,27 @@ public class InicialActivity extends Activity {
          super.onCreate(savedInstanceState);
          setContentView(R.layout.activity_inicial);
          
-         start=(Button)findViewById(R.id.btnBackgroundOn); //botao ligar
-         stop=(Button)findViewById(R.id.btnBackgroundOff); //botao desligar
+         start = (RadioButton) findViewById(R.id.btnBackgroundOn); //botao ligar
+         stop = (RadioButton) findViewById(R.id.btnBackgroundOff); //botao desligar
          start.setOnClickListener(new View.OnClickListener() {
              @Override
-             public void onClick(View v) {                
-             	startSensing();
-             	}
+             public void onClick(View v) {
+            	 	start.setChecked(true);
+            	 	stop.setChecked(false);
+          	 		startSensing();
+             	 }
              });
          
          
          stop.setOnClickListener(new View.OnClickListener() {
              @Override
              public void onClick(View v) { 
+         	 	start.setChecked(false);
+         	 	stop.setChecked(true);
              	stopSensing();}
              });        
          
+         //TODO: NAO REMOVER O BOTAO, POIS PARA DEBUGAR A HEURISTICA DE DESMAIO EH MAIS FACIL DEVIDO OS LOGS!!!!
          findViewById(R.id.btnUsarAcelerometro).setOnClickListener(new View.OnClickListener() {
     		@Override
         		public void onClick(View arg0) {
@@ -73,11 +79,10 @@ public void startSensing(){
 }
 
 private void stopSensing(){
-	Intent intent=new Intent(getApplicationContext(), EpilepsyHeuristicService.class);
+	Intent intent = new Intent(getApplicationContext(), EpilepsyHeuristicService.class);
 	intent.addCategory(EpilepsyHeuristicService.TAG);
 	stopService(intent);
-	mNotifyManager =
-	        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+	mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 	mNotifyManager.cancel(ID);
 	
 }
@@ -97,8 +102,7 @@ public void showNotification(){
 	            PendingIntent.FLAG_UPDATE_CURRENT
 	        );
 	mBuilder.setContentIntent(resultPendingIntent);
-	mNotifyManager =
-	        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+	mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 	mNotifyManager.notify(ID, mBuilder.build());	
          
      }

@@ -42,6 +42,7 @@
         android:textSize="16sp"
         android:textStyle="bold" />
 
+    <!-- TODO: NAO REMOVER O BOTAO, POIS PARA DEBUGAR A HEURISTICA DE DESMAIO EH MAIS FACIL DEVIDO OS LOGS!!!!-->
 	<Button
 	    android:id="@+id/btnUsarAcelerometro"
 	    android:layout_width="match_parent"
@@ -50,5 +51,5 @@
 	    android:layout_below="@+id/btnBackgroundOn"
 	    android:layout_marginTop="27dp"
 	    android:text="Usar o Acelerômetro" />
-	 
+	
 </RelativeLayout>

@@ -132,9 +132,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         textViewDesmaio = (TextView) findViewById(R.id.text_view_desmaio);
         textViewStatus = (TextView) findViewById(R.id.text_view_status);
 
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        
         /**TODO: RAWLINSON - NAO PRECISA DESSE BOTAO...
         Button btnCriarArquivo = (Button) findViewById(R.id.btnGerarArquivo);
         btnCriarArquivo.setOnClickListener(new View.OnClickListener() {
@@ -149,6 +146,9 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         /********************************************************************************
          *						HEURISTICA DE DETECCAO DE DESMAIO						*
          ********************************************************************************/
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        
         chaveNomeArquivoLog = getChaveArquivoLog();
         
         // Obtendo instante inicial do log...
