@@ -2,8 +2,6 @@ package com.promobile.epilepticdetector;
 
 import java.util.Stack;
 import android.app.AlertDialog;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,8 +16,6 @@ import android.net.Uri;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.Vibrator;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.widget.Button;
 
 public class EpilepsyHeuristicService extends Service implements SensorEventListener{

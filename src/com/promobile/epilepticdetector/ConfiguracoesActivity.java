@@ -29,30 +29,30 @@ public class ConfiguracoesActivity extends Activity {
 		//listview aponta para o id list do tipo ListView  
 		
    	 ListView listview = (ListView)findViewById(R.id.list1);                
-        //aqui é usado um ArrayAdapter para poder fazer com que telas diferentes sejam chamadas
-        //ao clicar em cada uma das opções do listview
-        mAdaptador = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, itens_config);
+        //aqui ï¿½ usado um ArrayAdapter para poder fazer com que telas diferentes sejam chamadas
+        //ao clicar em cada uma das opï¿½ï¿½es do listview
+        mAdaptador = new ArrayAdapter<String>(this,R.layout.list_view_itens, itens_config);
         listview.setAdapter(mAdaptador);                 
-        //início da função p/ chamar diferentes telas ao selecionar um item do listview
+        //inï¿½cio da funï¿½ï¿½o p/ chamar diferentes telas ao selecionar um item do listview
         listview.setOnItemClickListener(new OnItemClickListener() {  
              
         @Override  
         public void onItemClick(AdapterView<?> adapter, View view,  
                 int position, long id) {  
-            int pos = position;  //aqui recebe a posição de cada tab e seu id
-            if (pos == 0) {  //se a posição da tab selecionada for 0 (a primeira)
+            int pos = position;  //aqui recebe a posiï¿½ï¿½o de cada tab e seu id
+            if (pos == 0) {  //se a posiï¿½ï¿½o da tab selecionada for 0 (a primeira)
                     //chama a tela de alertas
                     //declara a chamada de telas
                 Intent intent = new Intent(ConfiguracoesActivity.this, AlertasActivity.class);  
                 startActivity(intent); //chama a tela AlertasActivity 
             }
-            if(pos == 1){  //se a posição da tab selecionada for 1 (a segunda)
+            if(pos == 1){  //se a posiï¿½ï¿½o da tab selecionada for 1 (a segunda)
                     //chama a tela de contatos
                     //declara a chamada de telas
                     Intent intent = new Intent(ConfiguracoesActivity.this, ContatosActivity.class);  
                 startActivity(intent); //chama a tela ContatosActivity
             }
-          /*  if(pos == 2){  //se a posição da tab selecionada for 2 (a terceira)
+          /*  if(pos == 2){  //se a posiï¿½ï¿½o da tab selecionada for 2 (a terceira)
                 //chama a tela de ativar app
                 //declara a chamada de telas
                 Intent intent = new Intent(ConfiguracoesActivity.this, AtivarAPPActivity.class);  

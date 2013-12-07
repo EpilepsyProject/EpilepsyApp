@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/RelativeLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#ff000000"
     tools:context=".TelaDesmaio" >
 
     <RadioGroup
@@ -13,7 +13,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/textView1"
-        android:layout_marginTop="31dp" >
+        android:layout_marginTop="31dp" 
+        android:textColor="#ffffffff">
 
         <RadioButton
             android:id="@+id/radio0"
@@ -22,7 +23,8 @@
             android:checked="true"
             android:text="@string/tempo5"
             android:textSize="13sp"
-        	android:textStyle="bold" />
+        	android:textStyle="bold" 
+        	android:textColor="#ffffffff"/>
 
         <RadioButton
             android:id="@+id/radio1"
@@ -30,7 +32,8 @@
             android:layout_height="wrap_content"
             android:text="@string/tempo10" 
             android:textSize="13sp"
-        	android:textStyle="bold"/>
+        	android:textStyle="bold"
+        	android:textColor="#ffffffff"/>
 
         <RadioButton
             android:id="@+id/radio2"
@@ -38,7 +41,8 @@
             android:layout_height="wrap_content"
             android:text="@string/tempo15"
             android:textSize="13sp"
-        	android:textStyle="bold" />
+        	android:textStyle="bold" 
+        	android:textColor="#ffffffff"/>
     </RadioGroup>
 
     <Button
@@ -52,7 +56,8 @@
         android:layout_marginRight="60dp"
         android:text="@string/salvar"
         android:textSize="13sp"
-        android:textStyle="bold" />
+        android:textStyle="bold" 
+        android:textColor="#ffffffff"/>
 
     <TextView
         android:id="@+id/textView1"
@@ -64,6 +69,6 @@
         android:text="@string/tempo"
         android:textSize="16sp"
         android:textStyle="bold"
-         />
+		android:textColor="#ffffffff"/>
 
 </RelativeLayout>
