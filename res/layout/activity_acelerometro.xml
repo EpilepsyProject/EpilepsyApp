@@ -35,6 +35,24 @@
         android:text="txtValorZ" />
 
     <TextView
+        android:id="@+id/txtValorXG"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="txtValorXG" />
+
+    <TextView
+        android:id="@+id/txtValorYG"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="txtValorYG" />
+
+    <TextView
+        android:id="@+id/txtValorZG"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="txtValorZG" />
+    
+    <TextView
         android:id="@+id/txtValorVetor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

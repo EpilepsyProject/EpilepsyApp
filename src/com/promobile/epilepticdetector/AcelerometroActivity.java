@@ -17,6 +17,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.ExifInterface;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -41,6 +42,9 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	private TextView textViewX;
     private TextView textViewY;
     private TextView textViewZ;
+	private TextView textViewXG;
+    private TextView textViewYG;
+    private TextView textViewZG;
     private TextView textViewVetor;
     private TextView textViewDetail;
     private TextView textViewDesmaio;
@@ -52,6 +56,8 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	Uri objNotification;
     Ringtone objRing;
     Button btnAlertDesmaio;
+
+    private Boolean flagGyroscopeAtivado = false;
     
     private Boolean flagEstagio1 = false;
     private Boolean flagEstagio2 = false;
@@ -77,7 +83,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	private final double LIMITE_PICO_INFERIOR = 8;
 	private final double LIMITE_PICO_SUPERIOR = 11;
 	private final int MARGEM_ERRO_TEMPO_ACELERACAO_DESACELERACAO = 200; // EM MILISEGUNDOS...
-	private final int MARGEM_ERRO_TEMPO_TOTAL_QUEDA_SINAL_ESTABILIZADO = 400; // EM MILISEGUNDOS...
+	private final int MARGEM_ERRO_TEMPO_TOTAL_QUEDA_SINAL_ESTABILIZADO = 450; // EM MILISEGUNDOS...
 	private final int MARGEN_ERRO_TEMPO_MINIMO_VALIDACAO_DESMAIO = 2000;
 	private final int MARGEN_ERRO_TEMPO_TOTAL_VALIDACAO_DESMAIO = 6000;
 	private final double MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO = 0.5;
@@ -89,13 +95,17 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	private final double MARGEM_ERRO_ACELERACAO_DESMAIO = 0.5;
 	int contadoMargemErroDesmaio = 0;
 	
-	private final int ID_EIXO_X_POSITIVO =  1;
-	private final int ID_EIXO_X_NEGATIVO = -1;
-	private final int ID_EIXO_Y_POSITIVO =  2;
-	private final int ID_EIXO_Y_NEGATIVO = -2;
-	private final int ID_EIXO_Z_POSITIVO =  3;
-	private final int ID_EIXO_Z_NEGATIVO = -3;
-	private final int QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO = 10;
+	private final int ID_EIXO_X = 1;
+	private final int ID_EIXO_Y = 2;
+	private final int ID_EIXO_Z = 3;
+	
+	private final int ID_EIXO_X_POSITIVO =  1 * ID_EIXO_X;
+	private final int ID_EIXO_X_NEGATIVO = -1 * ID_EIXO_X;
+	private final int ID_EIXO_Y_POSITIVO =  1 * ID_EIXO_Y;
+	private final int ID_EIXO_Y_NEGATIVO = -1 * ID_EIXO_Y;
+	private final int ID_EIXO_Z_POSITIVO =  1 * ID_EIXO_Z;
+	private final int ID_EIXO_Z_NEGATIVO = -1 * ID_EIXO_Z;
+	private final int QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO = 40;
 	Stack<Float> eixoNormalAceleracaoAntesX = new Stack<Float>();
 	Stack<Float> eixoNormalAceleracaoAntesY = new Stack<Float>();
 	Stack<Float> eixoNormalAceleracaoAntesZ = new Stack<Float>();
@@ -103,12 +113,19 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	Stack<Float> eixoNormalAceleracaoDepoisX = new Stack<Float>();
 	Stack<Float> eixoNormalAceleracaoDepoisY = new Stack<Float>();
 	Stack<Float> eixoNormalAceleracaoDepoisZ = new Stack<Float>();
+
+	private final double MARGEM_ERRO_MINIMO_GYROSCOPE = 4;
+	private double maxVariacaoGyroscopeEixoX = 0;
+	private double maxVariacaoGyroscopeEixoY = 0;
+	private double maxVariacaoGyroscopeEixoZ = 0;
 	
 	String chaveNomeArquivoLog = "";
      
     Float x, y, z;
+    Float xGiroscopio, yGiroscopio, zGiroscopio;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
+    private Sensor mGyroscope;
     
     private String TAG = "logs";
     
@@ -127,6 +144,9 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         textViewX = (TextView) findViewById(R.id.txtValorX);
         textViewY = (TextView) findViewById(R.id.txtValorY);
         textViewZ = (TextView) findViewById(R.id.txtValorZ);
+        textViewXG = (TextView) findViewById(R.id.txtValorXG);
+        textViewYG = (TextView) findViewById(R.id.txtValorYG);
+        textViewZG = (TextView) findViewById(R.id.txtValorZG);
         textViewVetor = (TextView) findViewById(R.id.txtValorVetor);
         textViewDetail = (TextView) findViewById(R.id.text_view_detail);
         textViewDesmaio = (TextView) findViewById(R.id.text_view_desmaio);
@@ -146,8 +166,11 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         /********************************************************************************
          *						HEURISTICA DE DETECCAO DE DESMAIO						*
          ********************************************************************************/
+        flagGyroscopeAtivado = false;
+
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mGyroscope = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         
         chaveNomeArquivoLog = getChaveArquivoLog();
         
@@ -159,6 +182,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
     protected void onResume() {
         super.onResume();
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+        mSensorManager.registerListener(this, mGyroscope, SensorManager.SENSOR_DELAY_GAME);
     }
      
     @Override
@@ -177,252 +201,352 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
     	x = event.values[0];
         y = event.values[1];
         z = event.values[2];
-    	
-		// Instante de tempo que o log foi gerado...
-        long timestampAtualSistema = System.currentTimeMillis();
-		double miliTimeAtual = (timestampAtualSistema - miliTimeInicial) / 1000.0;
-		
-		// Calculando os modulos resultantes dos eixos x, y e z
-		double moduloVetorAceleracao = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
-        
-    	// Atualizando array de amostragens da aceleracao...
-		if(arrayAmostragemAceleracao.size() >= QTD_TOTAL_AMOSTRAGEM_ACELERACAO)
-		{
-			arrayAmostragemAceleracao.pop();
-		}
-		arrayAmostragemAceleracao.add(0, moduloVetorAceleracao);
-		
-		/**************** BEGIN: COLETANDO DADOS DOS EIXOS... BASEADO NO HISTORICO PASSADO... ********************/
-		if(flagEstagio1 == false && flagEstagio2 == false && flagEstagio3 == false && flagEstagio4 == false)
-		{
-			int qtdAmostragemEixo = eixoNormalAceleracaoAntesX.size();
-			if(qtdAmostragemEixo >= QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO)
-			{
-				eixoNormalAceleracaoAntesX.pop();
-				eixoNormalAceleracaoAntesY.pop();
-				eixoNormalAceleracaoAntesZ.pop();
-			}
-			eixoNormalAceleracaoAntesX.add(0, x);
-			eixoNormalAceleracaoAntesY.add(0, y);
-			eixoNormalAceleracaoAntesZ.add(0, z);
-		}
-		else
-		{
-			int qtdAmostragemEixo = eixoNormalAceleracaoDepoisX.size();
-			if(qtdAmostragemEixo >= QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO)
-			{
-				eixoNormalAceleracaoDepoisX.pop();
-				eixoNormalAceleracaoDepoisY.pop();
-				eixoNormalAceleracaoDepoisZ.pop();
-			}
-			eixoNormalAceleracaoDepoisX.add(0, x);
-			eixoNormalAceleracaoDepoisY.add(0, y);
-			eixoNormalAceleracaoDepoisZ.add(0, z);
-		}
-		/**************** END: COLETANDO DADOS DOS EIXOS... BASEADO NO HISTORICO PASSADO... ********************/
-		
 
-    	textViewTimer.setText("Timer: " + miliTimeAtual);
-        textViewX.setText("Posicao X: " + x.intValue() + " Float: " + x);
-        textViewY.setText("Posicao Y: " + y.intValue() + " Float: " + y);
-        textViewZ.setText("Posicao Z: " + z.intValue() + " Float: " + z);
-        textViewVetor.setText("Vetor Aceleracao: " + Double.toString(moduloVetorAceleracao));
-         
-        // O codigo abaixo mostra a direcao na qual o celular esta dentro do plano cartesiano...
-//        if(y < 0) { // O dispositivo esta de cabeca pra baixo
-//            if(x > 0)  
-//                textViewDetail.setText("Virando para ESQUERDA ficando INVERTIDO");
-//            if(x < 0)  
-//                textViewDetail.setText("Virando para DIREITA ficando INVERTIDO");   
-//        } else {
-//            if(x > 0)  
-//                textViewDetail.setText("Virando para ESQUERDA ");
-//            if(x < 0)  
-//                textViewDetail.setText("Virando para DIREITA ");
-//        }
-        
-        /********************************************************************************
-         *						HEURISTICA DE DETECCAO DE DESMAIO						*
-         ********************************************************************************/
-        if(flagEstagio4 == true)
-        {
-        	double tempoTotalValidacaoDesmaio = timestampAtualSistema - timestampEstagio4;
-        	
-        	textViewDesmaio.setText("Picos Ultimo Desmaio..." + qtdTotalPicos);
-        	textViewDetail.setText(
-	    	        "\nEixo Normal Antes: " + obterEixoNormal(eixoNormalAceleracaoAntesX, eixoNormalAceleracaoAntesY, eixoNormalAceleracaoAntesZ) + 
-	    	        "\nEixo Normal Depois: " + obterEixoNormal(eixoNormalAceleracaoDepoisX, eixoNormalAceleracaoDepoisY, eixoNormalAceleracaoDepoisZ));
+        switch (event.sensor.getType()) {
+	    	case Sensor.TYPE_ACCELEROMETER:
+	            textViewX.setText("Posicao AX: " + x.intValue() + " Float: " + x);
+	            textViewY.setText("Posicao AY: " + y.intValue() + " Float: " + y);
+	            textViewZ.setText("Posicao AZ: " + z.intValue() + " Float: " + z);
+	        	
+	    		// Instante de tempo que o log foi gerado...
+	            long timestampAtualSistema = System.currentTimeMillis();
+	    		double miliTimeAtual = (timestampAtualSistema - miliTimeInicial) / 1000.0;
+	    		
+	    		// Calculando os modulos resultantes dos eixos x, y e z
+	    		double moduloVetorAceleracao = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
+	            
+	        	// Atualizando array de amostragens da aceleracao...
+	    		if(arrayAmostragemAceleracao.size() >= QTD_TOTAL_AMOSTRAGEM_ACELERACAO)
+	    		{
+	    			arrayAmostragemAceleracao.pop();
+	    		}
+	    		arrayAmostragemAceleracao.add(0, moduloVetorAceleracao);
+	    		
+	    		/**************** BEGIN: COLETANDO DADOS DOS EIXOS... BASEADO NO HISTORICO PASSADO... ********************/
+	    		if(flagEstagio1 == false && flagEstagio2 == false && flagEstagio3 == false && flagEstagio4 == false)
+	    		{
+	    			int qtdAmostragemEixo = eixoNormalAceleracaoAntesX.size();
+	    			if(qtdAmostragemEixo >= QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO)
+	    			{
+	    				eixoNormalAceleracaoAntesX.pop();
+	    				eixoNormalAceleracaoAntesY.pop();
+	    				eixoNormalAceleracaoAntesZ.pop();
+	    			}
+	    			eixoNormalAceleracaoAntesX.add(0, x);
+	    			eixoNormalAceleracaoAntesY.add(0, y);
+	    			eixoNormalAceleracaoAntesZ.add(0, z);
+	    		}
+	    		else
+	    		{
+	    			int qtdAmostragemEixo = eixoNormalAceleracaoDepoisX.size();
+	    			if(qtdAmostragemEixo >= QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO)
+	    			{
+	    				eixoNormalAceleracaoDepoisX.pop();
+	    				eixoNormalAceleracaoDepoisY.pop();
+	    				eixoNormalAceleracaoDepoisZ.pop();
+	    			}
+	    			eixoNormalAceleracaoDepoisX.add(0, x);
+	    			eixoNormalAceleracaoDepoisY.add(0, y);
+	    			eixoNormalAceleracaoDepoisZ.add(0, z);
+	    		}
+	    		/**************** END: COLETANDO DADOS DOS EIXOS... BASEADO NO HISTORICO PASSADO... ********************/
+	    		
 
-        	if(tempoTotalValidacaoDesmaio > MARGEN_ERRO_TEMPO_MINIMO_VALIDACAO_DESMAIO)
-        	{
-	        	if(tempoTotalValidacaoDesmaio < MARGEN_ERRO_TEMPO_TOTAL_VALIDACAO_DESMAIO)
-	        	{
-	        		// Verificar se houve alguma oscilação no acelerometro... caso contrario o cara apagou mesmo... :P
-	        		double mediaAmostralAceleracao = Math.abs(obterMediaVariacaoAceleracao());
-	    	        if(mediaAmostralAceleracao > MARGEM_ERRO_ACELERACAO_DESMAIO)
-	        		{
-	    	        	contadoMargemErroDesmaio++;
-	        		}
-	    	        
-	    	        if(contadoMargemErroDesmaio > MARGEM_ERRO_CONTADOR_VARIACOES_DESMAIO)
-	    	        {
-	    	        	textViewStatus.setText(textViewStatus.getText() + "\n - DESMAIO CANCELADO!!!! A pessoal se mexeu...");
-	
-	    	        	textViewStatus.setText(
-	    	        	textViewStatus.getText() + 
-	    				"\n" + intervaloEstagio1e2 + 
-	    				"\n" + intervaloEstagio2e3 + 
-	    				"\n" + intervaloEstagio1e3 + 
-	    				"\n" + moduloAceleracaoEstagio1 + 
-	    				"\n" + moduloAceleracaoEstagio2 
-	    	        	);
-	    	        	
-	    	        	resetarVariaveisMonitoramento();
-	    	        }
-	        	}
-	        	else
-	        	{
-	        		int eixoNormalAntes = obterEixoNormal(eixoNormalAceleracaoAntesX, eixoNormalAceleracaoAntesY, eixoNormalAceleracaoAntesZ);
-	        		int eixoNormalDepois = obterEixoNormal(eixoNormalAceleracaoDepoisX, eixoNormalAceleracaoDepoisY, eixoNormalAceleracaoDepoisZ);
-	        		
-	        		// A condicao abaixo verifica se a pessoa estava de pé e deitou ou virou... ou seja, a pessoa não está na mesma posicao antes do impacto.
-	        		if(eixoNormalAntes != eixoNormalDepois && Math.abs(eixoNormalAntes) != Math.abs(eixoNormalDepois))
-	        		{
-		        		textViewStatus.setText(textViewStatus.getText() + "\n - DESMAIO DETECTADO");
-		
-		            	textViewStatus.setText(
-		            	textViewStatus.getText() + 
-		    			"\n" + intervaloEstagio1e2 + 
-		    			"\n" + intervaloEstagio2e3 + 
-		    			"\n" + intervaloEstagio1e3 + 
-		    			"\n" + moduloAceleracaoEstagio1 + 
-		    			"\n" + moduloAceleracaoEstagio2
-		            	);
-		        		
-		        		// Exibindo alerta de desmaio...
-		        		showDialogDesmaio();
-			        	
-			        	resetarVariaveisMonitoramento();
-	        		}
-	        		else
-	        		{
-	    	        	textViewStatus.setText(textViewStatus.getText() + "\n - DESMAIO CANCELADO!!!! A pessoa esta na mesma posicao...");
-	
-	    	        	textViewStatus.setText(
-	    	        	textViewStatus.getText() + 
-	    				"\n" + intervaloEstagio1e2 + 
-	    				"\n" + intervaloEstagio2e3 + 
-	    				"\n" + intervaloEstagio1e3 + 
-	    				"\n" + moduloAceleracaoEstagio1 + 
-	    				"\n" + moduloAceleracaoEstagio2 
-	    	        	);
-	    	        	
-	    	        	resetarVariaveisMonitoramento();
-	        		}
-	        	}
-        	}
-        	else
-        	{
-        		contadoMargemErroDesmaio = 0;
-        	}
-        }
-        else
-        {
+	        	textViewTimer.setText("Timer: " + miliTimeAtual);
+	            textViewVetor.setText("Vetor Aceleracao: " + Double.toString(moduloVetorAceleracao));
+            	textViewDetail.setText(
+    	    	        "\nEixo Normal Antes: " + obterEixoNormal(eixoNormalAceleracaoAntesX, eixoNormalAceleracaoAntesY, eixoNormalAceleracaoAntesZ) + 
+    	    	        "\nEixo Normal Depois: " + obterEixoNormal(eixoNormalAceleracaoDepoisX, eixoNormalAceleracaoDepoisY, eixoNormalAceleracaoDepoisZ));
+ 	             
+	            // O codigo abaixo mostra a direcao na qual o celular esta dentro do plano cartesiano...
+//	            if(y < 0) { // O dispositivo esta de cabeca pra baixo
+//	                if(x > 0)  
+//	                    textViewDetail.setText("Virando para ESQUERDA ficando INVERTIDO");
+//	                if(x < 0)  
+//	                    textViewDetail.setText("Virando para DIREITA ficando INVERTIDO");   
+//	            } else {
+//	                if(x > 0)  
+//	                    textViewDetail.setText("Virando para ESQUERDA ");
+//	                if(x < 0)  
+//	                    textViewDetail.setText("Virando para DIREITA ");
+//	            }
+	            
+	            /********************************************************************************
+	             *						HEURISTICA DE DETECCAO DE DESMAIO						*
+	             ********************************************************************************/
+	            if(flagEstagio4 == true)
+	            {
+	            	double tempoTotalValidacaoDesmaio = timestampAtualSistema - timestampEstagio4;
+	            	
+	            	textViewDesmaio.setText("Picos Ultimo Desmaio..." + qtdTotalPicos + " Eixo Normal Antes: " + obterEixoNormal(eixoNormalAceleracaoAntesX, eixoNormalAceleracaoAntesY, eixoNormalAceleracaoAntesZ) + 
+    	    	        "\nEixo Normal Depois: " + obterEixoNormal(eixoNormalAceleracaoDepoisX, eixoNormalAceleracaoDepoisY, eixoNormalAceleracaoDepoisZ));
 
-        	textViewDetail.setText(
-	    	        "\nEixo Normal Antes: " + obterEixoNormal(eixoNormalAceleracaoAntesX, eixoNormalAceleracaoAntesY, eixoNormalAceleracaoAntesZ) + 
-	    	        "\nEixo Normal Depois: " + obterEixoNormal(eixoNormalAceleracaoDepoisX, eixoNormalAceleracaoDepoisY, eixoNormalAceleracaoDepoisZ));
-
-        	if(moduloVetorAceleracao <= LIMITE_PICO_INFERIOR)
-            {
-        		if(flagContagemPicos == false)
-        		{
-        			qtdTotalPicos += 1;
-        			flagContagemPicos = true;
-        		}
-        		
-        		if(moduloVetorAceleracao < moduloAceleracaoEstagio1)
-        		{
-	                // Obter tempo em milisegundos... para estimar com mais precisao o processo de queda...
-	                if(flagEstagio1 == false)
+	            	if(tempoTotalValidacaoDesmaio > MARGEN_ERRO_TEMPO_MINIMO_VALIDACAO_DESMAIO)
+	            	{
+	    	        	if(tempoTotalValidacaoDesmaio < MARGEN_ERRO_TEMPO_TOTAL_VALIDACAO_DESMAIO)
+	    	        	{
+	    	        		// Verificar se houve alguma oscilação no acelerometro... caso contrario o cara apagou mesmo... :P
+	    	        		double mediaAmostralAceleracao = Math.abs(obterMediaVariacaoAceleracao());
+	    	    	        if(mediaAmostralAceleracao > MARGEM_ERRO_ACELERACAO_DESMAIO)
+	    	        		{
+	    	    	        	contadoMargemErroDesmaio++;
+	    	        		}
+	    	    	        
+	    	    	        if(contadoMargemErroDesmaio > MARGEM_ERRO_CONTADOR_VARIACOES_DESMAIO)
+	    	    	        {
+	    	    	        	textViewStatus.setText(textViewStatus.getText() + "\n - DESMAIO CANCELADO!!!! A pessoal se mexeu...");
+	    	
+	    	    	        	textViewStatus.setText(
+	    	    	        	textViewStatus.getText() + 
+	    	    				"\n" + maxVariacaoGyroscopeEixoX + 
+	    	    				"\n" + maxVariacaoGyroscopeEixoY + 
+	    	    				"\n" + maxVariacaoGyroscopeEixoZ + 
+	    	    				"\n" + intervaloEstagio1e2 + 
+	    	    				"\n" + intervaloEstagio2e3 + 
+	    	    				"\n" + intervaloEstagio1e3 + 
+	    	    				"\n" + moduloAceleracaoEstagio1 + 
+	    	    				"\n" + moduloAceleracaoEstagio2 
+	    	    	        	);
+	    	    	        	
+	    	    	        	resetarVariaveisMonitoramento();
+	    	    	        }
+	    	        	}
+	    	        	else
+	    	        	{
+	    	        		int eixoNormalAntes = obterEixoNormal(eixoNormalAceleracaoAntesX, eixoNormalAceleracaoAntesY, eixoNormalAceleracaoAntesZ);
+	    	        		int eixoNormalDepois = obterEixoNormal(eixoNormalAceleracaoDepoisX, eixoNormalAceleracaoDepoisY, eixoNormalAceleracaoDepoisZ);
+	    	        		
+	    	        		// A condicao abaixo verifica se a pessoa estava de pé e deitou ou virou... ou seja, a pessoa não está na mesma posicao antes do impacto.
+	    	        		if(eixoNormalAntes != eixoNormalDepois && Math.abs(eixoNormalAntes) != Math.abs(eixoNormalDepois))
+	    	        		{
+	    	        			Boolean flagAtivarAlarteDesmaio = true;
+	    	        			
+	    	        			// Verificando se houve alguma variacao angular no giroscopio...
+	    	        			if(flagGyroscopeAtivado)
+	    	        			{
+    	        					switch (Math.abs(eixoNormalAntes)) {
+    	        						case ID_EIXO_X:
+    	        							if(maxVariacaoGyroscopeEixoY > MARGEM_ERRO_MINIMO_GYROSCOPE || maxVariacaoGyroscopeEixoZ > MARGEM_ERRO_MINIMO_GYROSCOPE)
+    	        							{
+    	        								flagAtivarAlarteDesmaio = true;
+    	        							}
+    	        							else
+    	        							{
+    	        								flagAtivarAlarteDesmaio = false;
+    	        							}
+	    	        			    	break;
+    	        						case ID_EIXO_Y:
+    	        							if(maxVariacaoGyroscopeEixoX > MARGEM_ERRO_MINIMO_GYROSCOPE || maxVariacaoGyroscopeEixoZ > MARGEM_ERRO_MINIMO_GYROSCOPE)
+    	        							{
+    	        								flagAtivarAlarteDesmaio = true;
+    	        							}
+    	        							else
+    	        							{
+    	        								flagAtivarAlarteDesmaio = false;
+    	        							}
+	    	        			    	break;
+    	        						case ID_EIXO_Z:
+    	        							if(maxVariacaoGyroscopeEixoX > MARGEM_ERRO_MINIMO_GYROSCOPE || maxVariacaoGyroscopeEixoY > MARGEM_ERRO_MINIMO_GYROSCOPE)
+    	        							{
+    	        								flagAtivarAlarteDesmaio = true;
+    	        							}
+    	        							else
+    	        							{
+    	        								flagAtivarAlarteDesmaio = false;
+    	        							}
+	    	        			    	break;
+    	        					}
+	    	        			}
+	    	        			
+	    	        			if(flagAtivarAlarteDesmaio)
+	    	        			{
+		    		        		textViewStatus.setText(textViewStatus.getText() + "\n - DESMAIO DETECTADO");
+		    		
+		    		            	textViewStatus.setText(
+		    		            	textViewStatus.getText() + 
+		    	    				"\n" + maxVariacaoGyroscopeEixoX + 
+		    	    				"\n" + maxVariacaoGyroscopeEixoY + 
+		    	    				"\n" + maxVariacaoGyroscopeEixoZ + 
+		    		    			"\n" + intervaloEstagio1e2 + 
+		    		    			"\n" + intervaloEstagio2e3 + 
+		    		    			"\n" + intervaloEstagio1e3 + 
+		    		    			"\n" + moduloAceleracaoEstagio1 + 
+		    		    			"\n" + moduloAceleracaoEstagio2
+		    		            	);
+		    		        		
+		    		        		// Exibindo alerta de desmaio...
+		    		        		showDialogDesmaio();
+		    			        	
+		    			        	resetarVariaveisMonitoramento();
+	    	        			}
+	    	        			else
+	    	        			{
+		    	    	        	textViewStatus.setText(textViewStatus.getText() + "\n - DESMAIO CANCELADO!!!! A pessoa nao caiu no chao... :P");
+		    	    		    	
+		    	    	        	textViewStatus.setText(
+		    	    	        	textViewStatus.getText() + 
+		    	    				"\n" + maxVariacaoGyroscopeEixoX + 
+		    	    				"\n" + maxVariacaoGyroscopeEixoY + 
+		    	    				"\n" + maxVariacaoGyroscopeEixoZ + 
+		    	    				"\n" + intervaloEstagio1e2 + 
+		    	    				"\n" + intervaloEstagio2e3 + 
+		    	    				"\n" + intervaloEstagio1e3 + 
+		    	    				"\n" + moduloAceleracaoEstagio1 + 
+		    	    				"\n" + moduloAceleracaoEstagio2 
+		    	    	        	);
+		    	    	        	
+		    	    	        	resetarVariaveisMonitoramento();
+	    	        			}
+	    	        		}
+	    	        		else
+	    	        		{
+	    	    	        	textViewStatus.setText(textViewStatus.getText() + "\n - DESMAIO CANCELADO!!!! A pessoa esta na mesma posicao...");
+	    	
+	    	    	        	textViewStatus.setText(
+	    	    	        	textViewStatus.getText() + 
+	    	    				"\n" + maxVariacaoGyroscopeEixoX + 
+	    	    				"\n" + maxVariacaoGyroscopeEixoY + 
+	    	    				"\n" + maxVariacaoGyroscopeEixoZ + 
+	    	    				"\n" + intervaloEstagio1e2 + 
+	    	    				"\n" + intervaloEstagio2e3 + 
+	    	    				"\n" + intervaloEstagio1e3 + 
+	    	    				"\n" + moduloAceleracaoEstagio1 + 
+	    	    				"\n" + moduloAceleracaoEstagio2 
+	    	    	        	);
+	    	    	        	
+	    	    	        	resetarVariaveisMonitoramento();
+	    	        		}
+	    	        	}
+	            	}
+	            	else
+	            	{
+	            		contadoMargemErroDesmaio = 0;
+	            	}
+	            }
+	            else
+	            {
+	            	if(moduloVetorAceleracao <= LIMITE_PICO_INFERIOR)
 	                {
-	            		timestampEstagio1 = timestampAtualSistema; // Nao deve ser inicializado o tempo inicial do estagio 1 ao identificar picos menores...
+	            		if(flagContagemPicos == false)
+	            		{
+	            			qtdTotalPicos += 1;
+	            			flagContagemPicos = true;
+	            		}
+	            		
+	            		if(moduloVetorAceleracao < moduloAceleracaoEstagio1)
+	            		{
+	    	                // Obter tempo em milisegundos... para estimar com mais precisao o processo de queda...
+	    	                if(flagEstagio1 == false)
+	    	                {
+	    	            		timestampEstagio1 = timestampAtualSistema; // Nao deve ser inicializado o tempo inicial do estagio 1 ao identificar picos menores...
+	    	                }
+	    	
+	    	                flagEstagio1 = true;
+	    	                moduloAceleracaoEstagio1 = moduloVetorAceleracao;
+	    	                
+	    	                textViewStatus.setText("\n Novo Desmaio... \n - ESTAGIO_1");
+	            		}
 	                }
-	
-	                flagEstagio1 = true;
-	                moduloAceleracaoEstagio1 = moduloVetorAceleracao;
+	         		
+	                if(flagEstagio1 == true)
+	                {
+	                	// Verificar se o sinal do acelerometro estabilizou... atraves de uma margem de erro em relacao a normal 9,8 
+	        	        double mediaAmostralAceleracao = Math.abs(obterMediaVariacaoAceleracao());
+	        	        if(mediaAmostralAceleracao <= MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO && flagEstagio2 == false) // Verificar se o sinal do acelerometro estabilizou...
+	        	        {
+	        	        	resetarVariaveisMonitoramento();
+	        	        }
+
+	        	        if(moduloVetorAceleracao >= LIMITE_PICO_SUPERIOR)
+	                	{
+	        	        	flagContagemPicos = false;    	        	
+	        	        	if(moduloVetorAceleracao >= moduloAceleracaoEstagio2)
+	        	        	{
+	    	                	flagEstagio2 = true;
+	    	            		timestampEstagio2 = timestampAtualSistema;
+	    	            		intervaloEstagio1e2 = timestampEstagio2 - timestampEstagio1;
+	    	
+	    	            		moduloAceleracaoEstagio2 = moduloVetorAceleracao;
+	    	                    
+	    	            		textViewStatus.setText(textViewStatus.getText() + "\n - ESTAGIO_2");
+	        	        	}
+	                	}
+	                }
+
+	                if(flagEstagio2 == true)
+	                {
+	                	// Verificar se o cara apagou... atraves de uma margem de erro em relacao a normal 9,8 
+	        	        double mediaAmostralAceleracao = Math.abs(obterMediaVariacaoAceleracao());
+	        	        if(mediaAmostralAceleracao <= MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO)
+	        	        {
+	        	        	if(flagEstagio3 == false)
+	        	        	{
+	        	        		textViewStatus.setText(textViewStatus.getText() + "\n - ESTAGIO_3");
+	        	        	}
+	        	        	
+	        	        	flagEstagio3 = true;
+	        	        	timestampEstagio3 = timestampAtualSistema;
+	        	        	intervaloEstagio2e3 = timestampEstagio3 - timestampEstagio2;
+	        	        	intervaloEstagio1e3 = timestampEstagio3 - timestampEstagio1;
+	        	        }
+	                }
 	                
-	                textViewStatus.setText("\n Novo Desmaio... \n - ESTAGIO_1");
-        		}
-            }
-     		
-            if(flagEstagio1 == true)
-            {
-            	// Verificar se o sinal do acelerometro estabilizou... atraves de uma margem de erro em relacao a normal 9,8 
-    	        double mediaAmostralAceleracao = Math.abs(obterMediaVariacaoAceleracao());
-    	        if(mediaAmostralAceleracao <= MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO && flagEstagio2 == false) // Verificar se o sinal do acelerometro estabilizou...
-    	        {
-    	        	resetarVariaveisMonitoramento();
-    	        }
+	                if(flagEstagio3 == true)
+	                {
+	                	// Obtendo amplitude de aceleracao entre o menor pico e o maior pico...
+	                	double amplitudeAceleracao = moduloAceleracaoEstagio2 - moduloAceleracaoEstagio1;
+	                	
+	                	if(amplitudeAceleracao > MARGEM_ERRO_AMPLITUDE_ACELERACAO)
+	                	{
+	                		if(intervaloEstagio1e2 >= MARGEM_ERRO_TEMPO_ACELERACAO_DESACELERACAO && intervaloEstagio1e3 >= MARGEM_ERRO_TEMPO_TOTAL_QUEDA_SINAL_ESTABILIZADO && qtdTotalPicos >= QTD_MINIMA_PICOS_DESMAIO)
+	                		{
+	    	            		flagEstagio4 = true;
+	    	            		timestampEstagio4 = timestampAtualSistema;
+	    	                    
+	    	                    textViewStatus.setText(textViewStatus.getText() + "\n - VALIDANDO POSSIVEL DESMAIO");
+	                		}
+	                    	else
+	                    	{
+	                    		resetarVariaveisMonitoramento();
+	                    	}
+	                	}
+	                }
+	            }
 
-    	        if(moduloVetorAceleracao >= LIMITE_PICO_SUPERIOR)
-            	{
-    	        	flagContagemPicos = false;    	        	
-    	        	if(moduloVetorAceleracao >= moduloAceleracaoEstagio2)
-    	        	{
-	                	flagEstagio2 = true;
-	            		timestampEstagio2 = timestampAtualSistema;
-	            		intervaloEstagio1e2 = timestampEstagio2 - timestampEstagio1;
-	
-	            		moduloAceleracaoEstagio2 = moduloVetorAceleracao;
-	                    
-	            		textViewStatus.setText(textViewStatus.getText() + "\n - ESTAGIO_2");
-    	        	}
-            	}
-            }
-
-            if(flagEstagio2 == true)
-            {
-            	// Verificar se o cara apagou... atraves de uma margem de erro em relacao a normal 9,8 
-    	        double mediaAmostralAceleracao = Math.abs(obterMediaVariacaoAceleracao());
-    	        if(mediaAmostralAceleracao <= MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO)
-    	        {
-    	        	if(flagEstagio3 == false)
-    	        	{
-    	        		textViewStatus.setText(textViewStatus.getText() + "\n - ESTAGIO_3");
-    	        	}
-    	        	
-    	        	flagEstagio3 = true;
-    	        	timestampEstagio3 = timestampAtualSistema;
-    	        	intervaloEstagio2e3 = timestampEstagio3 - timestampEstagio2;
-    	        	intervaloEstagio1e3 = timestampEstagio3 - timestampEstagio1;
-    	        }
-            }
-            
-            if(flagEstagio3 == true)
-            {
-            	// Obtendo amplitude de aceleracao entre o menor pico e o maior pico...
-            	double amplitudeAceleracao = moduloAceleracaoEstagio2 - moduloAceleracaoEstagio1;
-            	
-            	if(amplitudeAceleracao > MARGEM_ERRO_AMPLITUDE_ACELERACAO)
-            	{
-            		if(intervaloEstagio1e2 >= MARGEM_ERRO_TEMPO_ACELERACAO_DESACELERACAO && intervaloEstagio1e3 >= MARGEM_ERRO_TEMPO_TOTAL_QUEDA_SINAL_ESTABILIZADO && qtdTotalPicos >= QTD_MINIMA_PICOS_DESMAIO)
-            		{
-	            		flagEstagio4 = true;
-	            		timestampEstagio4 = timestampAtualSistema;
-	                    
-	                    textViewStatus.setText(textViewStatus.getText() + "\n - VALIDANDO POSSIVEL DESMAIO");
-            		}
-                	else
-                	{
-                		resetarVariaveisMonitoramento();
-                	}
-            	}
-            }
-        }
-
-        // Gerando os logs do sistema...
-        //TODO: CriaArquivosLog(miliTimeAtual, x, y, z, moduloVetorAceleracao);
+	            // Gerando os logs do sistema...
+	            //TODO: CriaArquivosLog(miliTimeAtual, x, y, z, moduloVetorAceleracao);
+	    	break;
+	    	
+	    	case Sensor.TYPE_GYROSCOPE:
+	    		flagGyroscopeAtivado = true;
+	    		
+	    		if(flagEstagio1 == true || flagEstagio2 == true || flagEstagio3 == true || flagEstagio4 == true)
+	    		{
+	    			double moduloX = Math.abs(x);
+	    			double moduloY = Math.abs(y);
+	    			double moduloZ = Math.abs(z);
+	    			
+	    			if(moduloX > maxVariacaoGyroscopeEixoX)
+	    			{
+	    				maxVariacaoGyroscopeEixoX = moduloX;
+	    			}
+	    			
+	    			if(moduloY > maxVariacaoGyroscopeEixoY)
+	    			{
+	    				maxVariacaoGyroscopeEixoY = moduloY;
+	    			}
+	    			
+	    			if(moduloZ > maxVariacaoGyroscopeEixoZ)
+	    			{
+	    				maxVariacaoGyroscopeEixoZ = moduloZ;
+	    			}
+	    		}
+    			
+	            textViewXG.setText("Posicao GX: " + x.intValue() + " Float: " + x);
+	            textViewYG.setText("Posicao GY: " + y.intValue() + " Float: " + y);
+	            textViewZG.setText("Posicao GZ: " + z.intValue() + " Float: " + z);
+	    	break;
+    	}
     }
     
     // Esta funcao retorna a porcentagem media de variacao da aceleracao... Ex.: -0.21, 0.50, 0.01, etc
@@ -453,6 +577,11 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
     	eixoNormalAceleracaoDepoisX.clear();
     	eixoNormalAceleracaoDepoisY.clear();
     	eixoNormalAceleracaoDepoisZ.clear();
+    	
+    	flagGyroscopeAtivado = false;
+    	maxVariacaoGyroscopeEixoX = 0;
+    	maxVariacaoGyroscopeEixoY = 0;
+    	maxVariacaoGyroscopeEixoZ = 0;
     }
     
     // Esta funcao retorna a porcentagem media de variacao da aceleracao... Ex.: -0.21, 0.50, 0.01, etc
