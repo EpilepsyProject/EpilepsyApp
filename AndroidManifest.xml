@@ -71,7 +71,7 @@
         </activity>
 
         <service
-            android:name="com.promobile.epilepticdetector.AcelerometroActivity"
+            android:name="com.promobile.epilepticdetector.EpilepsyHeuristicService"
             android:enabled="true" />
 
         <activity

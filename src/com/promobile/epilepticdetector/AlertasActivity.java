@@ -10,7 +10,7 @@ public class AlertasActivity extends Activity {
 
 	//Spinner spinner = (Spinner) findViewById(R.id.spinner1);
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_alertas);
 		Button button = (Button) findViewById(R.id.button1);		
@@ -18,7 +18,7 @@ public class AlertasActivity extends Activity {
 		button.setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-				Toast.makeText(getApplicationContext(), "Configuração de alertas salvo!",
+				Toast.makeText(getApplicationContext(), "ConfiguraÃ§Ã£o de alertas salvo!",
 						Toast.LENGTH_SHORT).show();								
 			}
 		});

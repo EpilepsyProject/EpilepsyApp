@@ -1,18 +1,11 @@
 package com.promobile.epilepticdetector;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.text.SimpleDateFormat;
 import java.util.Stack;
-
-import android.R.array;
+import android.app.AlertDialog;
+import android.app.Service;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -20,33 +13,15 @@ import android.hardware.SensorManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Environment;
+import android.os.IBinder;
 import android.os.Vibrator;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
-public class AcelerometroActivity extends Activity implements SensorEventListener{
+public class EpilepsyHeuristicService extends Service implements SensorEventListener{
 
-	private long miliTimeInicial;
-	private TextView textViewTimer;
-	private TextView textViewX;
-    private TextView textViewY;
-    private TextView textViewZ;
-    private TextView textViewVetor;
-    private TextView textViewDetail;
-    private TextView textViewDesmaio;
-    private TextView textViewStatus;
-    
     /************* Estagios da deteccao de desmaio ******************/
+	private long miliTimeInicial;
 
     // Iniciando objetos de musica do android...
 	Uri objNotification;
@@ -110,67 +85,52 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     
-    private String TAG = "logs";
+    static String TAG = "EpilepsyHeuristicService";
     
 	// Intervalo em milisegundos
 	private final int INTERVAL = 1000;
 	
 	// Duração em milisegundos
 	private final int DURATION = 60000;
- 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_acelerometro);
-         
-        textViewTimer = (TextView) findViewById(R.id.txtValorTimer);
-        textViewX = (TextView) findViewById(R.id.txtValorX);
-        textViewY = (TextView) findViewById(R.id.txtValorY);
-        textViewZ = (TextView) findViewById(R.id.txtValorZ);
-        textViewVetor = (TextView) findViewById(R.id.txtValorVetor);
-        textViewDetail = (TextView) findViewById(R.id.text_view_detail);
-        textViewDesmaio = (TextView) findViewById(R.id.text_view_desmaio);
-        textViewStatus = (TextView) findViewById(R.id.text_view_status);
+    //******** End: Estagios da deteccao de desmaio
+    
+	public IBinder onBind(Intent i) {
+		return null;
+	}
 
-        /**TODO: RAWLINSON - NAO PRECISA DESSE BOTAO...
-        Button btnCriarArquivo = (Button) findViewById(R.id.btnGerarArquivo);
-        btnCriarArquivo.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				CriaArquivosLog(x, y, z);
-			}
-		});
-		**/
-        
+    
+    public void onCreate()
+    {
         /********************************************************************************
          *						HEURISTICA DE DETECCAO DE DESMAIO						*
          ********************************************************************************/
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        
-        chaveNomeArquivoLog = getChaveArquivoLog();
-        
         // Obtendo instante inicial do log...
         miliTimeInicial = System.currentTimeMillis();
-    }
-       
-    @Override
-    protected void onResume() {
-        super.onResume();
+        
+		// Inicializando o servico...
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+
+        // Criando o Servico...
+        super.onCreate();
     }
-     
+    
     @Override
-    protected void onPause() {
-        super.onPause();
-        mSensorManager.unregisterListener(this);
-    }
-     
+	public void onDestroy() {
+		// Destroindo o servico...
+		mSensorManager.unregisterListener(this);
+		
+		super.onDestroy();
+	}
+
+	public void onStart(Intent intent, int startid) {
+	}
+
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
- 
+    
     @Override
     public void onSensorChanged(SensorEvent event)
     {
@@ -222,25 +182,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 		/**************** END: COLETANDO DADOS DOS EIXOS... BASEADO NO HISTORICO PASSADO... ********************/
 		
 
-    	textViewTimer.setText("Timer: " + miliTimeAtual);
-        textViewX.setText("Posicao X: " + x.intValue() + " Float: " + x);
-        textViewY.setText("Posicao Y: " + y.intValue() + " Float: " + y);
-        textViewZ.setText("Posicao Z: " + z.intValue() + " Float: " + z);
-        textViewVetor.setText("Vetor Aceleracao: " + Double.toString(moduloVetorAceleracao));
-         
-        // O codigo abaixo mostra a direcao na qual o celular esta dentro do plano cartesiano...
-//        if(y < 0) { // O dispositivo esta de cabeca pra baixo
-//            if(x > 0)  
-//                textViewDetail.setText("Virando para ESQUERDA ficando INVERTIDO");
-//            if(x < 0)  
-//                textViewDetail.setText("Virando para DIREITA ficando INVERTIDO");   
-//        } else {
-//            if(x > 0)  
-//                textViewDetail.setText("Virando para ESQUERDA ");
-//            if(x < 0)  
-//                textViewDetail.setText("Virando para DIREITA ");
-//        }
-        
         /********************************************************************************
          *						HEURISTICA DE DETECCAO DE DESMAIO						*
          ********************************************************************************/
@@ -248,11 +189,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         {
         	double tempoTotalValidacaoDesmaio = timestampAtualSistema - timestampEstagio4;
         	
-        	textViewDesmaio.setText("Picos Ultimo Desmaio..." + qtdTotalPicos);
-        	textViewDetail.setText(
-	    	        "\nEixo Normal Antes: " + obterEixoNormal(eixoNormalAceleracaoAntesX, eixoNormalAceleracaoAntesY, eixoNormalAceleracaoAntesZ) + 
-	    	        "\nEixo Normal Depois: " + obterEixoNormal(eixoNormalAceleracaoDepoisX, eixoNormalAceleracaoDepoisY, eixoNormalAceleracaoDepoisZ));
-
         	if(tempoTotalValidacaoDesmaio > MARGEN_ERRO_TEMPO_MINIMO_VALIDACAO_DESMAIO)
         	{
 	        	if(tempoTotalValidacaoDesmaio < MARGEN_ERRO_TEMPO_TOTAL_VALIDACAO_DESMAIO)
@@ -266,17 +202,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	    	        
 	    	        if(contadoMargemErroDesmaio > MARGEM_ERRO_CONTADOR_VARIACOES_DESMAIO)
 	    	        {
-	    	        	textViewStatus.setText(textViewStatus.getText() + "\n - DESMAIO CANCELADO!!!! A pessoal se mexeu...");
-	
-	    	        	textViewStatus.setText(
-	    	        	textViewStatus.getText() + 
-	    				"\n" + intervaloEstagio1e2 + 
-	    				"\n" + intervaloEstagio2e3 + 
-	    				"\n" + intervaloEstagio1e3 + 
-	    				"\n" + moduloAceleracaoEstagio1 + 
-	    				"\n" + moduloAceleracaoEstagio2 
-	    	        	);
-	    	        	
 	    	        	resetarVariaveisMonitoramento();
 	    	        }
 	        	}
@@ -288,17 +213,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	        		// A condicao abaixo verifica se a pessoa estava de pé e deitou ou virou... ou seja, a pessoa não está na mesma posicao antes do impacto.
 	        		if(eixoNormalAntes != eixoNormalDepois && Math.abs(eixoNormalAntes) != Math.abs(eixoNormalDepois))
 	        		{
-		        		textViewStatus.setText(textViewStatus.getText() + "\n - DESMAIO DETECTADO");
-		
-		            	textViewStatus.setText(
-		            	textViewStatus.getText() + 
-		    			"\n" + intervaloEstagio1e2 + 
-		    			"\n" + intervaloEstagio2e3 + 
-		    			"\n" + intervaloEstagio1e3 + 
-		    			"\n" + moduloAceleracaoEstagio1 + 
-		    			"\n" + moduloAceleracaoEstagio2
-		            	);
-		        		
 		        		// Exibindo alerta de desmaio...
 		        		showDialogDesmaio();
 			        	
@@ -306,17 +220,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	        		}
 	        		else
 	        		{
-	    	        	textViewStatus.setText(textViewStatus.getText() + "\n - DESMAIO CANCELADO!!!! A pessoa esta na mesma posicao...");
-	
-	    	        	textViewStatus.setText(
-	    	        	textViewStatus.getText() + 
-	    				"\n" + intervaloEstagio1e2 + 
-	    				"\n" + intervaloEstagio2e3 + 
-	    				"\n" + intervaloEstagio1e3 + 
-	    				"\n" + moduloAceleracaoEstagio1 + 
-	    				"\n" + moduloAceleracaoEstagio2 
-	    	        	);
-	    	        	
 	    	        	resetarVariaveisMonitoramento();
 	        		}
 	        	}
@@ -328,11 +231,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         }
         else
         {
-
-        	textViewDetail.setText(
-	    	        "\nEixo Normal Antes: " + obterEixoNormal(eixoNormalAceleracaoAntesX, eixoNormalAceleracaoAntesY, eixoNormalAceleracaoAntesZ) + 
-	    	        "\nEixo Normal Depois: " + obterEixoNormal(eixoNormalAceleracaoDepoisX, eixoNormalAceleracaoDepoisY, eixoNormalAceleracaoDepoisZ));
-
         	if(moduloVetorAceleracao <= LIMITE_PICO_INFERIOR)
             {
         		if(flagContagemPicos == false)
@@ -351,8 +249,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	
 	                flagEstagio1 = true;
 	                moduloAceleracaoEstagio1 = moduloVetorAceleracao;
-	                
-	                textViewStatus.setText("\n Novo Desmaio... \n - ESTAGIO_1");
         		}
             }
      		
@@ -375,8 +271,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	            		intervaloEstagio1e2 = timestampEstagio2 - timestampEstagio1;
 	
 	            		moduloAceleracaoEstagio2 = moduloVetorAceleracao;
-	                    
-	            		textViewStatus.setText(textViewStatus.getText() + "\n - ESTAGIO_2");
     	        	}
             	}
             }
@@ -387,11 +281,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
     	        double mediaAmostralAceleracao = Math.abs(obterMediaVariacaoAceleracao());
     	        if(mediaAmostralAceleracao <= MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO)
     	        {
-    	        	if(flagEstagio3 == false)
-    	        	{
-    	        		textViewStatus.setText(textViewStatus.getText() + "\n - ESTAGIO_3");
-    	        	}
-    	        	
     	        	flagEstagio3 = true;
     	        	timestampEstagio3 = timestampAtualSistema;
     	        	intervaloEstagio2e3 = timestampEstagio3 - timestampEstagio2;
@@ -403,15 +292,12 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
             {
             	// Obtendo amplitude de aceleracao entre o menor pico e o maior pico...
             	double amplitudeAceleracao = moduloAceleracaoEstagio2 - moduloAceleracaoEstagio1;
-            	
             	if(amplitudeAceleracao > MARGEM_ERRO_AMPLITUDE_ACELERACAO)
             	{
             		if(intervaloEstagio1e2 >= MARGEM_ERRO_TEMPO_ACELERACAO_DESACELERACAO && intervaloEstagio1e3 >= MARGEM_ERRO_TEMPO_TOTAL_QUEDA_SINAL_ESTABILIZADO && qtdTotalPicos >= QTD_MINIMA_PICOS_DESMAIO)
             		{
 	            		flagEstagio4 = true;
 	            		timestampEstagio4 = timestampAtualSistema;
-	                    
-	                    textViewStatus.setText(textViewStatus.getText() + "\n - VALIDANDO POSSIVEL DESMAIO");
             		}
                 	else
                 	{
@@ -420,9 +306,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
             	}
             }
         }
-
-        // Gerando os logs do sistema...
-        //TODO: CriaArquivosLog(miliTimeAtual, x, y, z, moduloVetorAceleracao);
     }
     
     // Esta funcao retorna a porcentagem media de variacao da aceleracao... Ex.: -0.21, 0.50, 0.01, etc
@@ -554,47 +437,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
     	}
     }
 
-    public void CriaArquivosLog(Double miliTimeAtual, Float x, Float y, Float z, Double moduloVetorAceleracao)
-    {
-    	try
-    	{
-//    		/** BEGIN: Salvando os dados do acelerometro em um log dentro do CARD SD... **/
-//    		File arq = new File(Environment.getExternalStorageDirectory(), "logsDadosAcelerometro_" + chaveNomeArquivoLog + ".txt");
-//			FileOutputStream escrever = new FileOutputStream(arq, true);
-//			
-//			escrever.write(x.toString().getBytes());
-//			escrever.write(";".getBytes());
-//			escrever.write(y.toString().getBytes());
-//			escrever.write(";".getBytes());
-//			escrever.write(z.toString().getBytes());
-//			escrever.write("\n".getBytes());
-//			escrever.flush();
-//			escrever.close();
-//    		/** END: Salvando os dados do acelerometro em um log dentro do CARD SD... **/
-			
-    		/** BEGIN: Gerando grafico de analise do acelerometro **/
-    		File arqLog = new File(Environment.getExternalStorageDirectory(), "logGraficoModuloAceleracao_" + chaveNomeArquivoLog + ".txt");
-			FileOutputStream escreverLog = new FileOutputStream(arqLog, true);
-			
-			// Instante de tempo que o log foi gerado...
-			escreverLog.write(Double.toString(miliTimeAtual).getBytes());
-			escreverLog.write(";".getBytes());
-
-			// Calculando os modulos resultantes dos eixos x, y e z
-			escreverLog.write(Double.toString(moduloVetorAceleracao).getBytes());
-			escreverLog.write("\n".getBytes());
-			
-			escreverLog.flush();
-			escreverLog.close();
-    		/** END: Gerando grafico de analise do acelerometro **/
-		}
-    	catch (IOException e)
-    	{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
-
 	public void showDialogDesmaio()
 	{
         // Prepara o Dialog informando o título, mensagem e cria o Positive Button        
@@ -665,12 +507,5 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 		        } catch (Exception e) {}
 			}
 		});
-	}
-	
-	public static String getChaveArquivoLog() {
-		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyyMMddHHmmss");
-		Date now = new Date();
-		String strDate = sdfDate.format(now);
-		return strDate;
 	}
 }

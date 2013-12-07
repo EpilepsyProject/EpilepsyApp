@@ -9,9 +9,9 @@ import android.widget.Button;
 
 public class TelaDesmaio extends Activity {
  
-	// Intervalo em milisegundos
+		// Intervalo em milisegundos
 		private final int INTERVAL = 1000;
-		// DuraÁ„o em milisegundos
+		// Dura√ß√£o em milisegundos
 		private final int DURATION = 6000;
 
 		@Override
@@ -22,12 +22,12 @@ public class TelaDesmaio extends Activity {
 
 		public void showDialogClick(View v) {
 			
-			// Prepara o Dialog informando o tÌtulo, mensagem e cria o Positive Button        
+			// Prepara o Dialog informando o t√≠tulo, mensagem e cria o Positive Button        
 			AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
 	        alertBuilder.setTitle(R.string.title);
-	        alertBuilder.setMessage("Um possÌvel demaio foi detectado! Enviando SMS ao fim da contagem...");
+	        alertBuilder.setMessage("Um poss√≠vel demaio foi detectado! Enviando SMS ao fim da contagem...");
 	        
-	        // Aqui vocÍ pode definir a aÁ„o de clique do bot„o
+	        // Aqui voc√™ pode definir a a√ß√£o de clique do bot√£o
 	        alertBuilder.setPositiveButton("OK", null);
 	                
 	        // Criar o AlertDialog
@@ -36,15 +36,15 @@ public class TelaDesmaio extends Activity {
 	        alert.show();
 	        
 	        // Cria um objeto da classe CountDownTimer 
-	        // informando a duraÁ„o e o intervalo
+	        // informando a dura√ß√£o e o intervalo
 	        new CountDownTimer(DURATION, INTERVAL) {
 				
-				// A cada 1 segundo o onTick È invocado
+				// A cada 1 segundo o onTick √© invocado
 	        	@Override
 				public void onTick(long millisUntilFinished) {
-	        		// Pega o bot„o do Alert
+	        		// Pega o bot√£o do Alert
 					Button btn = alert.getButton(AlertDialog.BUTTON_POSITIVE);
-					// Formata o texto do bot„o com os segundos. 
+					// Formata o texto do bot√£o com os segundos. 
 					// Ex. OK (9)
 					btn.setText(("Cancelar envio de SMS? ("+(millisUntilFinished/INTERVAL)) + ")");
 				}
