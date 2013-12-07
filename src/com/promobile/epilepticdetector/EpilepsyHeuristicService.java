@@ -2,6 +2,8 @@ package com.promobile.epilepticdetector;
 
 import java.util.Stack;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,6 +18,8 @@ import android.net.Uri;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.Vibrator;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.widget.Button;
 
 public class EpilepsyHeuristicService extends Service implements SensorEventListener{
@@ -101,14 +105,34 @@ public class EpilepsyHeuristicService extends Service implements SensorEventList
     
     public void onCreate()
     {
-    	// Criando o Servico...
-        super.onCreate();
-        
         /********************************************************************************
          *						HEURISTICA DE DETECCAO DE DESMAIO						*
          ********************************************************************************/
         // Obtendo instante inicial do log...
         miliTimeInicial = System.currentTimeMillis();
+        
+		// Inicializando o servico...
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+
+        // Criando o Servico...
+        super.onCreate();
+    }
+    
+    @Override
+	public void onDestroy() {
+		// Destroindo o servico...
+		mSensorManager.unregisterListener(this);
+		
+		super.onDestroy();
+	}
+
+	public void onStart(Intent intent, int startid) {
+	}
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
     
     @Override
@@ -286,23 +310,6 @@ public class EpilepsyHeuristicService extends Service implements SensorEventList
             	}
             }
         }
-    }
-    
-    @Override
-	public void onDestroy() {
-		// Destroindo o servico...
-		mSensorManager.unregisterListener(this);
-	}
-
-	public void onStart(Intent intent, int startid) {
-		// Inicializando o servico...
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
-	}
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
     
     // Esta funcao retorna a porcentagem media de variacao da aceleracao... Ex.: -0.21, 0.50, 0.01, etc
