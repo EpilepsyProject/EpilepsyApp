@@ -31,7 +31,7 @@ public class ConfiguracoesActivity extends Activity {
    	 ListView listview = (ListView)findViewById(R.id.list1);                
         //aqui � usado um ArrayAdapter para poder fazer com que telas diferentes sejam chamadas
         //ao clicar em cada uma das op��es do listview
-        mAdaptador = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, itens_config);
+        mAdaptador = new ArrayAdapter<String>(this,R.layout.list_view_itens, itens_config);
         listview.setAdapter(mAdaptador);                 
         //in�cio da fun��o p/ chamar diferentes telas ao selecionar um item do listview
         listview.setOnItemClickListener(new OnItemClickListener() {  
