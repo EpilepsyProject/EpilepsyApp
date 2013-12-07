@@ -66,7 +66,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 
     private Boolean flagContagemPicos = false;
     private int qtdTotalPicos = 0;
-    private final int QTD_MINIMA_PICOS_DESMAIO = 4;
+    private final int QTD_MINIMA_PICOS_DESMAIO = 2;
     
     long timestampEstagio1 = 0;
 	long timestampEstagio2 = 0;
@@ -82,8 +82,8 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	
 	private final double LIMITE_PICO_INFERIOR = 8;
 	private final double LIMITE_PICO_SUPERIOR = 11;
-	private final int MARGEM_ERRO_TEMPO_ACELERACAO_DESACELERACAO = 200; // EM MILISEGUNDOS...
-	private final int MARGEM_ERRO_TEMPO_TOTAL_QUEDA_SINAL_ESTABILIZADO = 450; // EM MILISEGUNDOS...
+	private final int MARGEM_ERRO_TEMPO_ACELERACAO_DESACELERACAO = 50; // EM MILISEGUNDOS...
+	private final int MARGEM_ERRO_TEMPO_TOTAL_QUEDA_SINAL_ESTABILIZADO = 900; // EM MILISEGUNDOS...
 	private final int MARGEN_ERRO_TEMPO_MINIMO_VALIDACAO_DESMAIO = 2000;
 	private final int MARGEN_ERRO_TEMPO_TOTAL_VALIDACAO_DESMAIO = 6000;
 	private final double MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO = 0.5;
@@ -114,7 +114,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	Stack<Float> eixoNormalAceleracaoDepoisY = new Stack<Float>();
 	Stack<Float> eixoNormalAceleracaoDepoisZ = new Stack<Float>();
 
-	private final double MARGEM_ERRO_MINIMO_GYROSCOPE = 4;
+	private final double MARGEM_ERRO_MINIMO_GYROSCOPE = 2.5;
 	private double maxVariacaoGyroscopeEixoX = 0;
 	private double maxVariacaoGyroscopeEixoY = 0;
 	private double maxVariacaoGyroscopeEixoZ = 0;
@@ -295,18 +295,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	    	    	        if(contadoMargemErroDesmaio > MARGEM_ERRO_CONTADOR_VARIACOES_DESMAIO)
 	    	    	        {
 	    	    	        	textViewStatus.setText(textViewStatus.getText() + "\n - DESMAIO CANCELADO!!!! A pessoal se mexeu...");
-	    	
-	    	    	        	textViewStatus.setText(
-	    	    	        	textViewStatus.getText() + 
-	    	    				"\n" + maxVariacaoGyroscopeEixoX + 
-	    	    				"\n" + maxVariacaoGyroscopeEixoY + 
-	    	    				"\n" + maxVariacaoGyroscopeEixoZ + 
-	    	    				"\n" + intervaloEstagio1e2 + 
-	    	    				"\n" + intervaloEstagio2e3 + 
-	    	    				"\n" + intervaloEstagio1e3 + 
-	    	    				"\n" + moduloAceleracaoEstagio1 + 
-	    	    				"\n" + moduloAceleracaoEstagio2 
-	    	    	        	);
 	    	    	        	
 	    	    	        	resetarVariaveisMonitoramento();
 	    	    	        }
@@ -326,7 +314,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	    	        			{
     	        					switch (Math.abs(eixoNormalAntes)) {
     	        						case ID_EIXO_X:
-    	        							if(maxVariacaoGyroscopeEixoY > MARGEM_ERRO_MINIMO_GYROSCOPE || maxVariacaoGyroscopeEixoZ > MARGEM_ERRO_MINIMO_GYROSCOPE)
+    	        							if(maxVariacaoGyroscopeEixoY >= MARGEM_ERRO_MINIMO_GYROSCOPE || maxVariacaoGyroscopeEixoZ >= MARGEM_ERRO_MINIMO_GYROSCOPE)
     	        							{
     	        								flagAtivarAlarteDesmaio = true;
     	        							}
@@ -336,7 +324,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
     	        							}
 	    	        			    	break;
     	        						case ID_EIXO_Y:
-    	        							if(maxVariacaoGyroscopeEixoX > MARGEM_ERRO_MINIMO_GYROSCOPE || maxVariacaoGyroscopeEixoZ > MARGEM_ERRO_MINIMO_GYROSCOPE)
+    	        							if(maxVariacaoGyroscopeEixoX >= MARGEM_ERRO_MINIMO_GYROSCOPE || maxVariacaoGyroscopeEixoZ >= MARGEM_ERRO_MINIMO_GYROSCOPE)
     	        							{
     	        								flagAtivarAlarteDesmaio = true;
     	        							}
@@ -346,7 +334,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
     	        							}
 	    	        			    	break;
     	        						case ID_EIXO_Z:
-    	        							if(maxVariacaoGyroscopeEixoX > MARGEM_ERRO_MINIMO_GYROSCOPE || maxVariacaoGyroscopeEixoY > MARGEM_ERRO_MINIMO_GYROSCOPE)
+    	        							if(maxVariacaoGyroscopeEixoX >= MARGEM_ERRO_MINIMO_GYROSCOPE || maxVariacaoGyroscopeEixoY >= MARGEM_ERRO_MINIMO_GYROSCOPE)
     	        							{
     	        								flagAtivarAlarteDesmaio = true;
     	        							}
@@ -361,18 +349,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	    	        			if(flagAtivarAlarteDesmaio)
 	    	        			{
 		    		        		textViewStatus.setText(textViewStatus.getText() + "\n - DESMAIO DETECTADO");
-		    		
-		    		            	textViewStatus.setText(
-		    		            	textViewStatus.getText() + 
-		    	    				"\n" + maxVariacaoGyroscopeEixoX + 
-		    	    				"\n" + maxVariacaoGyroscopeEixoY + 
-		    	    				"\n" + maxVariacaoGyroscopeEixoZ + 
-		    		    			"\n" + intervaloEstagio1e2 + 
-		    		    			"\n" + intervaloEstagio2e3 + 
-		    		    			"\n" + intervaloEstagio1e3 + 
-		    		    			"\n" + moduloAceleracaoEstagio1 + 
-		    		    			"\n" + moduloAceleracaoEstagio2
-		    		            	);
 		    		        		
 		    		        		// Exibindo alerta de desmaio...
 		    		        		showDialogDesmaio();
@@ -383,18 +359,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	    	        			{
 		    	    	        	textViewStatus.setText(textViewStatus.getText() + "\n - DESMAIO CANCELADO!!!! A pessoa nao caiu no chao... :P");
 		    	    		    	
-		    	    	        	textViewStatus.setText(
-		    	    	        	textViewStatus.getText() + 
-		    	    				"\n" + maxVariacaoGyroscopeEixoX + 
-		    	    				"\n" + maxVariacaoGyroscopeEixoY + 
-		    	    				"\n" + maxVariacaoGyroscopeEixoZ + 
-		    	    				"\n" + intervaloEstagio1e2 + 
-		    	    				"\n" + intervaloEstagio2e3 + 
-		    	    				"\n" + intervaloEstagio1e3 + 
-		    	    				"\n" + moduloAceleracaoEstagio1 + 
-		    	    				"\n" + moduloAceleracaoEstagio2 
-		    	    	        	);
-		    	    	        	
 		    	    	        	resetarVariaveisMonitoramento();
 	    	        			}
 	    	        		}
@@ -402,18 +366,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	    	        		{
 	    	    	        	textViewStatus.setText(textViewStatus.getText() + "\n - DESMAIO CANCELADO!!!! A pessoa esta na mesma posicao...");
 	    	
-	    	    	        	textViewStatus.setText(
-	    	    	        	textViewStatus.getText() + 
-	    	    				"\n" + maxVariacaoGyroscopeEixoX + 
-	    	    				"\n" + maxVariacaoGyroscopeEixoY + 
-	    	    				"\n" + maxVariacaoGyroscopeEixoZ + 
-	    	    				"\n" + intervaloEstagio1e2 + 
-	    	    				"\n" + intervaloEstagio2e3 + 
-	    	    				"\n" + intervaloEstagio1e3 + 
-	    	    				"\n" + moduloAceleracaoEstagio1 + 
-	    	    				"\n" + moduloAceleracaoEstagio2 
-	    	    	        	);
-	    	    	        	
 	    	    	        	resetarVariaveisMonitoramento();
 	    	        		}
 	    	        	}
@@ -454,6 +406,8 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	        	        double mediaAmostralAceleracao = Math.abs(obterMediaVariacaoAceleracao());
 	        	        if(mediaAmostralAceleracao <= MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO && flagEstagio2 == false) // Verificar se o sinal do acelerometro estabilizou...
 	        	        {
+	        	        	textViewStatus.setText(textViewStatus.getText() + "\n - DESMAIO CANCELADO!!!! O sinal estabilizou e nao alcancou nenhum pico.");
+	        	        	
 	        	        	resetarVariaveisMonitoramento();
 	        	        }
 
@@ -507,6 +461,8 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	                		}
 	                    	else
 	                    	{
+	                    		textViewStatus.setText(textViewStatus.getText() + "\n - DESMAIO CANCELADO!!!! Nao passou no processo de validacao dos tempos [Estagio3]");
+	                    		
 	                    		resetarVariaveisMonitoramento();
 	                    	}
 	                	}
@@ -551,6 +507,20 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
     
     // Esta funcao retorna a porcentagem media de variacao da aceleracao... Ex.: -0.21, 0.50, 0.01, etc
     public void resetarVariaveisMonitoramento() {
+    	textViewStatus.setText(
+    	textViewStatus.getText() + 
+		"\n$" + maxVariacaoGyroscopeEixoX + 
+		"|" + maxVariacaoGyroscopeEixoY + 
+		"|" + maxVariacaoGyroscopeEixoZ + 
+		"\n$" + intervaloEstagio1e2 + 
+		"|" + intervaloEstagio2e3 + 
+		"|" + intervaloEstagio1e3 + 
+		"\n$" + moduloAceleracaoEstagio1 + 
+		"|" + moduloAceleracaoEstagio2 +
+		"\n$" + qtdTotalPicos + 
+		"|" + contadoMargemErroDesmaio 
+    	);
+
     	timestampEstagio1 = 0;
     	timestampEstagio2 = 0;
     	timestampEstagio3 = 0;
