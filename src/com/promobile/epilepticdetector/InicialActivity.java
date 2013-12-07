@@ -91,7 +91,7 @@ public void showNotification(){
 	mBuilder = new NotificationCompat.Builder(this);
 	mBuilder.setContentTitle("Epileptic Detector")
 	    .setContentText("Monitorando possível ataque")
-	    .setSmallIcon(R.drawable.hd);
+	    .setSmallIcon(R.drawable.ic_launcher);
 	Intent resultIntent = new Intent(this, MainActivity.class);
 	TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 	stackBuilder.addParentStack(MainActivity.class);
