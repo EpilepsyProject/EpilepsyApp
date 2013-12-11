@@ -28,8 +28,12 @@ import android.os.Vibrator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -168,6 +172,7 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
          ********************************************************************************/
         flagGyroscopeAtivado = false;
 
+		// Inicializando o servico...
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mGyroscope = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
@@ -176,6 +181,22 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         
         // Obtendo instante inicial do log...
         miliTimeInicial = System.currentTimeMillis();
+        
+        /** TODO: Criar uma notificacao no android... **/
+//    	NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//    	Intent notificationIntent = new Intent(this, AcelerometroActivity.class);
+//    	
+//    	PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+//    	
+//    	int icon = R.drawable.hd;
+//    	String tickerText="You have message...";
+//    	long when = System.currentTimeMillis();
+//    	
+//    	Notification notification = new Notification(icon, tickerText, when);
+//    	String contentTitle = "Title";
+//    	String contentText = "This is your message...";
+//    	notification.setLatestEventInfo(this, contentTitle, contentText, pendingIntent);
+//    	notificationManager.notify(123, notification);
     }
        
     @Override
