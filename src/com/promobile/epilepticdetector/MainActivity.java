@@ -94,7 +94,7 @@ public class MainActivity extends Activity  {
         alert.show();
         
         // Iniciando objetos de musica do android...
-    	objNotification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+    	objNotification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
         objRing = RingtoneManager.getRingtone(getApplicationContext(), objNotification);
 
         // Pega o botão do Alert

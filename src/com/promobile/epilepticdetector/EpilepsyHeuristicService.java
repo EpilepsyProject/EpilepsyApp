@@ -38,7 +38,7 @@ public class EpilepsyHeuristicService extends Service implements SensorEventList
 
     private Boolean flagContagemPicos = false;
     private int qtdTotalPicos = 0;
-    private final int QTD_MINIMA_PICOS_DESMAIO = 2;
+    private final int QTD_MINIMA_PICOS_DESMAIO = 1;
     
     long timestampEstagio1 = 0;
 	long timestampEstagio2 = 0;
@@ -52,19 +52,20 @@ public class EpilepsyHeuristicService extends Service implements SensorEventList
 	double moduloAceleracaoEstagio1 = ACELERACAO_NORMAL_GRAVIDADE; // Aceleracao normal da gravidade... 
 	double moduloAceleracaoEstagio2 = 0;
 	
-	private final double LIMITE_PICO_INFERIOR = 8;
+	private final double LIMITE_PICO_INFERIOR = 7;
 	private final double LIMITE_PICO_SUPERIOR = 11;
-	private final int MARGEM_ERRO_TEMPO_ACELERACAO_DESACELERACAO = 50; // EM MILISEGUNDOS...
-	private final int MARGEM_ERRO_TEMPO_TOTAL_QUEDA_SINAL_ESTABILIZADO = 900; // EM MILISEGUNDOS...
-	private final int MARGEN_ERRO_TEMPO_MINIMO_VALIDACAO_DESMAIO = 2000;
+	private final int MARGEM_ERRO_TEMPO_ACELERACAO_DESACELERACAO = 30; // EM MILISEGUNDOS...
+	private final int MARGEM_ERRO_DESACELERACAO_SINAL_ESTABILIZADO = 200;
+	private final int MARGEM_ERRO_TEMPO_TOTAL_QUEDA_SINAL_ESTABILIZADO = 400; // EM MILISEGUNDOS...
+	private final int MARGEN_ERRO_TEMPO_MINIMO_VALIDACAO_DESMAIO = 1500;
 	private final int MARGEN_ERRO_TEMPO_TOTAL_VALIDACAO_DESMAIO = 6000;
-	private final double MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO = 0.5;
-	private final double MARGEM_ERRO_AMPLITUDE_ACELERACAO = 8;
-	private final int QTD_TOTAL_AMOSTRAGEM_ACELERACAO = 45;
+	private final double MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO = 0.8;
+	private final double MARGEM_ERRO_AMPLITUDE_ACELERACAO = 4;
+	private final int QTD_TOTAL_AMOSTRAGEM_ACELERACAO = 30;
 	Stack<Double> arrayAmostragemAceleracao = new Stack<Double>();
 
 	private final int MARGEM_ERRO_CONTADOR_VARIACOES_DESMAIO = 5;
-	private final double MARGEM_ERRO_ACELERACAO_DESMAIO = 0.5;
+	private final double MARGEM_ERRO_ACELERACAO_DESMAIO = MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO;
 	int contadoMargemErroDesmaio = 0;
 	
 	private final int ID_EIXO_X = 1;
@@ -100,6 +101,10 @@ public class EpilepsyHeuristicService extends Service implements SensorEventList
     private Sensor mGyroscope;
     
     static String TAG = "EpilepsyHeuristicService";
+
+    // Iniciando objetos de musica do android...
+	Uri objNotification;
+    Ringtone objRing;
     //******** End: Estagios da deteccao de desmaio
     
 	public IBinder onBind(Intent i) {
@@ -121,6 +126,11 @@ public class EpilepsyHeuristicService extends Service implements SensorEventList
         
         // Obtendo instante inicial do log...
         miliTimeInicial = System.currentTimeMillis();
+
+        /** BEGIN: Iniciando objetos de musica do android... **/
+    	objNotification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        objRing = RingtoneManager.getRingtone(getApplicationContext(), objNotification);
+        /** BEGIN: Iniciando objetos de musica do android... **/
 
         // Criando o Servico...
         super.onCreate();
@@ -150,7 +160,7 @@ public class EpilepsyHeuristicService extends Service implements SensorEventList
     @Override
     public void onSensorChanged(SensorEvent event)
     {
-    	x = event.values[0];
+        x = event.values[0];
         y = event.values[1];
         z = event.values[2];
 
@@ -171,20 +181,7 @@ public class EpilepsyHeuristicService extends Service implements SensorEventList
 	    		arrayAmostragemAceleracao.add(0, moduloVetorAceleracao);
 	    		
 	    		/**************** BEGIN: COLETANDO DADOS DOS EIXOS... BASEADO NO HISTORICO PASSADO... ********************/
-	    		if(flagEstagio1 == false && flagEstagio2 == false && flagEstagio3 == false && flagEstagio4 == false)
-	    		{
-	    			int qtdAmostragemEixo = eixoNormalAceleracaoAntesX.size();
-	    			if(qtdAmostragemEixo >= QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO)
-	    			{
-	    				eixoNormalAceleracaoAntesX.pop();
-	    				eixoNormalAceleracaoAntesY.pop();
-	    				eixoNormalAceleracaoAntesZ.pop();
-	    			}
-	    			eixoNormalAceleracaoAntesX.add(0, x);
-	    			eixoNormalAceleracaoAntesY.add(0, y);
-	    			eixoNormalAceleracaoAntesZ.add(0, z);
-	    		}
-	    		else
+	    		if(flagEstagio1 == true || flagEstagio2 == true || flagEstagio3 == true || flagEstagio4 == true)
 	    		{
 	    			int qtdAmostragemEixo = eixoNormalAceleracaoDepoisX.size();
 	    			if(qtdAmostragemEixo >= QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO)
@@ -196,6 +193,19 @@ public class EpilepsyHeuristicService extends Service implements SensorEventList
 	    			eixoNormalAceleracaoDepoisX.add(0, x);
 	    			eixoNormalAceleracaoDepoisY.add(0, y);
 	    			eixoNormalAceleracaoDepoisZ.add(0, z);
+	    		}
+	    		else
+	    		{
+	    			int qtdAmostragemEixo = eixoNormalAceleracaoAntesX.size();
+	    			if(qtdAmostragemEixo >= QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO)
+	    			{
+	    				eixoNormalAceleracaoAntesX.pop();
+	    				eixoNormalAceleracaoAntesY.pop();
+	    				eixoNormalAceleracaoAntesZ.pop();
+	    			}
+	    			eixoNormalAceleracaoAntesX.add(0, x);
+	    			eixoNormalAceleracaoAntesY.add(0, y);
+	    			eixoNormalAceleracaoAntesZ.add(0, z);
 	    		}
 	    		/**************** END: COLETANDO DADOS DOS EIXOS... BASEADO NO HISTORICO PASSADO... ********************/
 	    		
@@ -228,7 +238,7 @@ public class EpilepsyHeuristicService extends Service implements SensorEventList
 	    	        		int eixoNormalDepois = obterEixoNormal(eixoNormalAceleracaoDepoisX, eixoNormalAceleracaoDepoisY, eixoNormalAceleracaoDepoisZ);
 	    	        		
 	    	        		// A condicao abaixo verifica se a pessoa estava de pé e deitou ou virou... ou seja, a pessoa não está na mesma posicao antes do impacto.
-	    	        		if(eixoNormalAntes != eixoNormalDepois && Math.abs(eixoNormalAntes) != Math.abs(eixoNormalDepois))
+	    	        		if(eixoNormalAntes != eixoNormalDepois)//TODO: && Math.abs(eixoNormalAntes) != Math.abs(eixoNormalDepois))
 	    	        		{
 	    	        			Boolean flagAtivarAlertaDesmaio = true;
 	    	        			
@@ -323,8 +333,7 @@ public class EpilepsyHeuristicService extends Service implements SensorEventList
 	        	        {
 	        	        	resetarVariaveisMonitoramento();
 	        	        }
-
-	        	        if(moduloVetorAceleracao >= LIMITE_PICO_SUPERIOR)
+	        	        else if(moduloVetorAceleracao >= LIMITE_PICO_SUPERIOR)
 	                	{
 	        	        	flagContagemPicos = false;    	        	
 	        	        	if(moduloVetorAceleracao >= moduloAceleracaoEstagio2)
@@ -358,10 +367,17 @@ public class EpilepsyHeuristicService extends Service implements SensorEventList
 	                	
 	                	if(amplitudeAceleracao > MARGEM_ERRO_AMPLITUDE_ACELERACAO)
 	                	{
-	                		if(intervaloEstagio1e2 >= MARGEM_ERRO_TEMPO_ACELERACAO_DESACELERACAO && intervaloEstagio1e3 >= MARGEM_ERRO_TEMPO_TOTAL_QUEDA_SINAL_ESTABILIZADO && qtdTotalPicos >= QTD_MINIMA_PICOS_DESMAIO)
+	                		if(intervaloEstagio1e2 >= MARGEM_ERRO_TEMPO_ACELERACAO_DESACELERACAO && intervaloEstagio2e3 >= MARGEM_ERRO_DESACELERACAO_SINAL_ESTABILIZADO && intervaloEstagio1e3 >= MARGEM_ERRO_TEMPO_TOTAL_QUEDA_SINAL_ESTABILIZADO && qtdTotalPicos >= QTD_MINIMA_PICOS_DESMAIO)
 	                		{
 	    	            		flagEstagio4 = true;
 	    	            		timestampEstagio4 = timestampAtualSistema;
+	    		                
+	    	                    /** BEGIN: Iniciando objetos de musica do android... **/
+	    		                if(!objRing.isPlaying())
+	    			        	{
+	    			        		objRing.play();
+	    			        	}
+	    		                /** BEGIN: Iniciando objetos de musica do android... **/
 	                		}
 	                    	else
 	                    	{
