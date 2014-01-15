@@ -48,10 +48,15 @@
     <string name="inicio">Início</string>
     <string name="config">Configurações</string>
     <string name="title_activity_configuracoes">Configuracoes</string>
-    <string name="tempo15">15 seg</string><string name="tempo5">5 seg</string><string name="title_activity_ativar_app">Ativar aplicação</string>
+    <string name="tempo15">15 seg</string>
+    <string name="tempo5">5 seg</string>
+    <string name="title_activity_ativar_app">Ativar aplicação</string>
+    <string name="subtitle">Detector de Ataque Epilético</string>
+    <string name="usarAcelerometro">Usar o Acelerômetro</string>
+    <string name="profile2">Preciso</string><string name="tempo10">10 seg</string>
+    <string name="profile1">Moderado</string><string name="perfilGeral">Selecione o seu perfil...</string><string name="profile">Perfis</string><string name="title_activity_tipo_perfil">TipoPerfil</string>
     
     
-    <string name="subtitle">Detector de Ataque Epilético</string><string name="usarAcelerometro">Usar o Acelerômetro</string><string name="tempo10">10 seg</string>
     
     
 

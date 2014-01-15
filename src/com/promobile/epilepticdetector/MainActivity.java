@@ -37,6 +37,7 @@ public class MainActivity extends Activity  {
         setContentView(R.layout.activity_main);
         ImageButton inicio = (ImageButton) findViewById(R.id.imageButton2);
         ImageButton config = (ImageButton) findViewById(R.id.imageButton1);
+        ImageButton perfil = (ImageButton) findViewById(R.id.imageButton3);
         
         inicio.setOnClickListener(new OnClickListener() {
         	 
@@ -56,6 +57,18 @@ public class MainActivity extends Activity  {
 			public void onClick(View arg0) {
      			
 			  Intent intent = new Intent(MainActivity.this, ConfiguracoesActivity.class);
+			  startActivity(intent);
+ 
+			}
+ 
+		});
+        
+        perfil.setOnClickListener(new OnClickListener() {
+          	 
+			@Override
+			public void onClick(View arg0) {
+     			
+			  Intent intent = new Intent(MainActivity.this, TipoPerfil.class);
 			  startActivity(intent);
  
 			}

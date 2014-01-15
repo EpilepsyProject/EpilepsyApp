@@ -83,5 +83,24 @@
         android:text="@string/inicio"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="#ffffffff" />
-    
+
+    <ImageButton
+        android:id="@+id/imageButton3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView3"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="41dp"
+        android:src="@drawable/profile" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageButton3"
+        android:layout_centerHorizontal="true"
+        android:text="@string/profile"
+        android:textColor="#ffffffff"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
 </RelativeLayout>
