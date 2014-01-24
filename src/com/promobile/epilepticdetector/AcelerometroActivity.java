@@ -1,41 +1,20 @@
 package com.promobile.epilepticdetector;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.text.SimpleDateFormat;
 import java.util.Stack;
-
-import android.R.array;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.ExifInterface;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Environment;
 import android.os.Vibrator;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -124,8 +103,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	private double maxVariacaoGyroscopeEixoY = 0;
 	private double maxVariacaoGyroscopeEixoZ = 0;
 	
-	String chaveNomeArquivoLog = "";
-     
     Float x, y, z;
     Float xGiroscopio, yGiroscopio, zGiroscopio;
     private SensorManager mSensorManager;
@@ -157,17 +134,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         textViewDesmaio = (TextView) findViewById(R.id.text_view_desmaio);
         textViewStatus = (TextView) findViewById(R.id.text_view_status);
 
-        /**TODO: RAWLINSON - NAO PRECISA DESSE BOTAO...
-        Button btnCriarArquivo = (Button) findViewById(R.id.btnGerarArquivo);
-        btnCriarArquivo.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				CriaArquivosLog(x, y, z);
-			}
-		});
-		**/
-        
         /********************************************************************************
          *						HEURISTICA DE DETECCAO DE DESMAIO						*
          ********************************************************************************/
@@ -178,8 +144,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mGyroscope = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         
-        chaveNomeArquivoLog = getChaveArquivoLog();
-        
         // Obtendo instante inicial do log...
         miliTimeInicial = System.currentTimeMillis();
 
@@ -187,22 +151,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
     	objNotification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         objRing = RingtoneManager.getRingtone(getApplicationContext(), objNotification);
         /** BEGIN: Iniciando objetos de musica do android... **/
-        
-        /** TODO: Criar uma notificacao no android... **/
-//    	NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//    	Intent notificationIntent = new Intent(this, AcelerometroActivity.class);
-//    	
-//    	PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-//    	
-//    	int icon = R.drawable.hd;
-//    	String tickerText="You have message...";
-//    	long when = System.currentTimeMillis();
-//    	
-//    	Notification notification = new Notification(icon, tickerText, when);
-//    	String contentTitle = "Title";
-//    	String contentText = "This is your message...";
-//    	notification.setLatestEventInfo(this, contentTitle, contentText, pendingIntent);
-//    	notificationManager.notify(123, notification);
     }
        
     @Override
@@ -500,9 +448,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 	                	}
 	                }
 	            }
-
-	            // Gerando os logs do sistema...
-	            //TODO: CriaArquivosLog(miliTimeAtual, x, y, z, moduloVetorAceleracao);
 	    	break;
 	    	
 	    	case Sensor.TYPE_GYROSCOPE:
@@ -685,47 +630,6 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
     	}
     }
 
-    public void CriaArquivosLog(Double miliTimeAtual, Float x, Float y, Float z, Double moduloVetorAceleracao)
-    {
-    	try
-    	{
-//    		/** BEGIN: Salvando os dados do acelerometro em um log dentro do CARD SD... **/
-//    		File arq = new File(Environment.getExternalStorageDirectory(), "logsDadosAcelerometro_" + chaveNomeArquivoLog + ".txt");
-//			FileOutputStream escrever = new FileOutputStream(arq, true);
-//			
-//			escrever.write(x.toString().getBytes());
-//			escrever.write(";".getBytes());
-//			escrever.write(y.toString().getBytes());
-//			escrever.write(";".getBytes());
-//			escrever.write(z.toString().getBytes());
-//			escrever.write("\n".getBytes());
-//			escrever.flush();
-//			escrever.close();
-//    		/** END: Salvando os dados do acelerometro em um log dentro do CARD SD... **/
-			
-    		/** BEGIN: Gerando grafico de analise do acelerometro **/
-    		File arqLog = new File(Environment.getExternalStorageDirectory(), "logGraficoModuloAceleracao_" + chaveNomeArquivoLog + ".txt");
-			FileOutputStream escreverLog = new FileOutputStream(arqLog, true);
-			
-			// Instante de tempo que o log foi gerado...
-			escreverLog.write(Double.toString(miliTimeAtual).getBytes());
-			escreverLog.write(";".getBytes());
-
-			// Calculando os modulos resultantes dos eixos x, y e z
-			escreverLog.write(Double.toString(moduloVetorAceleracao).getBytes());
-			escreverLog.write("\n".getBytes());
-			
-			escreverLog.flush();
-			escreverLog.close();
-    		/** END: Gerando grafico de analise do acelerometro **/
-		}
-    	catch (IOException e)
-    	{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
-
 	public void showDialogDesmaio()
 	{
         // Prepara o Dialog informando o título, mensagem e cria o Positive Button        
@@ -796,12 +700,5 @@ public class AcelerometroActivity extends Activity implements SensorEventListene
 		        } catch (Exception e) {}
 			}
 		});
-	}
-	
-	public static String getChaveArquivoLog() {
-		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyyMMddHHmmss");
-		Date now = new Date();
-		String strDate = sdfDate.format(now);
-		return strDate;
 	}
 }

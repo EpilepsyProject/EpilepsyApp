@@ -102,7 +102,7 @@ public class ContatosActivity extends Activity {
 				List<Contato> contatos = mContatos.getContatosFromCursor(c);
 
 				// Caso retorne mais de um contato
-				// você pode criar uma estrurura de repetição
+				// vocï¿½ pode criar uma estrurura de repetiï¿½ï¿½o
 				if (contatos.size() > 0) {
 					id_contato = contatos.get(0).id;
 					mNome.setText(contatos.get(0).nome);
@@ -123,7 +123,7 @@ public class ContatosActivity extends Activity {
 					if (contatos.get(0).organizacoes.size() > 0) {
 						mOrganizacao.setText(contatos.get(0).organizacoes.get(0).empresa);	
 					}					
-					// Tem Endereço?
+					// Tem Endereco?
 					if (contatos.get(0).enderecos.size() > 0) {
 						mEndereco.setText(
 								contatos.get(0).enderecos.get(0).rua + " - " +

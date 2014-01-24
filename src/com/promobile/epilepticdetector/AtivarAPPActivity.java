@@ -1,6 +1,7 @@
 package com.promobile.epilepticdetector;
 
 import android.app.Activity;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -14,20 +15,20 @@ import android.widget.Button;
 
 public class AtivarAPPActivity extends Activity {
 	
-	NotificationCompat.Builder mBuilder;
+	Notification notification;
 	NotificationManager mNotifyManager;
 	String TAG = "MainActivity";
 	Button start, stop;
-	int ID = 101;
+	int NOTIFY_ID = 101;
 	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_ativar_app);
-		   //bot�es de ativar e desativar o app
-  		start=(Button)findViewById(R.id.btnBackgroundOn); //bot�o ligar
-          stop=(Button)findViewById(R.id.btnBackgroundOff); //bot�o desligar
+		   //botoes de ativar e desativar o app
+  		start=(Button)findViewById(R.id.btnBackgroundOn); //botao ligar
+          stop=(Button)findViewById(R.id.btnBackgroundOff); //botao desligar
           start.setOnClickListener(new View.OnClickListener() {
               @Override
               public void onClick(View v) {                
@@ -41,54 +42,48 @@ public class AtivarAPPActivity extends Activity {
               public void onClick(View v) { 
               	stopSensing();}
               });        
-}
-
-private void toggleService(){
-    Intent intent=new Intent(getApplicationContext(), EpilepsyHeuristicService.class);
-    // Try to stop the service if it is already running
-    intent.addCategory(EpilepsyHeuristicService.TAG);
-    if(!stopService(intent)){
-        startService(intent);
-    }
-}
-
-public void startSensing(){
-	showNotification();
-	toggleService();
-	//this.finish();
-}
-
-private void stopSensing(){
-	Intent intent=new Intent(getApplicationContext(), EpilepsyHeuristicService.class);
-	intent.addCategory(EpilepsyHeuristicService.TAG);
-	stopService(intent);
-	mNotifyManager =
-	        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-	mNotifyManager.cancel(ID);
+	}
 	
-}
-
-public void showNotification(){
-	mBuilder = new NotificationCompat.Builder(this);
-	mBuilder.setContentTitle("Epileptic Detector")
-	    .setContentText("Monitorando poss�vel ataque")
-	    .setSmallIcon(R.drawable.hd);
-	Intent resultIntent = new Intent(this, MainActivity.class);
-	TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-	stackBuilder.addParentStack(MainActivity.class);
-	stackBuilder.addNextIntent(resultIntent);
-	PendingIntent resultPendingIntent =
-	        stackBuilder.getPendingIntent(
-	            0,
-	            PendingIntent.FLAG_UPDATE_CURRENT
-	        );
-	mBuilder.setContentIntent(resultPendingIntent);
-	mNotifyManager =
-	        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-	mNotifyManager.notify(ID, mBuilder.build());	
-}
-
+	private void toggleService(){
+	    Intent intent=new Intent(getApplicationContext(), EpilepsyHeuristicService.class);
+	    // Try to stop the service if it is already running
+	    intent.addCategory(EpilepsyHeuristicService.TAG);
+	    if(!stopService(intent)){
+	        startService(intent);
+	    }
+	}
 	
+	public void startSensing(){
+		showNotification();
+		toggleService();
+		//this.finish();
+	}
+	
+	private void stopSensing(){
+		Intent intent=new Intent(getApplicationContext(), EpilepsyHeuristicService.class);
+		intent.addCategory(EpilepsyHeuristicService.TAG);
+		stopService(intent);
+		mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotifyManager.cancel(NOTIFY_ID);
+		
+	}
+	
+	public void showNotification(){
+		Context context = getApplicationContext();
+		Intent intent = new Intent(this, MainActivity.class);
+		final PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+		
+		notification = new Notification();
+		notification.icon = R.drawable.hd;
+		notification.tickerText = "Monitorando possível ataque";
+		notification.when = System.currentTimeMillis();
+
+		notification.flags = notification.flags | Notification.FLAG_ONGOING_EVENT;
+		notification.contentIntent = pendingIntent;
+		
+		mNotifyManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotifyManager.notify(NOTIFY_ID, notification);
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
