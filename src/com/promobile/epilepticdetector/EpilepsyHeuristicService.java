@@ -31,7 +31,7 @@ public class EpilepsyHeuristicService extends Service implements SensorEventList
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mGyroscope = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
-        objHeuristica = new EpilepsyHeuristic(getApplicationContext(), mSensorManager, true);
+        objHeuristica = new EpilepsyHeuristic(getApplicationContext(), mSensorManager, EpilepsyHeuristic.PERFIL_MODERADO, true);
         
         // Criando o Servico...
         super.onCreate();

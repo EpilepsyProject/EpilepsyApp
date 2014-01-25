@@ -18,8 +18,8 @@ import android.os.Environment;
 
 public class EpilepsyHeuristic {
 
-	private final int PERFIL_MODERADO = 0;
-	private final int PERFIL_PRECISAO = 1;
+	public static int PERFIL_MODERADO = 0;
+	public static int PERFIL_PRECISAO = 1;
 	private int perfil = PERFIL_MODERADO;
 	
 	private long miliTimeInicial;
@@ -103,11 +103,12 @@ public class EpilepsyHeuristic {
     //******** End: Estagios da deteccao de desmaio
    
 	// Construtor da classe...
-	public EpilepsyHeuristic(Context context, SensorManager sensorManager) {
+	public void EpilepsyHeuristic(Context context, SensorManager sensorManager) {
         /********************************************************************************
          *			HEURISTICA DE DETECCAO DE DESMAIOS E ATAQUES EPILEPTICOS			*
          ********************************************************************************/
-		flagHabilitarLogs = false;
+		perfil = PERFIL_MODERADO;
+        flagHabilitarLogs = false;
         flagGyroscopeAtivado = false;
         chaveNomeArquivoLog = getChaveArquivoLog();
 
@@ -127,28 +128,18 @@ public class EpilepsyHeuristic {
 	}
 	
 	public EpilepsyHeuristic(Context context, SensorManager sensorManager, boolean habilitarLogs) {
-        /********************************************************************************
-         *			HEURISTICA DE DETECCAO DE DESMAIOS E ATAQUES EPILEPTICOS			*
-         ********************************************************************************/
-		flagHabilitarLogs = habilitarLogs;
-        flagGyroscopeAtivado = false;
-        chaveNomeArquivoLog = getChaveArquivoLog();
-
-        // Obtendo instante inicial do log...
-        miliTimeInicial = System.currentTimeMillis();
+		EpilepsyHeuristic(context, sensorManager);
         
-        // Inicializando variaveis do monitoramento...
-        resetarVariaveisMonitoramento();
-
-        // Inicializando o servico...
-        objContext = context;
-
-        /** BEGIN: Iniciando objetos de musica do android... **/
-    	objNotification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        objRing = RingtoneManager.getRingtone(context, objNotification);
-        /** BEGIN: Iniciando objetos de musica do android... **/
+		flagHabilitarLogs = habilitarLogs;
 	}
-	
+
+	public EpilepsyHeuristic(Context context, SensorManager sensorManager, int perfilMonitoramento, boolean habilitarLogs) {
+		EpilepsyHeuristic(context, sensorManager);
+
+		perfil = perfilMonitoramento;
+        flagHabilitarLogs = habilitarLogs;
+	}
+
 	/**
 	 * Funcao responsavel por realizar o monitoramento de demaios
 	 * e ataques epilepticos.
