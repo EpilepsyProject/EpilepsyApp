@@ -932,8 +932,8 @@ public class EpilepsyHeuristic {
 		}
     }
 	
-	public static String getChaveArquivoLog() {
-		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyyMMddHHmmss");
+	private String getChaveArquivoLog() {
+		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyyMMdd_HHmmss");
 		Date now = new Date();
 		String strDate = sdfDate.format(now);
 		return strDate;
