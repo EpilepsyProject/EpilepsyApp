@@ -291,7 +291,10 @@ public class EpilepsyHeuristicModerado {
             	if(flagHabilitaEstado4)
         		{
                 	if(MODO_DEBUG)
-                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_3 -> ESTADO_4", Toast.LENGTH_SHORT).show();
+                	{
+                		String msgText = " A(" + Double.toString(amplitudeAceleracao) + ") G("+Double.toString(maiorModuloGiroscopio)+")";
+                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_3 -> ESTADO_4" + msgText, Toast.LENGTH_SHORT).show();
+                	}
 
     	        	estadoAtual = ESTADO_4;
             		timestampEstado4 = timestampAtualSistema;
@@ -325,7 +328,10 @@ public class EpilepsyHeuristicModerado {
     	    	        if(contadoMargemErroDesmaio > MARGEM_ERRO_CONTADOR_VARIACOES_DESMAIO)
     	    	        {
     	                	if(MODO_DEBUG)
-    	                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> ESTADO_INICIAL", Toast.LENGTH_SHORT).show();
+    	                	{
+    	                		String msgText = " CMED(" + Double.toString(contadoMargemErroDesmaio) + ")";
+    	                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> ESTADO_INICIAL" + msgText, Toast.LENGTH_SHORT).show();
+    	                	}
 
     	    	        	estadoAtual = ESTADO_INICIAL;
     	    	        	resetarVariaveisMonitoramento();
