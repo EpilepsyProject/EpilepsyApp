@@ -21,6 +21,8 @@ public class EpilepsyHeuristicService extends Service implements SensorEventList
     
     private EpilepsyHeuristic objHeuristica;
     
+    private boolean flagLogs = false;
+    
 	public IBinder onBind(Intent i) {
 		return null;
 	}
@@ -31,7 +33,7 @@ public class EpilepsyHeuristicService extends Service implements SensorEventList
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mGyroscope = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
-        objHeuristica = new EpilepsyHeuristic(getApplicationContext(), mSensorManager, EpilepsyHeuristic.PERFIL_MODERADO, true);
+        objHeuristica = new EpilepsyHeuristic(getApplicationContext(), mSensorManager, EpilepsyHeuristic.PERFIL_MODERADO, flagLogs);
         
         // Criando o Servico...
         super.onCreate();
