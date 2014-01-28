@@ -35,6 +35,7 @@ public class EpilepsyHeuristicPrecisao {
 	long timestampEstado2 = 0;
 	long timestampEstado3 = 0;
 	long timestampEstado4 = 0;
+	long timestampAdicionalEstado4 = 0;
 	long tempoValidacao = 0;
 	
 	private final double ACELERACAO_NORMAL_GRAVIDADE = 9.8;
@@ -43,12 +44,13 @@ public class EpilepsyHeuristicPrecisao {
 	double maiorModuloGiroscopio = 0;
 	
 	private final double LIMITE_ACELERACAO_PICO_INFERIOR = 5;
-	private final double LIMITE_ACELERACAO_PICO_SUPERIOR = 17;
-	private final double MARGEM_ERRO_AMPLITUDE_ACELERACAO = 13;
+	private final double LIMITE_ACELERACAO_PICO_SUPERIOR = 18;
+	private final double MARGEM_ERRO_AMPLITUDE_ACELERACAO = 14;
 	private final double MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO = 0.8;
 
 	private final int MARGEN_ERRO_TEMPO_MINIMO_VALIDACAO_DESMAIO = 1000;
 	private final int MARGEN_ERRO_TEMPO_TOTAL_VALIDACAO_DESMAIO = 6000;
+	private final int MARGEN_ERRO_TEMPO_ADICIONAL_VALIDACAO_DESMAIO = 10000;
 	private final int QTD_TOTAL_AMOSTRAGEM_ACELERACAO = 60;
 	Stack<Double> arrayAmostragemAceleracao = new Stack<Double>();
 
@@ -65,7 +67,7 @@ public class EpilepsyHeuristicPrecisao {
 	private final int ID_EIXO_Y_NEGATIVO = -1 * ID_EIXO_Y;
 	private final int ID_EIXO_Z_POSITIVO =  1 * ID_EIXO_Z;
 	private final int ID_EIXO_Z_NEGATIVO = -1 * ID_EIXO_Z;
-	private final int QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO = 50;
+	private final int QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO = 100;
 	Stack<Float> eixoNormalAceleracaoAntesX = new Stack<Float>();
 	Stack<Float> eixoNormalAceleracaoAntesY = new Stack<Float>();
 	Stack<Float> eixoNormalAceleracaoAntesZ = new Stack<Float>();
@@ -298,6 +300,7 @@ public class EpilepsyHeuristicPrecisao {
 
     	        	estadoAtual = ESTADO_4;
             		timestampEstado4 = timestampAtualSistema;
+            		timestampAdicionalEstado4 = 0;
             		
 	                if(!objRing.isPlaying()) /** Emitindo beep... para validar um possivel desmaio... **/
 		        		objRing.play();
@@ -317,7 +320,7 @@ public class EpilepsyHeuristicPrecisao {
             	tempoValidacao = timestampAtualSistema - timestampEstado4;
             	if(tempoValidacao > MARGEN_ERRO_TEMPO_MINIMO_VALIDACAO_DESMAIO)
             	{
-    	        	if(tempoValidacao < MARGEN_ERRO_TEMPO_TOTAL_VALIDACAO_DESMAIO)
+    	        	if(tempoValidacao < (MARGEN_ERRO_TEMPO_TOTAL_VALIDACAO_DESMAIO + timestampAdicionalEstado4))
     	        	{
     	        		double variacaoVetorAceleracaoAtual = Math.abs(moduloVetorAceleracao - ACELERACAO_NORMAL_GRAVIDADE);
     	        		
@@ -328,10 +331,7 @@ public class EpilepsyHeuristicPrecisao {
     	    	        if(contadoMargemErroDesmaio > MARGEM_ERRO_CONTADOR_VARIACOES_DESMAIO)
     	    	        {
     	                	if(MODO_DEBUG)
-    	                	{
-    	                		String msgText = " CMED(" + Double.toString(contadoMargemErroDesmaio) + ")";
-    	                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> ESTADO_INICIAL" + msgText, Toast.LENGTH_SHORT).show();
-    	                	}
+    	                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> ESTADO_INICIAL", Toast.LENGTH_SHORT).show();
 
     	    	        	estadoAtual = ESTADO_INICIAL;
     	    	        	resetarVariaveisMonitoramento();
@@ -347,9 +347,12 @@ public class EpilepsyHeuristicPrecisao {
     	        		if(eixoNormalAntes != eixoNormalDepois)
     	        		{
     	                	if(MODO_DEBUG)
-    	                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> ESTADO_INICIAL -> DESMAIO DETECTADO(1)", Toast.LENGTH_SHORT).show();
+    	                	{
+    	                		String msgTexto = "ANTES(" + Integer.toString(eixoNormalAntes) + ") DEPOIS(" + Integer.toString(eixoNormalDepois) + ")";
+    	                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> " + msgTexto, Toast.LENGTH_SHORT).show();
+    	                	}
 
-    	        			// Verificando se houve alguma variacao angular no giroscopio...
+    	                	// Verificando se houve alguma variacao angular no giroscopio...
     	                	boolean flagAtivarAlertaDesmaio = true;
         	        		if(flagGyroscopeAtivado)
     	        			{
@@ -377,18 +380,31 @@ public class EpilepsyHeuristicPrecisao {
 
         	        		if(flagAtivarAlertaDesmaio)
         	        		{
-	    	        			estadoAtual = ESTADO_INICIAL;
+        	                	if(MODO_DEBUG)
+        	                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> ESTADO_INICIAL -> DESMAIO DETECTADO(1)", Toast.LENGTH_SHORT).show();
+
+        	                	estadoAtual = ESTADO_INICIAL;
 		        	        	resetarVariaveisMonitoramento();
 	    			        	return true; // TEM MAIORES CHANCES DE SER UM DESMAIO...
         	        		}
     	        		}
 
-                    	if(MODO_DEBUG)
-                    		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> ESTADO_INICIAL -> DESMAIO DETECTADO(2)", Toast.LENGTH_SHORT).show();
+    	        		if(timestampAdicionalEstado4 == 0)
+    	        		{
+	                    	if(MODO_DEBUG)
+	                    		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> TEMPO ADICIONAL DE VALIDACAO DESMAIO", Toast.LENGTH_SHORT).show();
 
-	    	        	estadoAtual = ESTADO_INICIAL;
-        	        	resetarVariaveisMonitoramento();
-    	        		return false;
+	                    	timestampAdicionalEstado4 = MARGEN_ERRO_TEMPO_ADICIONAL_VALIDACAO_DESMAIO;
+    	        		}
+    	        		else
+    	        		{
+	                    	if(MODO_DEBUG)
+	                    		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> ESTADO_INICIAL -> DESMAIO DETECTADO(2)", Toast.LENGTH_SHORT).show();
+	
+		    	        	estadoAtual = ESTADO_INICIAL;
+	        	        	resetarVariaveisMonitoramento();
+	    	        		return true;
+    	        		}
     	        	}
             	}
             	else
@@ -422,6 +438,7 @@ public class EpilepsyHeuristicPrecisao {
     	timestampEstado2 = 0;
     	timestampEstado3 = 0;
     	timestampEstado4 = 0;
+    	timestampAdicionalEstado4 = 0;
     	tempoValidacao = 0;
 
     	contadoMargemErroDesmaio = 0;

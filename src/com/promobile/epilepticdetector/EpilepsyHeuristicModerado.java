@@ -65,7 +65,7 @@ public class EpilepsyHeuristicModerado {
 	private final int ID_EIXO_Y_NEGATIVO = -1 * ID_EIXO_Y;
 	private final int ID_EIXO_Z_POSITIVO =  1 * ID_EIXO_Z;
 	private final int ID_EIXO_Z_NEGATIVO = -1 * ID_EIXO_Z;
-	private final int QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO = 50;
+	private final int QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO = 100;
 	Stack<Float> eixoNormalAceleracaoAntesX = new Stack<Float>();
 	Stack<Float> eixoNormalAceleracaoAntesY = new Stack<Float>();
 	Stack<Float> eixoNormalAceleracaoAntesZ = new Stack<Float>();
@@ -328,10 +328,7 @@ public class EpilepsyHeuristicModerado {
     	    	        if(contadoMargemErroDesmaio > MARGEM_ERRO_CONTADOR_VARIACOES_DESMAIO)
     	    	        {
     	                	if(MODO_DEBUG)
-    	                	{
-    	                		String msgText = " CMED(" + Double.toString(contadoMargemErroDesmaio) + ")";
-    	                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> ESTADO_INICIAL" + msgText, Toast.LENGTH_SHORT).show();
-    	                	}
+    	                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> ESTADO_INICIAL", Toast.LENGTH_SHORT).show();
 
     	    	        	estadoAtual = ESTADO_INICIAL;
     	    	        	resetarVariaveisMonitoramento();
@@ -346,6 +343,12 @@ public class EpilepsyHeuristicModerado {
     	        		// A condicao abaixo verifica se a pessoa estava de pé e deitou ou virou... ou seja, a pessoa não está na mesma posicao antes do impacto.
     	        		if(eixoNormalAntes != eixoNormalDepois)
     	        		{
+    	                	if(MODO_DEBUG)
+    	                	{
+    	                		String msgTexto = "ANTES(" + Integer.toString(eixoNormalAntes) + ") DEPOIS(" + Integer.toString(eixoNormalDepois) + ")";
+    	                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> " + msgTexto, Toast.LENGTH_SHORT).show();
+    	                	}
+
     	                	if(MODO_DEBUG)
     	                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> ESTADO_INICIAL -> DESMAIO DETECTADO(1)", Toast.LENGTH_SHORT).show();
 
