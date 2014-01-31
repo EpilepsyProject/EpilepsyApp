@@ -1,6 +1,7 @@
 package com.promobile.epilepticdetector;
 
 import android.app.Activity;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -93,14 +94,17 @@ public void showNotification(){
 	    .setContentText("Monitorando possível ataque")
 	    .setSmallIcon(R.drawable.ic_launcher);
 	Intent resultIntent = new Intent(this, MainActivity.class);
+
+	
 	TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 	stackBuilder.addParentStack(MainActivity.class);
 	stackBuilder.addNextIntent(resultIntent);
 	PendingIntent resultPendingIntent =
 	        stackBuilder.getPendingIntent(
 	            0,
-	            PendingIntent.FLAG_UPDATE_CURRENT
+	            PendingIntent.FLAG_ONE_SHOT
 	        );
+	mBuilder.setOngoing(true);
 	mBuilder.setContentIntent(resultPendingIntent);
 	mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 	mNotifyManager.notify(ID, mBuilder.build());	
