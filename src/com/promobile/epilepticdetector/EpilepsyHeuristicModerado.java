@@ -47,6 +47,7 @@ public class EpilepsyHeuristicModerado {
 	private final double MARGEM_ERRO_AMPLITUDE_ACELERACAO = 13;
 	private final double MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO = 0.8;
 
+	private final int MARGEN_ERRO_TEMPO_MINIMO_QUEDA_DESMAIO = 40;
 	private final int MARGEN_ERRO_TEMPO_MINIMO_VALIDACAO_DESMAIO = 1000;
 	private final int MARGEN_ERRO_TEMPO_TOTAL_VALIDACAO_DESMAIO = 6000;
 	private final int QTD_TOTAL_AMOSTRAGEM_ACELERACAO = 60;
@@ -65,7 +66,7 @@ public class EpilepsyHeuristicModerado {
 	private final int ID_EIXO_Y_NEGATIVO = -1 * ID_EIXO_Y;
 	private final int ID_EIXO_Z_POSITIVO =  1 * ID_EIXO_Z;
 	private final int ID_EIXO_Z_NEGATIVO = -1 * ID_EIXO_Z;
-	private final int QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO = 50;
+	private final int QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO = 100;
 	Stack<Float> eixoNormalAceleracaoAntesX = new Stack<Float>();
 	Stack<Float> eixoNormalAceleracaoAntesY = new Stack<Float>();
 	Stack<Float> eixoNormalAceleracaoAntesZ = new Stack<Float>();
@@ -159,6 +160,7 @@ public class EpilepsyHeuristicModerado {
 	    			if(moduloVetorAceleracao >= maiorModuloAceleracao)
 	            	{
 	            		maiorModuloAceleracao = moduloVetorAceleracao;
+	            		timestampEstado2 = timestampAtualSistema; // atualiza o instante em que ocorreu o maior pico de aceleracao...
 	            	}
 
 	    			// Coletando as variacoes de aceleracao de cada eixo (X, Y e Z) durante a queda.
@@ -254,6 +256,7 @@ public class EpilepsyHeuristicModerado {
     	        	
     	        	estadoAtual = ESTADO_2;
     	        	timestampEstado2 = timestampAtualSistema;
+    	        	maiorModuloAceleracao = moduloVetorAceleracao;
             	}
     	        else if(maiorVariacaoAceleracao <= MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO) // Verificar se o sinal do acelerometro estabilizou... atraves de uma margem de erro em relacao a normal 9,8 
             	{
@@ -270,11 +273,24 @@ public class EpilepsyHeuristicModerado {
             	// Aguarda a estabilizacao do sinal do acelerometro... atraves de uma margem de erro em relacao a normal 9,8 
     	        if(maiorVariacaoAceleracao <= MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO)
     	        {
-                	if(MODO_DEBUG)
-                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_2 -> ESTADO_3", Toast.LENGTH_SHORT).show();
-
-    	        	estadoAtual = ESTADO_3;
     	        	timestampEstado3 = timestampAtualSistema;
+    	        	long tempoTotalEntrePicosQueda = timestampEstado2 - timestampEstado1;
+
+    	        	// Apenas debug...
+    	        	String msgText = " TEMPO_Q(" + Long.toString(tempoTotalEntrePicosQueda) + ")";
+
+    	        	if(tempoTotalEntrePicosQueda >= MARGEN_ERRO_TEMPO_MINIMO_QUEDA_DESMAIO) // Validando tempo minimo de queda...
+    	        	{
+    	        		estadoAtual = ESTADO_3;
+        	        	if(MODO_DEBUG)
+                    		Toast.makeText(objContext, "EpilepsyApp - ESTADO_2 -> ESTADO_3" + msgText, Toast.LENGTH_SHORT).show();
+    	        	}
+    	        	else
+    	        	{
+    	        		estadoAtual = ESTADO_INICIAL;
+        	        	if(MODO_DEBUG)
+                    		Toast.makeText(objContext, "EpilepsyApp - ESTADO_2 -> ESTADO_INICIAL" + msgText, Toast.LENGTH_SHORT).show();
+    	        	}
     	        }
 			break;
 			
@@ -291,7 +307,10 @@ public class EpilepsyHeuristicModerado {
             	if(flagHabilitaEstado4)
         		{
                 	if(MODO_DEBUG)
-                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_3 -> ESTADO_4", Toast.LENGTH_SHORT).show();
+                	{
+                		String msgText = " A(" + Double.toString(amplitudeAceleracao) + ") G("+Double.toString(maiorModuloGiroscopio)+")";
+                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_3 -> ESTADO_4" + msgText, Toast.LENGTH_SHORT).show();
+                	}
 
     	        	estadoAtual = ESTADO_4;
             		timestampEstado4 = timestampAtualSistema;
@@ -340,6 +359,12 @@ public class EpilepsyHeuristicModerado {
     	        		// A condicao abaixo verifica se a pessoa estava de pé e deitou ou virou... ou seja, a pessoa não está na mesma posicao antes do impacto.
     	        		if(eixoNormalAntes != eixoNormalDepois)
     	        		{
+    	                	if(MODO_DEBUG)
+    	                	{
+    	                		String msgTexto = "ANTES(" + Integer.toString(eixoNormalAntes) + ") DEPOIS(" + Integer.toString(eixoNormalDepois) + ")";
+    	                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> " + msgTexto, Toast.LENGTH_SHORT).show();
+    	                	}
+
     	                	if(MODO_DEBUG)
     	                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> ESTADO_INICIAL -> DESMAIO DETECTADO(1)", Toast.LENGTH_SHORT).show();
 

@@ -15,49 +15,47 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Environment;
+import android.widget.Toast;
 
 public class EpilepsyHeuristicPrecisao {
+	private final boolean MODO_DEBUG = true;
 
 	private long miliTimeInicial;
 	
 	private Boolean flagGyroscopeAtivado = false;
     
-    /************* Estagios da deteccao de desmaio ******************/
-    private Boolean flagEstagio1 = false;
-    private Boolean flagEstagio2 = false;
-    private Boolean flagEstagio3 = false;
-    private Boolean flagEstagio4 = false;
-
-    private Boolean flagContagemPicos = false;
-    private int qtdTotalPicos = 0;
-    private final int QTD_MINIMA_PICOS_DESMAIO = 1;
+    private final int ESTADO_INICIAL = 0;
+    private final int ESTADO_1 = 1;
+    private final int ESTADO_2 = 2;
+    private final int ESTADO_3 = 3;
+    private final int ESTADO_4 = 4;
+    private int estadoAtual = ESTADO_INICIAL;
     
-    long timestampEstagio1 = 0;
-	long timestampEstagio2 = 0;
-	long timestampEstagio3 = 0;
-	long timestampEstagio4 = 0;
-	long intervaloEstagio1e2 = 0;
-	long intervaloEstagio2e3 = 0;
-	long intervaloEstagio1e3 = 0;
+    long timestampEstado1 = 0;
+	long timestampEstado2 = 0;
+	long timestampEstado3 = 0;
+	long timestampEstado4 = 0;
+	long timestampAdicionalEstado4 = 0;
+	long tempoValidacao = 0;
 	
 	private final double ACELERACAO_NORMAL_GRAVIDADE = 9.8;
-	double moduloAceleracaoEstagio1 = ACELERACAO_NORMAL_GRAVIDADE; // Aceleracao normal da gravidade... 
-	double moduloAceleracaoEstagio2 = 0;
+	double menorModuloAceleracao = ACELERACAO_NORMAL_GRAVIDADE; // Aceleracao normal da gravidade... 
+	double maiorModuloAceleracao = 0;
+	double maiorModuloGiroscopio = 0;
 	
-	private final double LIMITE_PICO_INFERIOR = 7;
-	private final double LIMITE_PICO_SUPERIOR = 11;
-	private final int MARGEM_ERRO_TEMPO_ACELERACAO_DESACELERACAO = 30; // EM MILISEGUNDOS...
-	private final int MARGEM_ERRO_DESACELERACAO_SINAL_ESTABILIZADO = 200;
-	private final int MARGEM_ERRO_TEMPO_TOTAL_QUEDA_SINAL_ESTABILIZADO = 400; // EM MILISEGUNDOS...
-	private final int MARGEN_ERRO_TEMPO_MINIMO_VALIDACAO_DESMAIO = 1500;
-	private final int MARGEN_ERRO_TEMPO_TOTAL_VALIDACAO_DESMAIO = 6000;
+	private final double LIMITE_ACELERACAO_PICO_INFERIOR = 5;
+	private final double LIMITE_ACELERACAO_PICO_SUPERIOR = 18;
+	private final double MARGEM_ERRO_AMPLITUDE_ACELERACAO = 14;
 	private final double MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO = 0.8;
-	private final double MARGEM_ERRO_AMPLITUDE_ACELERACAO = 4;
-	private final int QTD_TOTAL_AMOSTRAGEM_ACELERACAO = 30;
+
+	private final int MARGEN_ERRO_TEMPO_MINIMO_QUEDA_DESMAIO = 40;
+	private final int MARGEN_ERRO_TEMPO_MINIMO_VALIDACAO_DESMAIO = 1000;
+	private final int MARGEN_ERRO_TEMPO_TOTAL_VALIDACAO_DESMAIO = 6000;
+	private final int MARGEN_ERRO_TEMPO_ADICIONAL_VALIDACAO_DESMAIO = 10000;
+	private final int QTD_TOTAL_AMOSTRAGEM_ACELERACAO = 60;
 	Stack<Double> arrayAmostragemAceleracao = new Stack<Double>();
 
 	private final int MARGEM_ERRO_CONTADOR_VARIACOES_DESMAIO = 5;
-	private final double MARGEM_ERRO_ACELERACAO_DESMAIO = MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO;
 	int contadoMargemErroDesmaio = 0;
 	
 	private final int ID_EIXO_X = 1;
@@ -70,7 +68,7 @@ public class EpilepsyHeuristicPrecisao {
 	private final int ID_EIXO_Y_NEGATIVO = -1 * ID_EIXO_Y;
 	private final int ID_EIXO_Z_POSITIVO =  1 * ID_EIXO_Z;
 	private final int ID_EIXO_Z_NEGATIVO = -1 * ID_EIXO_Z;
-	private final int QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO = 40;
+	private final int QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO = 100;
 	Stack<Float> eixoNormalAceleracaoAntesX = new Stack<Float>();
 	Stack<Float> eixoNormalAceleracaoAntesY = new Stack<Float>();
 	Stack<Float> eixoNormalAceleracaoAntesZ = new Stack<Float>();
@@ -79,10 +77,10 @@ public class EpilepsyHeuristicPrecisao {
 	Stack<Float> eixoNormalAceleracaoDepoisY = new Stack<Float>();
 	Stack<Float> eixoNormalAceleracaoDepoisZ = new Stack<Float>();
 
-	private final double MARGEM_ERRO_MINIMO_GYROSCOPE = 2.5;
 	private double maxVariacaoGyroscopeEixoX = 0;
 	private double maxVariacaoGyroscopeEixoY = 0;
 	private double maxVariacaoGyroscopeEixoZ = 0;
+	private final double LIMITE_GIROSCOPIO_PICO_SUPERIOR = 2.0;
 	
 	boolean flagHabilitarLogs;
 	String chaveNomeArquivoLog = "";
@@ -96,7 +94,6 @@ public class EpilepsyHeuristicPrecisao {
     // Iniciando objetos de musica do android...
 	Uri objNotification;
     Ringtone objRing;
-    //******** End: Estagios da deteccao de desmaio
    
 	// Construtor da classe...
 	public EpilepsyHeuristicPrecisao(Context context, SensorManager sensorManager, boolean habilitarLogs) {
@@ -125,37 +122,50 @@ public class EpilepsyHeuristicPrecisao {
 	/**
 	 * Funcao responsavel por realizar o monitoramento de demaios
 	 * e ataques epilepticos.
-	 * 
 	 * @param event
 	 */
     public boolean monitorar(SensorEvent event) {
-    	x = event.values[0];
-        y = event.values[1];
-        z = event.values[2];
+    	double moduloVetorAceleracao = ACELERACAO_NORMAL_GRAVIDADE;
+    	double moduloVetorGiroscopio = 0;
 
         // Instante de tempo que o log foi gerado...
         long timestampAtualSistema = System.currentTimeMillis();
 		double miliTimeAtual = (timestampAtualSistema - miliTimeInicial) / 1000.0;
+    	
+    	x = event.values[0];
+        y = event.values[1];
+        z = event.values[2];
 
 		// Calculando os modulos resultantes dos eixos x, y e z
 		double moduloVetor = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
 
         switch (event.sensor.getType()) {
-        
 	    	case Sensor.TYPE_ACCELEROMETER:
 	    		// Calculando os modulos resultantes dos eixos x, y e z
-	    		double moduloVetorAceleracao = moduloVetor;
+	    		moduloVetorAceleracao = moduloVetor;
 	            
 	        	// Atualizando array de amostragens da aceleracao...
 	    		if(arrayAmostragemAceleracao.size() >= QTD_TOTAL_AMOSTRAGEM_ACELERACAO)
-	    		{
 	    			arrayAmostragemAceleracao.pop();
-	    		}
+
 	    		arrayAmostragemAceleracao.add(0, moduloVetorAceleracao);
-	    		
-	    		/**************** BEGIN: COLETANDO DADOS DOS EIXOS... BASEADO NO HISTORICO PASSADO... ********************/
-	    		if(flagEstagio1 == true || flagEstagio2 == true || flagEstagio3 == true || flagEstagio4 == true)
+
+	    		// Obtendo o menor e o maior pico de aceleracao... quando a maquina de estado for iniciada.
+	    		if(estadoAtual != ESTADO_INICIAL)
 	    		{
+	    			// Detecta o menor pico de aceleracao
+	    			if(moduloVetorAceleracao < menorModuloAceleracao)
+	    			{
+	    				menorModuloAceleracao = moduloVetorAceleracao;
+	    			}
+	    			// Detecta o maior pico de aceleracao
+	    			if(moduloVetorAceleracao >= maiorModuloAceleracao)
+	            	{
+	            		maiorModuloAceleracao = moduloVetorAceleracao;
+	            		timestampEstado2 = timestampAtualSistema; // atualiza o instante em que ocorreu o maior pico de aceleracao...
+	            	}
+
+	    			// Coletando as variacoes de aceleracao de cada eixo (X, Y e Z) durante a queda.
 	    			int qtdAmostragemEixo = eixoNormalAceleracaoDepoisX.size();
 	    			if(qtdAmostragemEixo >= QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO)
 	    			{
@@ -169,6 +179,10 @@ public class EpilepsyHeuristicPrecisao {
 	    		}
 	    		else
 	    		{
+	    	    	menorModuloAceleracao = ACELERACAO_NORMAL_GRAVIDADE; // Aceleracao normal da gravidade.
+	    	    	maiorModuloAceleracao = 0;
+
+	    	    	// Coletando as variacoes de aceleracao de cada eixo (X, Y e Z) antes da queda.
 	    			int qtdAmostragemEixo = eixoNormalAceleracaoAntesX.size();
 	    			if(qtdAmostragemEixo >= QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO)
 	    			{
@@ -180,186 +194,7 @@ public class EpilepsyHeuristicPrecisao {
 	    			eixoNormalAceleracaoAntesY.add(0, y);
 	    			eixoNormalAceleracaoAntesZ.add(0, z);
 	    		}
-	    		/**************** END: COLETANDO DADOS DOS EIXOS... BASEADO NO HISTORICO PASSADO... ********************/
 	    		
-	            /********************************************************************************
-	             *						HEURISTICA DE DETECCAO DE DESMAIO						*
-	             ********************************************************************************/
-	            if(flagEstagio4 == true)
-	            {
-	            	double tempoTotalValidacaoDesmaio = timestampAtualSistema - timestampEstagio4;
-
-	            	if(tempoTotalValidacaoDesmaio > MARGEN_ERRO_TEMPO_MINIMO_VALIDACAO_DESMAIO)
-	            	{
-	    	        	if(tempoTotalValidacaoDesmaio < MARGEN_ERRO_TEMPO_TOTAL_VALIDACAO_DESMAIO)
-	    	        	{
-	    	        		// Verificar se houve alguma oscilação no acelerometro... caso contrario o cara apagou mesmo... :P
-	    	        		double mediaAmostralAceleracao = Math.abs(obterMediaVariacaoAceleracao());
-	    	    	        if(mediaAmostralAceleracao > MARGEM_ERRO_ACELERACAO_DESMAIO)
-	    	        		{
-	    	    	        	contadoMargemErroDesmaio++;
-	    	        		}
-	    	    	        
-	    	    	        if(contadoMargemErroDesmaio > MARGEM_ERRO_CONTADOR_VARIACOES_DESMAIO)
-	    	    	        {
-	    	    	        	resetarVariaveisMonitoramento();
-	    	    	        }
-	    	        	}
-	    	        	else
-	    	        	{
-	    	        		int eixoNormalAntes = obterEixoNormal(eixoNormalAceleracaoAntesX, eixoNormalAceleracaoAntesY, eixoNormalAceleracaoAntesZ);
-	    	        		int eixoNormalDepois = obterEixoNormal(eixoNormalAceleracaoDepoisX, eixoNormalAceleracaoDepoisY, eixoNormalAceleracaoDepoisZ);
-	    	        		
-	    	        		// A condicao abaixo verifica se a pessoa estava de pé e deitou ou virou... ou seja, a pessoa não está na mesma posicao antes do impacto.
-	    	        		if(eixoNormalAntes != eixoNormalDepois)//TODO: && Math.abs(eixoNormalAntes) != Math.abs(eixoNormalDepois))
-	    	        		{
-	    	        			Boolean flagAtivarAlertaDesmaio = true;
-	    	        			
-	    	        			// Verificando se houve alguma variacao angular no giroscopio...
-	    	        			if(flagGyroscopeAtivado)
-	    	        			{
-    	        					switch (Math.abs(eixoNormalAntes)) {
-    	        						case ID_EIXO_X:
-    	        							if(maxVariacaoGyroscopeEixoY >= MARGEM_ERRO_MINIMO_GYROSCOPE || maxVariacaoGyroscopeEixoZ >= MARGEM_ERRO_MINIMO_GYROSCOPE)
-    	        							{
-    	        								flagAtivarAlertaDesmaio = true;
-    	        							}
-    	        							else
-    	        							{
-    	        								flagAtivarAlertaDesmaio = false;
-    	        							}
-	    	        			    	break;
-    	        						case ID_EIXO_Y:
-    	        							if(maxVariacaoGyroscopeEixoX >= MARGEM_ERRO_MINIMO_GYROSCOPE || maxVariacaoGyroscopeEixoZ >= MARGEM_ERRO_MINIMO_GYROSCOPE)
-    	        							{
-    	        								flagAtivarAlertaDesmaio = true;
-    	        							}
-    	        							else
-    	        							{
-    	        								flagAtivarAlertaDesmaio = false;
-    	        							}
-	    	        			    	break;
-    	        						case ID_EIXO_Z:
-    	        							if(maxVariacaoGyroscopeEixoX >= MARGEM_ERRO_MINIMO_GYROSCOPE || maxVariacaoGyroscopeEixoY >= MARGEM_ERRO_MINIMO_GYROSCOPE)
-    	        							{
-    	        								flagAtivarAlertaDesmaio = true;
-    	        							}
-    	        							else
-    	        							{
-    	        								flagAtivarAlertaDesmaio = false;
-    	        							}
-	    	        			    	break;
-    	        					}
-	    	        			}
-	    	        			
-	    	        			if(flagAtivarAlertaDesmaio)
-	    	        			{
-		    			        	resetarVariaveisMonitoramento();
-		    			        	
-		    			        	// Exibindo alerta de desmaio...
-		    			        	return true;
-	    	        			}
-	    	        			else
-	    	        			{
-		    	    	        	resetarVariaveisMonitoramento();
-	    	        			}
-	    	        		}
-	    	        		else
-	    	        		{
-	    	    	        	resetarVariaveisMonitoramento();
-	    	        		}
-	    	        	}
-	            	}
-	            	else
-	            	{
-	            		contadoMargemErroDesmaio = 0;
-	            	}
-	            }
-	            else
-	            {
-	            	if(moduloVetorAceleracao <= LIMITE_PICO_INFERIOR)
-	                {
-	            		if(flagContagemPicos == false)
-	            		{
-	            			qtdTotalPicos += 1;
-	            			flagContagemPicos = true;
-	            		}
-	            		
-	            		if(moduloVetorAceleracao < moduloAceleracaoEstagio1)
-	            		{
-	    	                // Obter tempo em milisegundos... para estimar com mais precisao o processo de queda...
-	    	                if(flagEstagio1 == false)
-	    	                {
-	    	            		timestampEstagio1 = timestampAtualSistema; // Nao deve ser inicializado o tempo inicial do estagio 1 ao identificar picos menores...
-	    	                }
-	    	
-	    	                flagEstagio1 = true;
-	    	                moduloAceleracaoEstagio1 = moduloVetorAceleracao;
-	            		}
-	                }
-	         		
-	                if(flagEstagio1 == true)
-	                {
-	                	// Verificar se o sinal do acelerometro estabilizou... atraves de uma margem de erro em relacao a normal 9,8 
-	        	        double mediaAmostralAceleracao = Math.abs(obterMediaVariacaoAceleracao());
-	        	        if(mediaAmostralAceleracao <= MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO && flagEstagio2 == false) // Verificar se o sinal do acelerometro estabilizou...
-	        	        {
-	        	        	resetarVariaveisMonitoramento();
-	        	        }
-	        	        else if(moduloVetorAceleracao >= LIMITE_PICO_SUPERIOR)
-	                	{
-	        	        	flagContagemPicos = false;    	        	
-	        	        	if(moduloVetorAceleracao >= moduloAceleracaoEstagio2)
-	        	        	{
-	    	                	flagEstagio2 = true;
-	    	            		timestampEstagio2 = timestampAtualSistema;
-	    	            		intervaloEstagio1e2 = timestampEstagio2 - timestampEstagio1;
-	    	
-	    	            		moduloAceleracaoEstagio2 = moduloVetorAceleracao;
-	        	        	}
-	                	}
-	                }
-
-	                if(flagEstagio2 == true)
-	                {
-	                	// Verificar se o cara apagou... atraves de uma margem de erro em relacao a normal 9,8 
-	        	        double mediaAmostralAceleracao = Math.abs(obterMediaVariacaoAceleracao());
-	        	        if(mediaAmostralAceleracao <= MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO)
-	        	        {
-	        	        	flagEstagio3 = true;
-	        	        	timestampEstagio3 = timestampAtualSistema;
-	        	        	intervaloEstagio2e3 = timestampEstagio3 - timestampEstagio2;
-	        	        	intervaloEstagio1e3 = timestampEstagio3 - timestampEstagio1;
-	        	        }
-	                }
-	                
-	                if(flagEstagio3 == true)
-	                {
-	                	// Obtendo amplitude de aceleracao entre o menor pico e o maior pico...
-	                	double amplitudeAceleracao = moduloAceleracaoEstagio2 - moduloAceleracaoEstagio1;
-	                	
-	                	if(amplitudeAceleracao > MARGEM_ERRO_AMPLITUDE_ACELERACAO)
-	                	{
-	                		if(intervaloEstagio1e2 >= MARGEM_ERRO_TEMPO_ACELERACAO_DESACELERACAO && intervaloEstagio2e3 >= MARGEM_ERRO_DESACELERACAO_SINAL_ESTABILIZADO && intervaloEstagio1e3 >= MARGEM_ERRO_TEMPO_TOTAL_QUEDA_SINAL_ESTABILIZADO && qtdTotalPicos >= QTD_MINIMA_PICOS_DESMAIO)
-	                		{
-	    	            		flagEstagio4 = true;
-	    	            		timestampEstagio4 = timestampAtualSistema;
-
-	    	            		/** BEGIN: Iniciando objetos de musica do android... **/
-	    		                if(!objRing.isPlaying())
-	    			        	{
-	    			        		objRing.play();
-	    			        	}
-	    		                /** BEGIN: Iniciando objetos de musica do android... **/
-	                		}
-	                    	else
-	                    	{
-	                    		resetarVariaveisMonitoramento();
-	                    	}
-	                	}
-	                }
-	            }
-
 	    		if(flagHabilitarLogs)
 	    		{
 		            // Gerando os Logs dos dados coletados no acelerometro...
@@ -371,28 +206,34 @@ public class EpilepsyHeuristicPrecisao {
 	    		flagGyroscopeAtivado = true;
 
 	    		// Calculando os modulos resultantes dos eixos x, y e z
-	    		double moduloVetorGiroscopio = moduloVetor;
+	    		moduloVetorGiroscopio = moduloVetor;
 	    		
-	    		if(flagEstagio1 == true || flagEstagio2 == true || flagEstagio3 == true || flagEstagio4 == true)
+	    		if(estadoAtual != ESTADO_INICIAL)
 	    		{
 	    			double moduloX = Math.abs(x);
 	    			double moduloY = Math.abs(y);
 	    			double moduloZ = Math.abs(z);
 	    			
 	    			if(moduloX > maxVariacaoGyroscopeEixoX)
-	    			{
 	    				maxVariacaoGyroscopeEixoX = moduloX;
-	    			}
 	    			
 	    			if(moduloY > maxVariacaoGyroscopeEixoY)
-	    			{
 	    				maxVariacaoGyroscopeEixoY = moduloY;
-	    			}
 	    			
 	    			if(moduloZ > maxVariacaoGyroscopeEixoZ)
-	    			{
 	    				maxVariacaoGyroscopeEixoZ = moduloZ;
-	    			}
+	    		}
+
+	    		// Obtendo o menor e o maior pico do giroscopio... quando a maquina de estado for iniciada.
+	    		if(estadoAtual != ESTADO_INICIAL)
+	    		{
+	    			// Detecta o maior pico do giroscopio
+	    			if(moduloVetorGiroscopio >= maiorModuloGiroscopio)
+	            		maiorModuloGiroscopio = moduloVetorGiroscopio;
+	    		}
+	    		else
+	    		{
+	    			maiorModuloGiroscopio = 0;
 	    		}
 
 	    		if(flagHabilitarLogs)
@@ -402,7 +243,206 @@ public class EpilepsyHeuristicPrecisao {
 	    		}
 	    	break;
     	}
-        
+		
+        /********************************************************************************
+         *						HEURISTICA DE DETECCAO DE DESMAIO						*
+         ********************************************************************************/
+    	double maiorVariacaoAceleracao = obterMaiorVariacaoAceleracao();
+
+    	switch (estadoAtual) {
+			case ESTADO_1:
+                if(moduloVetorAceleracao >= LIMITE_ACELERACAO_PICO_SUPERIOR) // Verifica se alcancou o pico superior
+            	{
+                	if(MODO_DEBUG)
+                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_1 -> ESTADO_2", Toast.LENGTH_SHORT).show();
+    	        	
+    	        	estadoAtual = ESTADO_2;
+    	        	timestampEstado2 = timestampAtualSistema;
+    	        	maiorModuloAceleracao = moduloVetorAceleracao;
+            	}
+    	        else if(maiorVariacaoAceleracao <= MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO) // Verificar se o sinal do acelerometro estabilizou... atraves de uma margem de erro em relacao a normal 9,8 
+            	{
+                	if(MODO_DEBUG)
+                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_1 -> ESTADO_INICIAL", Toast.LENGTH_SHORT).show();
+    	        	
+    	        	estadoAtual = ESTADO_INICIAL;
+    	        	resetarVariaveisMonitoramento();
+            		return false;
+            	}
+			break;
+			
+			case ESTADO_2:
+            	// Aguarda a estabilizacao do sinal do acelerometro... atraves de uma margem de erro em relacao a normal 9,8 
+    	        if(maiorVariacaoAceleracao <= MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO)
+    	        {
+    	        	timestampEstado3 = timestampAtualSistema;
+    	        	long tempoTotalEntrePicosQueda = timestampEstado2 - timestampEstado1;
+
+    	        	// Apenas debug...
+    	        	String msgText = " TEMPO_Q(" + Long.toString(tempoTotalEntrePicosQueda) + ")";
+
+    	        	if(tempoTotalEntrePicosQueda >= MARGEN_ERRO_TEMPO_MINIMO_QUEDA_DESMAIO) // Validando tempo minimo de queda...
+    	        	{
+    	        		estadoAtual = ESTADO_3;
+        	        	if(MODO_DEBUG)
+                    		Toast.makeText(objContext, "EpilepsyApp - ESTADO_2 -> ESTADO_3" + msgText, Toast.LENGTH_SHORT).show();
+    	        	}
+    	        	else
+    	        	{
+    	        		estadoAtual = ESTADO_INICIAL;
+        	        	if(MODO_DEBUG)
+                    		Toast.makeText(objContext, "EpilepsyApp - ESTADO_2 -> ESTADO_INICIAL" + msgText, Toast.LENGTH_SHORT).show();
+    	        	}
+    	        }
+			break;
+			
+			case ESTADO_3:
+            	// Obtendo amplitude de aceleracao entre o menor pico e o maior pico...
+            	double amplitudeAceleracao = maiorModuloAceleracao - menorModuloAceleracao;
+            	boolean flagHabilitaEstado4 = false;
+            	
+            	if(!flagGyroscopeAtivado && amplitudeAceleracao > MARGEM_ERRO_AMPLITUDE_ACELERACAO)
+            		flagHabilitaEstado4 = true;
+            	else if(flagGyroscopeAtivado && amplitudeAceleracao > MARGEM_ERRO_AMPLITUDE_ACELERACAO && maiorModuloGiroscopio >= LIMITE_GIROSCOPIO_PICO_SUPERIOR)
+            		flagHabilitaEstado4 = true;
+            	
+            	if(flagHabilitaEstado4)
+        		{
+                	if(MODO_DEBUG)
+                	{
+                		String msgText = " A(" + Double.toString(amplitudeAceleracao) + ") G("+Double.toString(maiorModuloGiroscopio)+")";
+                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_3 -> ESTADO_4" + msgText, Toast.LENGTH_SHORT).show();
+                	}
+
+    	        	estadoAtual = ESTADO_4;
+            		timestampEstado4 = timestampAtualSistema;
+            		timestampAdicionalEstado4 = 0;
+            		
+	                if(!objRing.isPlaying()) /** Emitindo beep... para validar um possivel desmaio... **/
+		        		objRing.play();
+        		}
+            	else
+            	{
+                	if(MODO_DEBUG)
+                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_3 -> ESTADO_INICIAL", Toast.LENGTH_SHORT).show();
+
+    	        	estadoAtual = ESTADO_INICIAL;
+    	        	resetarVariaveisMonitoramento();
+            		return false;
+            	}
+			break;
+			
+			case ESTADO_4:
+            	tempoValidacao = timestampAtualSistema - timestampEstado4;
+            	if(tempoValidacao > MARGEN_ERRO_TEMPO_MINIMO_VALIDACAO_DESMAIO)
+            	{
+    	        	if(tempoValidacao < (MARGEN_ERRO_TEMPO_TOTAL_VALIDACAO_DESMAIO + timestampAdicionalEstado4))
+    	        	{
+    	        		double variacaoVetorAceleracaoAtual = Math.abs(moduloVetorAceleracao - ACELERACAO_NORMAL_GRAVIDADE);
+    	        		
+    	        		// Verificar se está havendo alguma oscilação no acelerometro... caso contrario o cara apagou mesmo... :P
+    	    	        if(variacaoVetorAceleracaoAtual > MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO)
+    	    	        	contadoMargemErroDesmaio++;
+    	    	        
+    	    	        if(contadoMargemErroDesmaio > MARGEM_ERRO_CONTADOR_VARIACOES_DESMAIO)
+    	    	        {
+    	                	if(MODO_DEBUG)
+    	                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> ESTADO_INICIAL", Toast.LENGTH_SHORT).show();
+
+    	    	        	estadoAtual = ESTADO_INICIAL;
+    	    	        	resetarVariaveisMonitoramento();
+    	    	        	return false;
+    	    	        }
+    	        	}
+    	        	else
+    	        	{
+    	        		int eixoNormalAntes = obterEixoNormal(eixoNormalAceleracaoAntesX, eixoNormalAceleracaoAntesY, eixoNormalAceleracaoAntesZ);
+    	        		int eixoNormalDepois = obterEixoNormal(eixoNormalAceleracaoDepoisX, eixoNormalAceleracaoDepoisY, eixoNormalAceleracaoDepoisZ);
+    	        		
+    	        		// A condicao abaixo verifica se a pessoa estava de pé e deitou ou virou... ou seja, a pessoa não está na mesma posicao antes do impacto.
+    	        		if(eixoNormalAntes != eixoNormalDepois)
+    	        		{
+    	                	if(MODO_DEBUG)
+    	                	{
+    	                		String msgTexto = "ANTES(" + Integer.toString(eixoNormalAntes) + ") DEPOIS(" + Integer.toString(eixoNormalDepois) + ")";
+    	                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> " + msgTexto, Toast.LENGTH_SHORT).show();
+    	                	}
+
+    	                	// Verificando se houve alguma variacao angular no giroscopio...
+    	                	boolean flagAtivarAlertaDesmaio = true;
+        	        		if(flagGyroscopeAtivado)
+    	        			{
+	        					switch (Math.abs(eixoNormalAntes)) {
+	        						case ID_EIXO_X:
+	        							if(maxVariacaoGyroscopeEixoY >= LIMITE_GIROSCOPIO_PICO_SUPERIOR || maxVariacaoGyroscopeEixoZ >= LIMITE_GIROSCOPIO_PICO_SUPERIOR)
+	        								flagAtivarAlertaDesmaio = true;
+	        							else
+	        								flagAtivarAlertaDesmaio = false;
+    	        			    	break;
+	        						case ID_EIXO_Y:
+	        							if(maxVariacaoGyroscopeEixoX >= LIMITE_GIROSCOPIO_PICO_SUPERIOR || maxVariacaoGyroscopeEixoZ >= LIMITE_GIROSCOPIO_PICO_SUPERIOR)
+	        								flagAtivarAlertaDesmaio = true;
+	        							else
+	        								flagAtivarAlertaDesmaio = false;
+    	        			    	break;
+	        						case ID_EIXO_Z:
+	        							if(maxVariacaoGyroscopeEixoX >= LIMITE_GIROSCOPIO_PICO_SUPERIOR || maxVariacaoGyroscopeEixoY >= LIMITE_GIROSCOPIO_PICO_SUPERIOR)
+	        								flagAtivarAlertaDesmaio = true;
+	        							else
+	        								flagAtivarAlertaDesmaio = false;
+    	        			    	break;
+	        					}
+	    	        		}
+
+        	        		if(flagAtivarAlertaDesmaio)
+        	        		{
+        	                	if(MODO_DEBUG)
+        	                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> ESTADO_INICIAL -> DESMAIO DETECTADO(1)", Toast.LENGTH_SHORT).show();
+
+        	                	estadoAtual = ESTADO_INICIAL;
+		        	        	resetarVariaveisMonitoramento();
+	    			        	return true; // TEM MAIORES CHANCES DE SER UM DESMAIO...
+        	        		}
+    	        		}
+
+    	        		if(timestampAdicionalEstado4 == 0)
+    	        		{
+	                    	if(MODO_DEBUG)
+	                    		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> TEMPO ADICIONAL DE VALIDACAO DESMAIO", Toast.LENGTH_SHORT).show();
+
+	                    	timestampAdicionalEstado4 = MARGEN_ERRO_TEMPO_ADICIONAL_VALIDACAO_DESMAIO;
+    	        		}
+    	        		else
+    	        		{
+	                    	if(MODO_DEBUG)
+	                    		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> ESTADO_INICIAL -> DESMAIO DETECTADO(2)", Toast.LENGTH_SHORT).show();
+	
+		    	        	estadoAtual = ESTADO_INICIAL;
+	        	        	resetarVariaveisMonitoramento();
+	    	        		return true;
+    	        		}
+    	        	}
+            	}
+            	else
+            	{
+            		contadoMargemErroDesmaio = 0;
+            	}
+			break;
+			
+			default: // Estado Inicial
+				estadoAtual = ESTADO_INICIAL;
+            	if(moduloVetorAceleracao <= LIMITE_ACELERACAO_PICO_INFERIOR)
+                {
+                	if(MODO_DEBUG)
+                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_INICIAL -> ESTADO_1", Toast.LENGTH_SHORT).show();
+
+    	        	estadoAtual = ESTADO_1;
+	            	timestampEstado1 = timestampAtualSistema;
+	                menorModuloAceleracao = moduloVetorAceleracao;
+                }
+			break;
+		}
+		
         return false;
     }
     
@@ -410,23 +450,13 @@ public class EpilepsyHeuristicPrecisao {
      *  Esta funcao retorna a porcentagem media de variacao da aceleracao... Ex.: -0.21, 0.50, 0.01, etc
      */
     private void resetarVariaveisMonitoramento() {
-    	timestampEstagio1 = 0;
-    	timestampEstagio2 = 0;
-    	timestampEstagio3 = 0;
-    	timestampEstagio4 = 0;
-    	intervaloEstagio1e2 = 0;
-    	intervaloEstagio2e3 = 0;
-    	intervaloEstagio1e3 = 0;
-    	moduloAceleracaoEstagio1 = ACELERACAO_NORMAL_GRAVIDADE; // Aceleracao normal da gravidade.
-    	moduloAceleracaoEstagio2 = 0;
-    	flagEstagio1 = false;
-    	flagEstagio2 = false;
-    	flagEstagio3 = false;
-    	flagEstagio4 = false;
-    	
-    	flagContagemPicos = false;
-    	qtdTotalPicos = 0;
-    	
+    	timestampEstado1 = 0;
+    	timestampEstado2 = 0;
+    	timestampEstado3 = 0;
+    	timestampEstado4 = 0;
+    	timestampAdicionalEstado4 = 0;
+    	tempoValidacao = 0;
+
     	contadoMargemErroDesmaio = 0;
 
     	eixoNormalAceleracaoAntesX.clear();
@@ -444,20 +474,20 @@ public class EpilepsyHeuristicPrecisao {
     }
     
     /**
-     *  Esta funcao retorna a porcentagem media de variacao da aceleracao... Ex.: -0.21, 0.50, 0.01, etc
+     *  Esta funcao retorna a porcentagem da maior variacao da aceleracao... Ex.: -0.21, 0.50, 0.01, etc
      * @return
      */
-    private double obterMediaVariacaoAceleracao() {
-    	double totalVariacaoAceleracao = 0;
-    	double mediaVariacaoAceleracao = 0;
+    private double obterMaiorVariacaoAceleracao() {
+    	double maiorVetorAceleracao = 0;
+    	double maiorVariacaoAceleracao = 0;
     	
     	for(Double valorAceleracao : arrayAmostragemAceleracao) {
-    		totalVariacaoAceleracao += valorAceleracao;
+    		if(valorAceleracao >= maiorVetorAceleracao)
+    			maiorVetorAceleracao = valorAceleracao;
     	}
     	
-    	mediaVariacaoAceleracao = ACELERACAO_NORMAL_GRAVIDADE - (totalVariacaoAceleracao / QTD_TOTAL_AMOSTRAGEM_ACELERACAO);
-    	
-    	return(mediaVariacaoAceleracao);
+    	maiorVariacaoAceleracao = Math.abs(maiorVetorAceleracao - ACELERACAO_NORMAL_GRAVIDADE);
+    	return(maiorVariacaoAceleracao);
     }
     
     /**
@@ -481,35 +511,22 @@ public class EpilepsyHeuristicPrecisao {
     	
     	for(Float valorAceleracao : eixoX) {
     		if(valorAceleracao >= 0)
-    		{
     			totalAceleracaoEixoX_Positivo += Math.abs(valorAceleracao);
-    		}
     		else
-    		{
     			totalAceleracaoEixoX_Negativo += Math.abs(valorAceleracao);
-    		}
     	}
     	for(Float valorAceleracao : eixoY) {
     		if(valorAceleracao >= 0)
-    		{
     			totalAceleracaoEixoY_Positivo += Math.abs(valorAceleracao);
-    		}
     		else
-    		{
     			totalAceleracaoEixoY_Negativo += Math.abs(valorAceleracao);
-    		}
         }
     	for(Float valorAceleracao : eixoZ) {
     		if(valorAceleracao >= 0)
-    		{
     			totalAceleracaoEixoZ_Positivo += Math.abs(valorAceleracao);
-    		}
     		else
-    		{
     			totalAceleracaoEixoZ_Negativo += Math.abs(valorAceleracao);
-    		}
         }
-
     	
     	totalAceleracaoEixoX = totalAceleracaoEixoX_Positivo + totalAceleracaoEixoX_Negativo;
     	totalAceleracaoEixoY = totalAceleracaoEixoY_Positivo + totalAceleracaoEixoY_Negativo;
