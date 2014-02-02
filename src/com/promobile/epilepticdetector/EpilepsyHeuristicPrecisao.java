@@ -96,7 +96,7 @@ public class EpilepsyHeuristicPrecisao {
     Ringtone objRing;
    
 	// Construtor da classe...
-	public EpilepsyHeuristicPrecisao(Context context, SensorManager sensorManager, boolean habilitarLogs) {
+	public EpilepsyHeuristicPrecisao(Context context, boolean habilitarLogs) {
         /********************************************************************************
          *			HEURISTICA DE DETECCAO DE DESMAIOS E ATAQUES EPILEPTICOS			*
          ********************************************************************************/

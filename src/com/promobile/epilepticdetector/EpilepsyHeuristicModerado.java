@@ -10,7 +10,6 @@ import java.util.Stack;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -94,7 +93,7 @@ public class EpilepsyHeuristicModerado {
     Ringtone objRing;
    
 	// Construtor da classe...
-	public EpilepsyHeuristicModerado(Context context, SensorManager sensorManager, boolean habilitarLogs) {
+	public EpilepsyHeuristicModerado(Context context, boolean habilitarLogs) {
         /********************************************************************************
          *			HEURISTICA DE DETECCAO DE DESMAIOS E ATAQUES EPILEPTICOS			*
          ********************************************************************************/

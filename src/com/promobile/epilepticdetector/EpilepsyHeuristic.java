@@ -1,20 +1,7 @@
 package com.promobile.epilepticdetector;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Stack;
-
 import android.content.Context;
-import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorManager;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Environment;
 
 public class EpilepsyHeuristic {
 
@@ -26,10 +13,10 @@ public class EpilepsyHeuristic {
 	private EpilepsyHeuristicPrecisao objPerfilPrecisao;
 	
 	// Construtor da classe...
-	public EpilepsyHeuristic(Context context, SensorManager sensorManager, int perfilMonitoramento, boolean habilitarLogs) {
+	public EpilepsyHeuristic(Context context, int perfilMonitoramento, boolean habilitarLogs) {
 		perfil = perfilMonitoramento;
-		objPerfilModerado = new EpilepsyHeuristicModerado(context, sensorManager, habilitarLogs);
-		objPerfilPrecisao = new EpilepsyHeuristicPrecisao(context, sensorManager, habilitarLogs);
+		objPerfilModerado = new EpilepsyHeuristicModerado(context, habilitarLogs);
+		objPerfilPrecisao = new EpilepsyHeuristicPrecisao(context, habilitarLogs);
 	}
 
 	/**
