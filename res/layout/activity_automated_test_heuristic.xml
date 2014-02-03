@@ -1,7 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/LinearLayout1"
-    android:layout_width="wrap_content"
+    android:layout_width="fill_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
@@ -10,20 +10,26 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".AutomatedTestHeuristicActivity" >
 
-    <!-- TODO: NAO REMOVER O BOTAO, POIS PARA DEBUGAR A HEURISTICA DE DESMAIO EH MAIS FACIL DEVIDO OS LOGS!!!!-->
+    <!-- TODO: NAO REMOVER O BOTAO, POIS PARA DEBUGAR A HEURISTICA DE DESMAIO EH MAIS FACIL DEVIDO OS LOGS!!!! -->
 
-	<Button
-	    android:id="@+id/btnStartTest"
-	    android:layout_width="284dp"
-	    android:layout_height="wrap_content"
-	    android:layout_alignParentLeft="true"
-	    android:layout_below="@+id/btnStartTest"
-	    android:layout_marginBottom="10dp"
-	    android:text="@string/btnStartTest"
-	    android:textAlignment="center"
-	    android:textColor="#ffffffff" />
-    
-    <TextView        
+    <Button
+        android:id="@+id/btnStartTest"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/btnStartTest"
+        android:layout_marginBottom="10dp"
+        android:text="@string/btnStartTest"
+        android:textAlignment="center"
+        android:textColor="#ffffffff" />
+
+    <TextView
+        android:id="@+id/txtChaveTeste"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ChaveTeste" />
+
+    <TextView
         android:id="@+id/txtValorTimer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -64,7 +70,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="txtValorZG" />
-    
+
     <TextView
         android:id="@+id/txtValorVetor"
         android:layout_width="wrap_content"
@@ -73,9 +79,10 @@
 
     <TextView
         android:id="@+id/text_view_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:layout_marginTop="30px"
-        android:text="text_view_status" />
-
+        android:text="text_view_status"
+        android:background="#C3C3C3" />
+    
 </LinearLayout>
