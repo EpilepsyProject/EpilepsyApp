@@ -108,89 +108,116 @@ public class AutomatedTestHeuristicActivity extends Activity{
     }
     
     protected void startAutomatedTest() {
-    	textViewStatus.setText("Processando os testes automatizados... Aguarde...\n");
-
-		File diretorio = new File(pathArquivosTeste);
-        if (!diretorio.exists()) {  
-        	diretorio.mkdirs(); //mkdir() cria somente um diretório, mkdirs() cria diretórios e subdiretórios.  
-        } 
-
-        File[] arquivos = diretorio.listFiles();
-    	
-    	if(arquivos != null)
-    	{
-    		int length = arquivos.length;
-    	    for(int i = 0; i < length; ++i)
+    	Runnable runnable = new Runnable() {
+    		int contArquivos = 0;
+    		File diretorio;
+    		File[] arquivos;
+    		boolean flagConstrutor = true;
+    		
+    		public void run() 
     	    {
-    	        File f = arquivos[i];
-    	        if(f.isFile() && f.getName().contains("logsEpilepsyApp_Accelerometer_"))
-    	        {
-    	        	int contA = 0;
-    	        	Stack<Double> timerA = new Stack<Double>();
-    	        	Stack<Double> eixoXA = new Stack<Double>();
-    	        	Stack<Double> eixoYA = new Stack<Double>();
-    	        	Stack<Double> eixoZA = new Stack<Double>();
-    	        	Stack<Double> eixoMA = new Stack<Double>();
+    			if(flagConstrutor) // Guambi para criar um contrutor... heheheh :-P
+    			{
+    				textViewStatus.setText("Processando os testes automatizados... Aguarde...\n");
 
-    	        	int contG = 0;
-    	        	Stack<Double> timerG = new Stack<Double>();
-    	        	Stack<Double> eixoXG = new Stack<Double>();
-    	        	Stack<Double> eixoYG = new Stack<Double>();
-    	        	Stack<Double> eixoZG = new Stack<Double>();
-    	        	Stack<Double> eixoMG = new Stack<Double>();
+    				diretorio = new File(pathArquivosTeste);
+    		        if (!diretorio.exists()) {  
+    		        	diretorio.mkdirs(); //mkdir() cria somente um diretório, mkdirs() cria diretórios e subdiretórios.  
+    		        } 
+    		        arquivos = diretorio.listFiles();
+    		        
+    		        contArquivos = 0;
+    		        
+		    		flagConstrutor = false;
+    			}
 
-    	        	chaveTeste = f.getName().replace("logsEpilepsyApp_Accelerometer_", "").replace(".txt", "");
-    	        	pathDadosTesteAcelerometro =  "logsEpilepsyApp_Accelerometer_" + chaveTeste + ".txt";
-    	        	pathDadosTesteGiroscopio = "logsEpilepsyApp_Gyroscope_" + chaveTeste + ".txt";
+    			// Recursividade... para ler o proximo arquivo de teste automatizado...
+    			if(txtChaveTeste.getText().length() != 0)
+				{
+					handler.postDelayed(this, 100);
+					return;
+				}
+    			
+    	    	if(arquivos != null && contArquivos < arquivos.length)
+    	    	{
+	    	        File f = arquivos[contArquivos];
+	    	        if(f.isFile() && f.getName().contains("logsEpilepsyApp_Accelerometer_"))
+	    	        {
+	    	        	int contA = 0;
+	    	        	Stack<Double> timerA = new Stack<Double>();
+	    	        	Stack<Double> eixoXA = new Stack<Double>();
+	    	        	Stack<Double> eixoYA = new Stack<Double>();
+	    	        	Stack<Double> eixoZA = new Stack<Double>();
+	    	        	Stack<Double> eixoMA = new Stack<Double>();
 
-    	        	try
-    	            {
-	    	        	File arqDadosTeste;
-	    	        	Scanner scanner;
+	    	        	int contG = 0;
+	    	        	Stack<Double> timerG = new Stack<Double>();
+	    	        	Stack<Double> eixoXG = new Stack<Double>();
+	    	        	Stack<Double> eixoYG = new Stack<Double>();
+	    	        	Stack<Double> eixoZG = new Stack<Double>();
+	    	        	Stack<Double> eixoMG = new Stack<Double>();
+
+	    	        	chaveTeste = f.getName().replace("logsEpilepsyApp_Accelerometer_", "").replace(".txt", "");
+	    	        	pathDadosTesteAcelerometro =  "logsEpilepsyApp_Accelerometer_" + chaveTeste + ".txt";
+	    	        	pathDadosTesteGiroscopio = "logsEpilepsyApp_Gyroscope_" + chaveTeste + ".txt";
+
+	    	        	try
+	    	            {
+		    	        	File arqDadosTeste;
+		    	        	Scanner scanner;
+		    	        	
+		    	        	arqDadosTeste = new File(pathArquivosTeste, pathDadosTesteAcelerometro);
+		    	        	scanner = new Scanner(arqDadosTeste);
+		    	            while (scanner.hasNextLine()) {
+		    	                String[] arrayDados = scanner.nextLine().split(";");
+								timerA.add(contA, Double.parseDouble(arrayDados[0]));
+								eixoXA.add(contA, Double.parseDouble(arrayDados[1]));
+								eixoYA.add(contA, Double.parseDouble(arrayDados[2]));
+								eixoZA.add(contA, Double.parseDouble(arrayDados[3]));
+								eixoMA.add(contA, Double.parseDouble(arrayDados[4]));
+								contA = contA + 1;
+							}
+		    	            
+		    	        	arqDadosTeste = new File(pathArquivosTeste, pathDadosTesteGiroscopio);
+		    	        	scanner = new Scanner(arqDadosTeste);
+		    	            while (scanner.hasNextLine()) {
+		    	                String[] arrayDados = scanner.nextLine().split(";");
+								timerG.add(contG, Double.parseDouble(arrayDados[0]));
+								eixoXG.add(contG, Double.parseDouble(arrayDados[1]));
+								eixoYG.add(contG, Double.parseDouble(arrayDados[2]));
+								eixoZG.add(contG, Double.parseDouble(arrayDados[3]));
+								eixoMG.add(contG, Double.parseDouble(arrayDados[4]));
+								contG = contG + 1;
+							}
+		    	            scanner.close();
+	    	            }
+	    	            catch (Exception e)
+	    	            {
+	    	            	textViewStatus.append("# " + chaveTeste + " - Erro durante a leitura!\n");
+	    	            	salvarLog(chaveTeste, "Erro durante a leitura dos dados do arquivo!");
+	    	            }
 	    	        	
-	    	        	arqDadosTeste = new File(pathArquivosTeste, pathDadosTesteAcelerometro);
-	    	        	scanner = new Scanner(arqDadosTeste);
-	    	            while (scanner.hasNextLine()) {
-	    	                String[] arrayDados = scanner.nextLine().split(";");
-							timerA.add(contA, Double.parseDouble(arrayDados[0]));
-							eixoXA.add(contA, Double.parseDouble(arrayDados[1]));
-							eixoYA.add(contA, Double.parseDouble(arrayDados[2]));
-							eixoZA.add(contA, Double.parseDouble(arrayDados[3]));
-							eixoMA.add(contA, Double.parseDouble(arrayDados[4]));
-							contA = contA + 1;
-						}
-	    	            
-	    	        	arqDadosTeste = new File(pathArquivosTeste, pathDadosTesteGiroscopio);
-	    	        	scanner = new Scanner(arqDadosTeste);
-	    	            while (scanner.hasNextLine()) {
-	    	                String[] arrayDados = scanner.nextLine().split(";");
-							timerG.add(contG, Double.parseDouble(arrayDados[0]));
-							eixoXG.add(contG, Double.parseDouble(arrayDados[1]));
-							eixoYG.add(contG, Double.parseDouble(arrayDados[2]));
-							eixoZG.add(contG, Double.parseDouble(arrayDados[3]));
-							eixoMG.add(contG, Double.parseDouble(arrayDados[4]));
-							contG = contG + 1;
-						}
-	    	            scanner.close();
-    	            }
-    	            catch (Exception e)
-    	            {
-    	            	textViewStatus.append("# " + chaveTeste + " - Erro durante a leitura!\n");
-    	            	salvarLog(chaveTeste, "Erro durante a leitura dos dados do arquivo!");
-    	            }
-    	        	
-    	        	if(timerA.size() > 0 && timerG.size() > 0)
-    	        	{
-    	        		processarMonitoramento(chaveTeste, timerA, eixoXA, eixoYA, eixoZA, eixoMA, timerG, eixoXG, eixoYG, eixoZG, eixoMG);
-    	        	}
-    	        	else
-    	        	{
-    	        		textViewStatus.append("# " + chaveTeste + " - Um dos arquivos não possui dados!\n");
-    	        		salvarLog(chaveTeste, "Um dos arquivos não possui dados!");
-    	        	}
-    	        }
+	    	        	if(timerA.size() > 0 && timerG.size() > 0)
+	    	        	{
+	    	        		txtChaveTeste.setText(chaveTeste);
+	    	        		processarMonitoramento(chaveTeste, timerA, eixoXA, eixoYA, eixoZA, eixoMA, timerG, eixoXG, eixoYG, eixoZG, eixoMG);
+	    	        	}
+	    	        	else
+	    	        	{
+	    	        		textViewStatus.append("# " + chaveTeste + " - Um dos arquivos não possui dados!\n");
+	    	        		salvarLog(chaveTeste, "Um dos arquivos não possui dados!");
+	    	        	}
+	    	        }
+	    	        
+	    	        contArquivos = contArquivos + 1;
+	    	        
+	    	        handler.postDelayed(this, 100);
+    	    	}
     	    }
-    	}
+    	};
+    	
+        handler.postDelayed(runnable, 100);
+        sleepTimer(100);
     }
 
     private void processarMonitoramento(String strChaveTeste, Stack<Double> timerA, Stack<Double> eixoXA, Stack<Double> eixoYA, Stack<Double> eixoZA, Stack<Double> eixoMA, Stack<Double> timerG, Stack<Double> eixoXG, Stack<Double> eixoYG, Stack<Double> eixoZG, Stack<Double> eixoMG)
