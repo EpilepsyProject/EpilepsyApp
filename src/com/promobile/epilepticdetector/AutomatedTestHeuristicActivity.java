@@ -193,7 +193,7 @@ public class AutomatedTestHeuristicActivity extends Activity{
 	    	            }
 	    	            catch (Exception e)
 	    	            {
-	    	            	textViewStatus.append("# " + chaveTeste + " - Erro durante a leitura!\n");
+	    	            	textViewStatus.setText("# " + chaveTeste + " - Erro durante a leitura!\n" + textViewStatus.getText());
 	    	            	salvarLog(chaveTeste, "Erro durante a leitura dos dados do arquivo!");
 	    	            }
 	    	        	
@@ -204,7 +204,7 @@ public class AutomatedTestHeuristicActivity extends Activity{
 	    	        	}
 	    	        	else
 	    	        	{
-	    	        		textViewStatus.append("# " + chaveTeste + " - Um dos arquivos não possui dados!\n");
+	    	        		textViewStatus.setText("# " + chaveTeste + " - Um dos arquivos não possui dados!\n" + textViewStatus.getText());
 	    	        		salvarLog(chaveTeste, "Um dos arquivos não possui dados!");
 	    	        	}
 	    	        }
@@ -212,7 +212,10 @@ public class AutomatedTestHeuristicActivity extends Activity{
 	    	        contArquivos = contArquivos + 1;
 	    	        
 	    	        handler.postDelayed(this, 100);
+	    	        return;
     	    	}
+    	    	
+    	    	textViewStatus.setText("# Testes finalizados!!!\n" + textViewStatus.getText());
     	    }
     	};
     	
@@ -261,7 +264,7 @@ public class AutomatedTestHeuristicActivity extends Activity{
     					return;
     				}
     				
-    				objHeuristica = new EpilepsyHeuristic(context, EpilepsyHeuristic.PERFIL_PRECISAO, false);
+    				objHeuristica = new EpilepsyHeuristic(context, EpilepsyHeuristic.PERFIL_MODERADO, false);
     				timerAtualA = 0;
     				timerAtualG = 0;
 		    	    contA = 0;
@@ -344,12 +347,12 @@ public class AutomatedTestHeuristicActivity extends Activity{
 				{
 	        		if(flagMonitoramento)
 	        		{
-	        			textViewStatus.append("# " + chaveTeste + " - DESMAIO DETECTADO!!!!\n");
+	        			textViewStatus.setText("# " + chaveTeste + " - DESMAIO DETECTADO!!!!\n" + textViewStatus.getText());
 	        			salvarLog(chaveTeste, "DESMAIO DETECTADO!!!!");
 	        		}
 	        		else
 	        		{
-	        			textViewStatus.append("# " + chaveTeste + " - OK\n");
+	        			textViewStatus.setText("# " + chaveTeste + " - OK\n" + textViewStatus.getText());
 	        			salvarLog(chaveTeste, "OK");
 	        		}
 	        		
