@@ -52,10 +52,10 @@ public class InicialActivity extends Activity {
              });        
          
          //TODO: NAO REMOVER O BOTAO, POIS PARA DEBUGAR A HEURISTICA DE DESMAIO EH MAIS FACIL DEVIDO OS LOGS!!!!
-         findViewById(R.id.btnUsarAcelerometro).setOnClickListener(new View.OnClickListener() {
+         findViewById(R.id.btnAutomatedTestHeuristic).setOnClickListener(new View.OnClickListener() {
     		@Override
         		public void onClick(View arg0) {
-        			Intent intent = new Intent(InicialActivity.this, AcelerometroActivity.class);
+        			Intent intent = new Intent(InicialActivity.this, AutomatedTestHeuristicActivity.class);
         			startActivity(intent);
         		}
         	});

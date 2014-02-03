@@ -69,13 +69,14 @@ public class EpilepsyHeuristicPrecisao {
 	private final int ID_EIXO_Z_POSITIVO =  1 * ID_EIXO_Z;
 	private final int ID_EIXO_Z_NEGATIVO = -1 * ID_EIXO_Z;
 	private final int QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO = 100;
-	Stack<Float> eixoNormalAceleracaoAntesX = new Stack<Float>();
-	Stack<Float> eixoNormalAceleracaoAntesY = new Stack<Float>();
-	Stack<Float> eixoNormalAceleracaoAntesZ = new Stack<Float>();
+	
+	Stack<Double> eixoNormalAceleracaoAntesX = new Stack<Double>();
+	Stack<Double> eixoNormalAceleracaoAntesY = new Stack<Double>();
+	Stack<Double> eixoNormalAceleracaoAntesZ = new Stack<Double>();
 
-	Stack<Float> eixoNormalAceleracaoDepoisX = new Stack<Float>();
-	Stack<Float> eixoNormalAceleracaoDepoisY = new Stack<Float>();
-	Stack<Float> eixoNormalAceleracaoDepoisZ = new Stack<Float>();
+	Stack<Double> eixoNormalAceleracaoDepoisX = new Stack<Double>();
+	Stack<Double> eixoNormalAceleracaoDepoisY = new Stack<Double>();
+	Stack<Double> eixoNormalAceleracaoDepoisZ = new Stack<Double>();
 
 	private double maxVariacaoGyroscopeEixoX = 0;
 	private double maxVariacaoGyroscopeEixoY = 0;
@@ -86,9 +87,6 @@ public class EpilepsyHeuristicPrecisao {
 	String chaveNomeArquivoLog = "";
 	private final String CATACTER_SEPARADOR_ARQ_LOGS = ";";
      
-    Float x, y, z;
-    Float xGiroscopio, yGiroscopio, zGiroscopio;
-
     private Context objContext;
 
     // Iniciando objetos de musica do android...
@@ -124,7 +122,7 @@ public class EpilepsyHeuristicPrecisao {
 	 * e ataques epilepticos.
 	 * @param event
 	 */
-    public boolean monitorar(SensorEvent event) {
+    public boolean monitorar(double x, double y, double z, int typeSensor) {
     	double moduloVetorAceleracao = ACELERACAO_NORMAL_GRAVIDADE;
     	double moduloVetorGiroscopio = 0;
 
@@ -132,14 +130,10 @@ public class EpilepsyHeuristicPrecisao {
         long timestampAtualSistema = System.currentTimeMillis();
 		double miliTimeAtual = (timestampAtualSistema - miliTimeInicial) / 1000.0;
     	
-    	x = event.values[0];
-        y = event.values[1];
-        z = event.values[2];
-
 		// Calculando os modulos resultantes dos eixos x, y e z
 		double moduloVetor = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
 
-        switch (event.sensor.getType()) {
+        switch (typeSensor) {
 	    	case Sensor.TYPE_ACCELEROMETER:
 	    		// Calculando os modulos resultantes dos eixos x, y e z
 	    		moduloVetorAceleracao = moduloVetor;
@@ -497,7 +491,7 @@ public class EpilepsyHeuristicPrecisao {
      * @param eixoZ
      * @return
      */
-    private int obterEixoNormal(Stack<Float> eixoX, Stack<Float> eixoY, Stack<Float> eixoZ) {
+    private int obterEixoNormal(Stack<Double> eixoX, Stack<Double> eixoY, Stack<Double> eixoZ) {
     	double totalAceleracaoEixoX_Positivo = 0;
     	double totalAceleracaoEixoX_Negativo = 0;
     	double totalAceleracaoEixoY_Positivo = 0;
@@ -509,19 +503,19 @@ public class EpilepsyHeuristicPrecisao {
     	double totalAceleracaoEixoY = 0;
     	double totalAceleracaoEixoZ = 0;
     	
-    	for(Float valorAceleracao : eixoX) {
+    	for(Double valorAceleracao : eixoX) {
     		if(valorAceleracao >= 0)
     			totalAceleracaoEixoX_Positivo += Math.abs(valorAceleracao);
     		else
     			totalAceleracaoEixoX_Negativo += Math.abs(valorAceleracao);
     	}
-    	for(Float valorAceleracao : eixoY) {
+    	for(Double valorAceleracao : eixoY) {
     		if(valorAceleracao >= 0)
     			totalAceleracaoEixoY_Positivo += Math.abs(valorAceleracao);
     		else
     			totalAceleracaoEixoY_Negativo += Math.abs(valorAceleracao);
         }
-    	for(Float valorAceleracao : eixoZ) {
+    	for(Double valorAceleracao : eixoZ) {
     		if(valorAceleracao >= 0)
     			totalAceleracaoEixoZ_Positivo += Math.abs(valorAceleracao);
     		else
@@ -568,7 +562,7 @@ public class EpilepsyHeuristicPrecisao {
     	}
     }
 
-    private void CriaArquivosLogAceleracao(Double miliTimeAtual, Float x, Float y, Float z, Double moduloVetor)
+    private void CriaArquivosLogAceleracao(Double miliTimeAtual, Double x, Double y, Double z, Double moduloVetor)
     {
     	try
     	{
@@ -604,7 +598,7 @@ public class EpilepsyHeuristicPrecisao {
 		}
     }
 
-    private void CriaArquivosLogGiroscopio(Double miliTimeAtual, Float x, Float y, Float z, Double moduloVetor)
+    private void CriaArquivosLogGiroscopio(double miliTimeAtual, double x, double y, double z, double moduloVetor)
     {
     	try
     	{
@@ -617,13 +611,13 @@ public class EpilepsyHeuristicPrecisao {
 			escreverLog.write(Double.toString(miliTimeAtual).getBytes());
 			escreverLog.write(CATACTER_SEPARADOR_ARQ_LOGS.getBytes());
 
-			escreverLog.write(x.toString().getBytes());
+			escreverLog.write(Double.toString(x).getBytes());
 			escreverLog.write(CATACTER_SEPARADOR_ARQ_LOGS.getBytes());
 
-			escreverLog.write(y.toString().getBytes());
+			escreverLog.write(Double.toString(y).getBytes());
 			escreverLog.write(CATACTER_SEPARADOR_ARQ_LOGS.getBytes());
 
-			escreverLog.write(z.toString().getBytes());
+			escreverLog.write(Double.toString(z).getBytes());
 			escreverLog.write(CATACTER_SEPARADOR_ARQ_LOGS.getBytes());
 
 			escreverLog.write(Double.toString(moduloVetor).getBytes());

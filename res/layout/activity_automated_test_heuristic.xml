@@ -8,8 +8,21 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".AcelerometroActivity" >
+    tools:context=".AutomatedTestHeuristicActivity" >
 
+    <!-- TODO: NAO REMOVER O BOTAO, POIS PARA DEBUGAR A HEURISTICA DE DESMAIO EH MAIS FACIL DEVIDO OS LOGS!!!!-->
+
+	<Button
+	    android:id="@+id/btnStartTest"
+	    android:layout_width="284dp"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentLeft="true"
+	    android:layout_below="@+id/btnStartTest"
+	    android:layout_marginBottom="10dp"
+	    android:text="@string/btnStartTest"
+	    android:textAlignment="center"
+	    android:textColor="#ffffffff" />
+    
     <TextView        
         android:id="@+id/txtValorTimer"
         android:layout_width="wrap_content"
@@ -57,18 +70,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="txtValorVetor" />
-
-    <TextView
-        android:id="@+id/text_view_detail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="text_view_detail" />
-
-    <TextView
-        android:id="@+id/text_view_desmaio"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="text_view_desmaio" />
 
     <TextView
         android:id="@+id/text_view_status"

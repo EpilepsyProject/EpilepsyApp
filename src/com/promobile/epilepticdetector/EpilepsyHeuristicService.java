@@ -63,8 +63,13 @@ public class EpilepsyHeuristicService extends Service implements SensorEventList
     @Override
     public void onSensorChanged(SensorEvent event)
     {
-    	// Verificando se esta acontecendo algum desmaio ou ataque epileptico...
-    	if(objHeuristica.monitorar(event))
+        double x = event.values[0];
+        double y = event.values[1];
+        double z = event.values[2];
+        int typeSensor = event.sensor.getType();
+
+        // Verificando se esta acontecendo algum desmaio ou ataque epileptico...
+    	if(objHeuristica.monitorar(x, y, z, typeSensor))
     	{
     		exibirAlertaDesmaio();
     	}

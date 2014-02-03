@@ -1,7 +1,6 @@
 package com.promobile.epilepticdetector;
 
 import android.content.Context;
-import android.hardware.SensorEvent;
 
 public class EpilepsyHeuristic {
 
@@ -25,12 +24,12 @@ public class EpilepsyHeuristic {
 	 * 
 	 * @param event
 	 */
-    public boolean monitorar(SensorEvent event) {
+    public boolean monitorar(double x, double y, double z, int typeSensor) {
     	if(perfil == PERFIL_MODERADO) {
-    		return(objPerfilModerado.monitorar(event));
+    		return(objPerfilModerado.monitorar(x, y, z, typeSensor));
     	}
     	else if(perfil == PERFIL_PRECISAO) {
-    		return(objPerfilPrecisao.monitorar(event));
+    		return(objPerfilPrecisao.monitorar(x, y, z, typeSensor));
     	}
     	else {
     		// Perfil de monitoramento nao existe... :-P

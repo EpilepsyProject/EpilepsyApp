@@ -6,6 +6,5 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="lib" path="libs/achartengine-1.1.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Usuario/Downloads/teste/sensorsimulator-2.0-rc1/lib/sensorsimulator-lib-2.0-rc1.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

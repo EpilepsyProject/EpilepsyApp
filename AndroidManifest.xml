@@ -68,7 +68,7 @@
             android:label="@string/title_activity_tela_desmaio" >
         </activity>
         <activity
-            android:name="com.promobile.epilepticdetector.AcelerometroActivity"
+            android:name="com.promobile.epilepticdetector.AutomatedTestHeuristicActivity"
             android:label="@string/title_activity_acelerometro" >
         </activity>
 
