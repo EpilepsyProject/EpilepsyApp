@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.app.Activity;
 import android.content.Context;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.Button;
@@ -197,8 +198,16 @@ public class AutomatedTestHeuristicActivity extends Activity{
 	    	            	salvarLog(chaveTeste, "Erro durante a leitura dos dados do arquivo!");
 	    	            }
 	    	        	
-	    	        	if(timerA.size() > 0 && timerG.size() > 0)
+	    	        	if(timerA.size() > 0)
 	    	        	{
+	    	        		if(timerG.size() == 0)
+	    	        		{
+	    	        			timerG.clear();
+								eixoXG.clear();
+								eixoYG.clear();
+								eixoZG.clear();
+								eixoMG.clear();
+	    	        		}
 	    	        		txtChaveTeste.setText(chaveTeste);
 	    	        		processarMonitoramento(chaveTeste, timerA, eixoXA, eixoYA, eixoZA, eixoMA, timerG, eixoXG, eixoYG, eixoZG, eixoMG);
 	    	        	}
@@ -282,57 +291,74 @@ public class AutomatedTestHeuristicActivity extends Activity{
 				
     	    	while(flagSincronizarDados)
     	    	{
-					timerAtualA = timer_A.get(contA);
-					timerAtualG = timer_G.get(contG);
-	
-	    			if(!flagFimDadosAcelerometro && timerAtualA <= miliTimeAtual)
-	    			{
-	    				// Verificando se esta acontAecendo algum desmaio ou ataque epileptico...
-	        			//Log.i(TAG, "A#" + timerA.get(contA) + "|" + eixoXA.get(contA) + "|" + eixoYA.get(contA) + "|" + eixoZA.get(contA));
-	    				textViewTimer.setText("Timer: " + timerAtualA);
-	    				textViewXA.setText("Posicao AX: " + eixoX_A.get(contA).intValue() + " Float: " + eixoX_A.get(contA));
-	    	            textViewYA.setText("Posicao AY: " + eixoY_A.get(contA).intValue() + " Float: " + eixoY_A.get(contA));
-	    	            textViewZA.setText("Posicao AZ: " + eixoZ_A.get(contA).intValue() + " Float: " + eixoZ_A.get(contA));
-	    	            textViewVetor.setText("Vetor Aceleracao: " + Double.toString(eixoM_A.get(contA)));
-	        	    	if(objHeuristica.monitorar(eixoX_A.get(contA), eixoY_A.get(contA), eixoZ_A.get(contA), Sensor.TYPE_ACCELEROMETER))
-	        	    	{
-	        	    		flagMonitoramento = true;
-	        	    	}
-	        	    	contA = contA + 1;
-	    			}
-	    			if(!flagFimDadosGiroscopio && timerAtualG <= miliTimeAtual)
-	    			{
-	    				// Verificando se esta acontAecendo algum desmaio ou ataque epileptico...
-	        			//Log.i(TAG, "G#" + timerG.get(contG) + "|" + eixoXG.get(contG) + "|" + eixoYG.get(contG) + "|" + eixoZG.get(contG));
-	    				textViewTimer.setText("Timer: " + timerAtualG);
-	    				textViewXG.setText("Posicao GX: " + eixoX_G.get(contG).intValue() + " Float: " + eixoX_G.get(contG));
-	    	            textViewYG.setText("Posicao GY: " + eixoY_G.get(contG).intValue() + " Float: " + eixoY_G.get(contG));
-	    	            textViewZG.setText("Posicao GZ: " + eixoZ_G.get(contG).intValue() + " Float: " + eixoZ_G.get(contG));
-	        	    	if(objHeuristica.monitorar(eixoX_G.get(contG), eixoY_G.get(contG), eixoZ_G.get(contG), Sensor.TYPE_GYROSCOPE))
-	        	    	{
-	        	    		flagMonitoramento = true;
-	        	    	}
-	        	    	contG = contG + 1;
-	    			}
-	    			//Log.i(TAG, "CONTG: " + Integer.toString(contG) + "=" + Integer.toString(timerG.size()) + "|CONTA: " + Integer.toString(contA) + "=" + Integer.toString(timerA.size()));
-	    			//Log.i(TAG, "timerG: " + Double.toString(timerAtualG) + "|timerA: " + Double.toString(timerAtualA));
-	    			
-	    			// Verifica... se ainda há necessidade de sincronizar dados...
-					if(contA >= timer_A.size())
+					if(timer_A.size() > 0 && !flagFimDadosAcelerometro)
 					{
-						contA = timer_A.size() - 1;
+						timerAtualA = timer_A.get(contA);
+						
+		    			if(contA >= 0 && contA < timer_A.size() && timerAtualA <= miliTimeAtual)
+		    			{
+		    				// Verificando se esta acontAecendo algum desmaio ou ataque epileptico...
+		        			Log.i(TAG, "A#" + timer_A.get(contA) + "|" + eixoX_A.get(contA) + "|" + eixoY_A.get(contA) + "|" + eixoZ_A.get(contA));
+		    				textViewTimer.setText("Timer: " + timerAtualA);
+		    				textViewXA.setText("Posicao AX: " + eixoX_A.get(contA).intValue() + " Float: " + eixoX_A.get(contA));
+		    	            textViewYA.setText("Posicao AY: " + eixoY_A.get(contA).intValue() + " Float: " + eixoY_A.get(contA));
+		    	            textViewZA.setText("Posicao AZ: " + eixoZ_A.get(contA).intValue() + " Float: " + eixoZ_A.get(contA));
+		    	            textViewVetor.setText("Vetor Aceleracao: " + Double.toString(eixoM_A.get(contA)));
+		        	    	if(objHeuristica.monitorar(eixoX_A.get(contA), eixoY_A.get(contA), eixoZ_A.get(contA), Sensor.TYPE_ACCELEROMETER))
+		        	    	{
+		        	    		flagMonitoramento = true;
+		        	    	}
+		        	    	contA = contA + 1;
+		    			}
+		    			
+						if(contA >= timer_A.size())
+							flagFimDadosAcelerometro = true;
+					}
+					else
+					{
 						flagFimDadosAcelerometro = true;
 					}
 						
-					if(contG >= timer_G.size())
+					if(timer_G.size() > 0 && !flagFimDadosGiroscopio)
 					{
-						contG = timer_G.size() - 1;
+						timerAtualG = timer_G.get(contG);
+
+						if(contG >= 0 && contG < timer_G.size() && timerAtualG <= miliTimeAtual)
+		    			{
+		    				// Verificando se esta acontAecendo algum desmaio ou ataque epileptico...
+		        			Log.i(TAG, "G#" + timer_G.get(contG) + "|" + eixoX_G.get(contG) + "|" + eixoY_G.get(contG) + "|" + eixoZ_G.get(contG));
+		    				textViewTimer.setText("Timer: " + timerAtualG);
+		    				textViewXG.setText("Posicao GX: " + eixoX_G.get(contG).intValue() + " Float: " + eixoX_G.get(contG));
+		    	            textViewYG.setText("Posicao GY: " + eixoY_G.get(contG).intValue() + " Float: " + eixoY_G.get(contG));
+		    	            textViewZG.setText("Posicao GZ: " + eixoZ_G.get(contG).intValue() + " Float: " + eixoZ_G.get(contG));
+		        	    	if(objHeuristica.monitorar(eixoX_G.get(contG), eixoY_G.get(contG), eixoZ_G.get(contG), Sensor.TYPE_GYROSCOPE))
+		        	    	{
+		        	    		flagMonitoramento = true;
+		        	    	}
+		        	    	contG = contG + 1;
+		    			}
+
+						// Verifica... se ainda há necessidade de sincronizar dados...
+						if(contG >= timer_G.size())
+							flagFimDadosGiroscopio = true;
+					}
+					else
+					{
 						flagFimDadosGiroscopio = true;
 					}
+	    			//Log.i(TAG, "CONTG: " + Integer.toString(contG) + "=" + Integer.toString(timer_G.size()) + "|CONTA: " + Integer.toString(contA) + "=" + Integer.toString(timer_A.size()));
+	    			//Log.i(TAG, "timerG: " + Double.toString(timerAtualG) + "|timerA: " + Double.toString(timerAtualA));
 	    			
-					timerAtualA = timer_A.get(contA);
-					timerAtualG = timer_G.get(contG);
-	    			if(!(timerAtualA <= miliTimeAtual || timerAtualG <= miliTimeAtual) || (flagFimDadosAcelerometro && flagFimDadosGiroscopio))
+					if(contA >= 0 && contA < timer_A.size())
+					{
+						timerAtualA = timer_A.get(contA);
+					}
+					if(contG >= 0 && contG < timer_G.size())
+					{
+						timerAtualG = timer_G.get(contG);
+					}
+					
+	    			if((flagFimDadosAcelerometro || timerAtualA > miliTimeAtual) && (flagFimDadosGiroscopio || timerAtualG > miliTimeAtual))
 	    			{
 	    				flagSincronizarDados = false;
 	    			}

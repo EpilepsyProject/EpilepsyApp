@@ -21,7 +21,7 @@ public class InicialActivity extends Activity {
 
 	private PendingIntent pendingIntent;
     private AlarmManager alarmManager;
-	private final int TIMER_MONITORAMENTO_HEURISTICA = 100; // EM milisegundos...
+	private final int TIMER_MONITORAMENTO_HEURISTICA = 30; // EM milisegundos...
 
 	 @Override
      public void onCreate(Bundle savedInstanceState)
