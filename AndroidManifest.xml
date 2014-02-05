@@ -71,7 +71,9 @@
             android:name="com.promobile.epilepticdetector.AutomatedTestHeuristicActivity"
             android:label="@string/title_activity_acelerometro" >
         </activity>
-
+		<activity 
+		    android:name= "com.promobile.epilepticdetector.TipoPerfil"
+		    android:label="@string/title_activity_tipo_perfil"></activity>"
         <service
             android:name="com.promobile.epilepticdetector.EpilepsyHeuristicService"
             android:enabled="true" />
