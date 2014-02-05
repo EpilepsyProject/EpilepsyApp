@@ -298,7 +298,7 @@ public class AutomatedTestHeuristicActivity extends Activity{
 		    			if(contA >= 0 && contA < timer_A.size() && timerAtualA <= miliTimeAtual)
 		    			{
 		    				// Verificando se esta acontAecendo algum desmaio ou ataque epileptico...
-		        			Log.i(TAG, "A#" + timer_A.get(contA) + "|" + eixoX_A.get(contA) + "|" + eixoY_A.get(contA) + "|" + eixoZ_A.get(contA));
+		        			//Log.i(TAG, "A#" + timer_A.get(contA) + "|" + eixoX_A.get(contA) + "|" + eixoY_A.get(contA) + "|" + eixoZ_A.get(contA));
 		    				textViewTimer.setText("Timer: " + timerAtualA);
 		    				textViewXA.setText("Posicao AX: " + eixoX_A.get(contA).intValue() + " Float: " + eixoX_A.get(contA));
 		    	            textViewYA.setText("Posicao AY: " + eixoY_A.get(contA).intValue() + " Float: " + eixoY_A.get(contA));
@@ -326,7 +326,7 @@ public class AutomatedTestHeuristicActivity extends Activity{
 						if(contG >= 0 && contG < timer_G.size() && timerAtualG <= miliTimeAtual)
 		    			{
 		    				// Verificando se esta acontAecendo algum desmaio ou ataque epileptico...
-		        			Log.i(TAG, "G#" + timer_G.get(contG) + "|" + eixoX_G.get(contG) + "|" + eixoY_G.get(contG) + "|" + eixoZ_G.get(contG));
+		        			//Log.i(TAG, "G#" + timer_G.get(contG) + "|" + eixoX_G.get(contG) + "|" + eixoY_G.get(contG) + "|" + eixoZ_G.get(contG));
 		    				textViewTimer.setText("Timer: " + timerAtualG);
 		    				textViewXG.setText("Posicao GX: " + eixoX_G.get(contG).intValue() + " Float: " + eixoX_G.get(contG));
 		    	            textViewYG.setText("Posicao GY: " + eixoY_G.get(contG).intValue() + " Float: " + eixoY_G.get(contG));
