@@ -57,5 +57,15 @@
 	    android:textColor="#ffffffff"
 	    android:textAlignment="center"
 	    android:text="@string/automated_test_heuristic" />
-	
+
+		<Button
+	    android:id="@+id/btnSmsSendTest"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentLeft="true"
+	    android:layout_marginTop="120dp"
+	    android:textColor="#ffffffff"
+	    android:textAlignment="center"
+	    android:text="@string/btnSmsSendTest" />
+		
 </RelativeLayout>

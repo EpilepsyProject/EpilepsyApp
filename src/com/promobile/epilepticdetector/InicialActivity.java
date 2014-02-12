@@ -9,8 +9,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.telephony.SmsManager;
+import android.telephony.SmsMessage;
 import android.view.View;
 import android.widget.RadioButton;
+import android.widget.Toast;
 
 public class InicialActivity extends Activity {
 	NotificationCompat.Builder mBuilder;
@@ -18,6 +21,8 @@ public class InicialActivity extends Activity {
 	String TAG = "MainActivity";
 	RadioButton start, stop;
 	int ID = 101;
+	
+	int contSms = 0;
 
 	private PendingIntent pendingIntent;
     private AlarmManager alarmManager;
@@ -57,6 +62,22 @@ public class InicialActivity extends Activity {
         		public void onClick(View arg0) {
         			Intent intent = new Intent(InicialActivity.this, AutomatedTestHeuristicActivity.class);
         			startActivity(intent);
+        		}
+        	});
+         
+         // Teste envio de SMS... :-) OBS.: EH NECESSARIO TER DOIS EMULADORES ABERTOS!!!!!!
+         findViewById(R.id.btnSmsSendTest).setOnClickListener(new View.OnClickListener() {
+    		@Override
+        		public void onClick(View arg0) {
+    				contSms = contSms + 1;
+    			
+    				String phoneNumber = "5556";
+    				String mensagem = "Teste envio SMS numero " + Integer.toString(contSms);
+	    			
+    				SmsManager sms = SmsManager.getDefault();
+	    			sms.sendTextMessage(phoneNumber, null, mensagem, null, null);
+	    			
+	    			Toast.makeText(getApplicationContext(), "EpilepsyApp - Mensagem Enviada!", Toast.LENGTH_SHORT).show();
         		}
         	});
 	}
