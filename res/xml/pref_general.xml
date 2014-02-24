@@ -1,0 +1,9 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <SwitchPreference 
+        android:key="pref_key_inicio"
+        android:title="Ativar" 
+        android:summaryOn="Aplicação Ativada"
+        android:summaryOff="Aplicação Desativada"
+        android:switchTextOn="SIM" 
+        android:switchTextOff="NÃO"/>
+</PreferenceScreen>
