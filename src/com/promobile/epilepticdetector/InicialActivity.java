@@ -80,6 +80,15 @@ public class InicialActivity extends Activity {
 	    			Toast.makeText(getApplicationContext(), "EpilepsyApp - Mensagem Enviada!", Toast.LENGTH_SHORT).show();
         		}
         	});
+         
+         // Testando GPS
+         findViewById(R.id.btnTestGps).setOnClickListener(new View.OnClickListener() {
+    		@Override
+        		public void onClick(View arg) {
+	    			Intent intent = new Intent(InicialActivity.this, GpsTestActivity.class);
+	    			startActivity(intent);
+        		}
+        	});
 	}
 	
 	private void toggleService(){

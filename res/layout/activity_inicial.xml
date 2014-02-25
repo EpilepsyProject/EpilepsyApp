@@ -58,14 +58,26 @@
 	    android:textAlignment="center"
 	    android:text="@string/automated_test_heuristic" />
 
-		<Button
+	<Button
+	    android:id="@+id/btnTestGps"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentLeft="true"
+	    android:layout_below="@+id/btnSmsSendTest"
+	    android:layout_marginTop="15dp"
+	    android:text="@string/btnTestGps"
+	    android:textAlignment="center"
+	    android:textColor="#ffffffff" />
+
+	<Button
 	    android:id="@+id/btnSmsSendTest"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:layout_alignParentLeft="true"
-	    android:layout_marginTop="120dp"
-	    android:textColor="#ffffffff"
+	    android:layout_below="@+id/btnAutomatedTestHeuristic"
+	    android:layout_marginTop="14dp"
+	    android:text="@string/btnSmsSendTest"
 	    android:textAlignment="center"
-	    android:text="@string/btnSmsSendTest" />
-		
+	    android:textColor="#ffffffff" />
+			
 </RelativeLayout>
