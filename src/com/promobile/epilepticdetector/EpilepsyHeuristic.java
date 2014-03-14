@@ -23,6 +23,9 @@ public class EpilepsyHeuristic {
 	 * e ataques epilepticos.
 	 * 
 	 * @param event
+	 * 
+	 * QUANDO FOR FEITO O MONITORAMENTO COM PRECISAO.
+	 * http://www.klebermota.eti.br/2012/08/26/sensores-de-movimento-no-android-traducao-da-documentacao-oficial/
 	 */
     public boolean monitorar(double x, double y, double z, int typeSensor) {
     	if(perfil == PERFIL_MODERADO) {
