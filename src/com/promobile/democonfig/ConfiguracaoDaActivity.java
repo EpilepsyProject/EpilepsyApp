@@ -25,8 +25,7 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 import com.promobile.contatos.Contato;
 import com.promobile.contatos.ContatosUtil;
-import com.promobile.epilepticdetector.EpilepsyHeuristicModerado;
-import com.promobile.epilepticdetector.EpilepsyHeuristicPrecisao;
+import com.promobile.epilepticdetector.EpilepsyHeuristic;
 import com.promobile.epilepticdetector.EpilepsyHeuristicService;
 import com.promobile.epilepticdetector.MainActivity;
 
@@ -110,6 +109,7 @@ public class ConfiguracaoDaActivity extends PreferenceActivity implements OnShar
 	    editor.putString("telefoneKey"+num, telefone);
 	    editor.commit();    
 	}
+	
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -124,11 +124,13 @@ public class ConfiguracaoDaActivity extends PreferenceActivity implements OnShar
 		atualizaMeuContatoPreference(3);
 		atualizaMeuContatoPreference(4);
 	}
+	
 	@Override
 	protected void onPause() {
 	    super.onPause();
 	    getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
 	}
+	
 	private void setupSimplePreferencesScreen() {
 		addPreferencesFromResource(R.xml.pref_general);
 		PreferenceCategory fakeHeader = new PreferenceCategory(this);
@@ -155,16 +157,14 @@ public class ConfiguracaoDaActivity extends PreferenceActivity implements OnShar
 			}
 		
 		if(key.equals("pref_key_perfis")){
-				String op = sharedPreferences.getString(key, "Nda");
+				String op = sharedPreferences.getString(key, Integer.toString(EpilepsyHeuristic.PERFIL_MODERADO));
 				
-				if(op.equals("1")){					
-					startSensingModerado();				  
+				if(op.equals(Integer.toString(EpilepsyHeuristic.PERFIL_MODERADO))){					
 	       	 		Toast.makeText(this, "EpilepsyApp - Perfil Moderado selecionado!" , Toast.LENGTH_SHORT).show();
 				}
-				if(op.equals("2")){
-					startSensingPreciso(); 
+				if(op.equals(Integer.toString(EpilepsyHeuristic.PERFIL_PRECISAO))){
 	       	 		Toast.makeText(this, "EpilepsyApp - Perfil Preciso selecionado!" , Toast.LENGTH_SHORT).show();
-				}			  
+				}
         }else if (key.equals("pref_key_ringtore")){
         	
         }else if(key.equals("pref_key_contato1")){
@@ -192,6 +192,7 @@ public class ConfiguracaoDaActivity extends PreferenceActivity implements OnShar
       	    atualizaMeuContatoPreference(NUMTYPEPREF);
         }
 	}
+
 	@Override
 	  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 	    super.onActivityResult(requestCode, resultCode, data);
@@ -234,9 +235,9 @@ public class ConfiguracaoDaActivity extends PreferenceActivity implements OnShar
 	      }
 	      break;
 	    }
-	    
-	  }
-/************************************ SERVIÇO ************************************/	
+	}
+	
+	/************************************ SERVIÇO ************************************/	
 	
 	private void toggleService(){
 		Context context = getApplicationContext();
@@ -270,61 +271,8 @@ public class ConfiguracaoDaActivity extends PreferenceActivity implements OnShar
 		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		alarmManager.cancel(pendingIntent);
 	}
-	
-	/******************************	SERVICE DO PERFIL MODERADO	******************************/
-	
-	private void toggleServiceModerado(){
-	   Intent intent=new Intent(getApplicationContext(), EpilepsyHeuristicModerado.class);
-	   // Try to stop the service if it is already running
-	   intent.addCategory(EpilepsyHeuristicService.TAG);
-	   if(!stopService(intent)){
-	       startService(intent);
-	   }
-	}
-	
-	public void startSensingModerado(){
-		showNotification();
-		toggleServiceModerado();
-		//this.finish();
-	}
-	
-	private void stopSensingModerado(){
-		Intent intent = new Intent(getApplicationContext(), EpilepsyHeuristicModerado.class);
-		intent.addCategory(EpilepsyHeuristicService.TAG);
-		stopService(intent);
-		mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotifyManager.cancel(ID);
-		
-	}
-			
-	/******************************	SERVICE DO PERFIL PRECISO	******************************/
-	
-	private void toggleServicePreciso(){
-		   Intent intent=new Intent(getApplicationContext(), EpilepsyHeuristicPrecisao.class);
-		   // Try to stop the service if it is already running
-		   intent.addCategory(EpilepsyHeuristicService.TAG);
-		   if(!stopService(intent)){
-		       startService(intent);
-		   }
-		}
-		
-		public void startSensingPreciso(){
-			showNotification();
-			toggleServicePreciso();
-			//this.finish();
-		}
-		
-		private void stopSensingPreciso(){
-			Intent intent = new Intent(getApplicationContext(), EpilepsyHeuristicPrecisao.class);
-			intent.addCategory(EpilepsyHeuristicService.TAG);
-			stopService(intent);
-			mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-			mNotifyManager.cancelAll();
-			
-		}
-		
-		
-		/******************************	BARRA DE NOTIFICAÇÃO ******************************/
+
+	/******************************	BARRA DE NOTIFICAÇÃO ******************************/
 	
 	@SuppressLint("NewApi")
 	public void showNotification(){
@@ -333,19 +281,19 @@ public class ConfiguracaoDaActivity extends PreferenceActivity implements OnShar
 		    .setContentText("Monitorando possível ataque")
 		    .setSmallIcon(R.drawable.ic_launcher);
 		Intent resultIntent = new Intent(this, MainActivity.class);
+	
+		
 		TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 		stackBuilder.addParentStack(MainActivity.class);
 		stackBuilder.addNextIntent(resultIntent);
 		PendingIntent resultPendingIntent =
 		        stackBuilder.getPendingIntent(
 		            0,
-		            PendingIntent.FLAG_UPDATE_CURRENT
+		            PendingIntent.FLAG_ONE_SHOT
 		        );
+		mBuilder.setOngoing(true);
 		mBuilder.setContentIntent(resultPendingIntent);
 		mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotifyManager.notify(ID, mBuilder.build());	
-	         
-	     }
-
-
+     }
 }

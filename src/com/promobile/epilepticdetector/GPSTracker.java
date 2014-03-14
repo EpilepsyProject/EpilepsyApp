@@ -1,4 +1,4 @@
-package com.promobile.demolocalizacao;
+package com.promobile.epilepticdetector;
 
 import java.io.IOException;
 import java.util.List;
@@ -174,10 +174,10 @@ public class GPSTracker extends Service implements LocationListener{
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
 
         //Setting Dialog Title
-        alertDialog.setTitle("Epileptic Detector");
+        alertDialog.setTitle("Alerta");
 
         //Setting Dialog Message
-        alertDialog.setMessage("Para que a sua localização seja enviada é necessário ativar GPS. Deseja ativar?");
+        alertDialog.setMessage("dados não encontrados, deseja ativar o GPS?");
 
         //On Pressing Setting button
         alertDialog.setPositiveButton("Sim", new DialogInterface.OnClickListener() 

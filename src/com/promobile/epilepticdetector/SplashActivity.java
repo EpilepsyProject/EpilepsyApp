@@ -1,9 +1,14 @@
 package com.promobile.epilepticdetector;
  
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
+
 import com.promobile.epilepticdetector.R;
  
 public class SplashActivity extends Activity {
@@ -16,6 +21,16 @@ public class SplashActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
  
+        PhoneCallListener phoneListener = new PhoneCallListener();
+        phoneListener.phoneStateListener(this);
+		TelephonyManager telephonyManager = (TelephonyManager) this
+			.getSystemService(Context.TELEPHONY_SERVICE);
+		telephonyManager.listen(phoneListener,PhoneStateListener.LISTEN_CALL_STATE);
+		GPSTracker gpsTracker = new GPSTracker(this);
+		if(!gpsTracker.canGetLocation()){
+			gpsTracker.showSettingsAlert();
+		}
+		
         new Handler().postDelayed(new Runnable() {
  
             /*

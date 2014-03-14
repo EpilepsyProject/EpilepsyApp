@@ -1,12 +1,15 @@
 package com.promobile.epilepticdetector;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 public class EpilepsyHeuristic {
 
 	public static int PERFIL_MODERADO = 0;
 	public static int PERFIL_PRECISAO = 1;
 	private int perfil = PERFIL_MODERADO;
+	
+	private SharedPreferences prefs_do_perfil;
 	
 	private EpilepsyHeuristicModerado objPerfilModerado;
 	private EpilepsyHeuristicPrecisao objPerfilPrecisao;

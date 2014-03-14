@@ -1,6 +1,10 @@
 package com.promobile.epilepticdetector;
 
-import com.promobile.demolocalizacao.GPSTracker;
+import java.io.File;
+import java.util.Scanner;
+import java.util.Stack;
+
+import javax.crypto.spec.PSource.PSpecified;
 
 import com.promobile.democonfig.ConfiguracaoDaActivity;
 import com.promobile.epilepticdetector.R;
@@ -16,9 +20,13 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.telephony.PhoneStateListener;
 import android.telephony.SmsManager;
+import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,6 +36,11 @@ import android.widget.Toast;
 @SuppressLint("NewApi")
 public class MainActivity extends Activity  {
 	Boolean flagDesmaioDetectadoMonitoramento = false;
+	
+	String phoneNumber;
+	GPSTracker gps;
+	Handler handler;
+	SmsManager sms;
 	
     // Iniciando objetos de musica do android...
 	Uri objNotification;
@@ -221,20 +234,41 @@ public class MainActivity extends Activity  {
 		}
 	    
 	    public void enviaSms(String destino){
-			
-			String phoneNumber = destino;
-			String mensagem = "Acabei de sofrer um ataque epilético";
-			
-			SmsManager sms = SmsManager.getDefault();
-			sms.sendTextMessage(phoneNumber, null, mensagem, null, null);
-			
-			Toast.makeText(getApplicationContext(), "EpilepsyApp - Mensagem Enviada para "+destino, Toast.LENGTH_SHORT).show();
+			sms = SmsManager.getDefault();
+			phoneNumber = destino;
 
+	    	handler = new Handler();
+	    	gps = new GPSTracker(this);
+	    	
+	    	Runnable runnable = new Runnable() {
+	    		public void run() 
+	    	    {
+	    			double latitude = gps.getLatitude();
+	    			double longitude = gps.getLongitude();
+	    	    	
+	    			if(latitude != 0 && longitude != 0)
+	    			{
+	    				//String mensagem = "Acabei de sofrer um ataque epiletico -> (Latitude: " + String.valueOf(latitude) + ") Longitude(" + String.valueOf(longitude) + ")";//TODO: Verificar link google -> Link Google Maps: https__www.google.com.au_maps_preview_" + String.valueOf(latitude) + " ," + String.valueOf(longitude) + ",50z";
+	    				String mensagem = "Ataque epiletico detectado. http://maps.google.com/?q=" + String.valueOf(latitude) + "," +  String.valueOf(longitude);
+	    				sms.sendTextMessage(phoneNumber, null, mensagem, null, null);
+	    			}
+	    			else
+	    			{
+	    				handler.postDelayed(this, 100);
+						return;
+	    			}
+	    	    	
+	    			Toast.makeText(getApplicationContext(), "EpilepsyApp - Mensagem Enviada para " + phoneNumber, Toast.LENGTH_SHORT).show();
+	    			return;
+	    	    }
+	    	};
+	    	
+	        handler.postDelayed(runnable, 100);
 		}
 	    
 	    public void ligarContato(String destino){
 	    	Uri uri = Uri.parse("tel:"+ destino);
-			Intent intent = new Intent(Intent.ACTION_DIAL,uri);
+			Intent intent = new Intent(Intent.ACTION_CALL,uri);
 			startActivity(intent);
 	    }
 }

@@ -4,11 +4,13 @@ import com.promobile.epilepticdetector.MainActivity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 public class EpilepsyHeuristicService extends Service implements SensorEventListener{
@@ -33,7 +35,12 @@ public class EpilepsyHeuristicService extends Service implements SensorEventList
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mGyroscope = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
-        objHeuristica = new EpilepsyHeuristic(getApplicationContext(), EpilepsyHeuristic.PERFIL_PRECISAO, flagLogs);
+        // LENDO DADOS DO BANCO DE DADOS DO APLICATIVO...
+        Context context = getApplicationContext();
+        SharedPreferences appDB = PreferenceManager.getDefaultSharedPreferences(context);
+        String perfilMonitoramento = appDB.getString("pref_key_perfis", String.valueOf(EpilepsyHeuristic.PERFIL_MODERADO));
+        
+        objHeuristica = new EpilepsyHeuristic(getApplicationContext(), Integer.valueOf(perfilMonitoramento), flagLogs);
         
         // Criando o Servico...
         super.onCreate();
