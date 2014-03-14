@@ -17,11 +17,15 @@
         <item>5 segundos</item>
         <item>10 segundos</item>
         <item>15 segundos</item>
+        <item>30 segundos</item>
+        <item>60 segundos</item>
     </string-array>
     <string-array name="pref_dado_alerta_values">
         <item>5</item>
         <item>10</item>
         <item>15</item>
+        <item>30</item>
+        <item>60</item>
     </string-array>
 
     <!-- Example settings for Data & Sync -->
@@ -53,5 +57,22 @@
     <string name="pref_title_ringtone">Ringtone</string>
     <string name="pref_ringtone_silent">Silent</string>
     <string name="pref_title_vibrate">Vibrate</string>
+    <string name="pref_ativar_aplicacao">Ativar a aplicação</string>
+    <string name="pref_modoaviao">Modo Avião</string>
+    <string name="pref_titulo_modo_silencioso">Modo silecioso</string>
+    <string name="pref_summary_modo_silencioso">Desabilita o som e a vibração das notificações</string>
+    <string name="pref_titulo_toque">Toque</string>
+    <string name="pref_summary_toque">"Definir o toque para as notificações "</string>
+    <string name="pref_titulo_vibrar">Vibrar</string><string-array name="pref_perfis_titulo">
+        
+        
+        <item >Perfil Moderado</item>
+        <item >Perfil Preciso</item>
+    </string-array><string-array name="pref_perfis_values">
+        <item >1</item>
+        <item >2</item>
+    </string-array><string name="pref_titulo_alerta">Alerta</string>
+    
+    
 
 </resources>

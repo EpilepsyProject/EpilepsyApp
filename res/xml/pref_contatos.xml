@@ -1,23 +1,24 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-	<com.br.promobile.democonfig.MeuContatoPreference
+	<com.promobile.democonfig.MeuContatoPreference
             android:key="pref_key_contato1"
             android:title="Gerenciar Contato"
             android:summary="vazio"
             android:defaultValue="0" />
 	
-	<com.br.promobile.democonfig.MeuContatoPreference
+	<com.promobile.democonfig.MeuContatoPreference
             android:key="pref_key_contato2"
             android:title="Gerenciar Contato"
             android:summary="vazio"
-            android:defaultValue="0" />
+            android:defaultValue="0" 
+             android:src="@drawable/sms"/>
 	
-	<com.br.promobile.democonfig.MeuContatoPreference
+	<com.promobile.democonfig.MeuContatoPreference
             android:key="pref_key_contato3"
             android:title="Gerenciar Contato"
             android:summary="vazio"
             android:defaultValue="0" />
 	
-	<com.br.promobile.democonfig.MeuContatoPreference
+	<com.promobile.democonfig.MeuContatoPreference
             android:key="pref_key_contato4"
             android:title="Gerenciar Contato"
             android:summary="vazio"

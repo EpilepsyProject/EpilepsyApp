@@ -3,8 +3,8 @@
     android:id="@+id/meucontato_widget"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_gravity="center_vertical"
+    android:layout_gravity="right"
     android:clickable="false"
     android:focusable="false"
-    android:src="@drawable/telefone" 
-    />
+    android:src="@drawable/telefone" />
+

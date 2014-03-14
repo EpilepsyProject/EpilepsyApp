@@ -3,13 +3,13 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="com.br.promobile.democonfig.ConfiguracaoActivity$GeneralPreferenceFragment"
+        android:fragment="com.promobile.democonfig.ConfiguracaoActivity$GeneralPreferenceFragment"
         android:title="@string/pref_header_general" />
     <header
-        android:fragment="com.br.promobile.democonfig.ConfiguracaoActivity$NotificationPreferenceFragment"
+        android:fragment="com.promobile.democonfig.ConfiguracaoActivity$NotificationPreferenceFragment"
         android:title="@string/pref_header_notifications" />
     <!-- <header
-        android:fragment="com.br.promobile.democonfig.ConfiguracaoActivity$DataSyncPreferenceFragment"
+        android:fragment="com..promobile.democonfig.ConfiguracaoActivity$DataSyncPreferenceFragment"
         android:title="@string/pref_header_data_sync" />
 	 -->
 </preference-headers>

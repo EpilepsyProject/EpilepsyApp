@@ -1,106 +1,17 @@
-<RelativeLayout 
-   xmlns:android="http://schemas.android.com/apk/res/android"  
-   xmlns:tools="http://schemas.android.com/tools"  
-   android:id="@+id/RelativeLayout1"  
-   android:layout_width="match_parent"  
-   android:layout_height="match_parent"  
-   android:orientation="vertical" 
-   android:background="#ff000000" 
-   tools:context=".MainActivity" >
-
-    <ImageButton
-        android:id="@+id/imageButton1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginRight="19dp"
-        android:layout_marginTop="152dp"
-        android:src="@drawable/config"
-        android:textColor="#ffffffff"
-        android:clickable="true" />
-
-    <ImageButton
-        android:id="@+id/imageButton2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignTop="@+id/imageButton1"
-        android:layout_marginLeft="18dp"
-        android:src="@drawable/checkbox"
-        android:textColor="#ffffffff" 
-        android:clickable="true"/>
-
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/imageButton1"
-        android:layout_below="@+id/imageButton2"
-        android:layout_marginRight="18dp"
-        android:text="@string/config"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#ffffffff" />
-
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView2"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="14dp"
-        android:text="@string/app_name"
-        android:textColor="#ffffffff"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ff000000" 
+    tools:context=".MainActivity" >
 
     <ImageView
         android:id="@+id/imageView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignTop="@+id/textView1"
-        android:src="@drawable/ic_launcher" />
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/imageView1"
-        android:layout_alignLeft="@+id/textView1"
-        android:text="@string/subtitle"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#ff888888" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textView3"
-        android:layout_alignBottom="@+id/textView3"
-        android:layout_marginLeft="16dp"
-        android:layout_toRightOf="@+id/imageView1"
-        android:text="@string/inicio"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#ffffffff" />
-
-    <ImageButton
-        android:id="@+id/imageButton3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView3"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="41dp"
-        android:src="@drawable/profile" />
-
-    <TextView
-        android:id="@+id/textView5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/imageButton3"
-        android:layout_centerHorizontal="true"
-        android:text="@string/profile"
-        android:textColor="#ffffffff"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:layout_marginTop="74dp"
+        android:src="@drawable/splash_tela" />
 
 </RelativeLayout>

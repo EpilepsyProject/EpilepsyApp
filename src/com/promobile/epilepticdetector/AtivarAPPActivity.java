@@ -1,5 +1,7 @@
 package com.promobile.epilepticdetector;
 
+import com.promobile.epilepticdetector.R;
+
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;

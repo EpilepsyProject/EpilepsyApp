@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 public class EpilepsyHeuristicService extends Service implements SensorEventListener{
 
-    static String TAG = "EpilepsyHeuristicService";
+    public static String TAG = "EpilepsyHeuristicService";
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;

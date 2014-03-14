@@ -1,83 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-  <RelativeLayout 
-   xmlns:android="http://schemas.android.com/apk/res/android"  
-   xmlns:tools="http://schemas.android.com/tools"  
-   android:id="@+id/RelativeLayout1"  
-   android:layout_width="match_parent"  
-   android:layout_height="match_parent"  
-   android:orientation="vertical"
-   android:background="#ff000000"     
-   tools:context=".InicialActivity" >  
-	 <RadioButton
-        android:id="@+id/btnBackgroundOn"
-        android:layout_width="wrap_content"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LinearLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ff000000"
+    android:orientation="vertical"
+    tools:context=".InicialActivity" >
+
+    <!-- TODO: NAO REMOVER O BOTAO, POIS PARA DEBUGAR A HEURISTICA DE DESMAIO EH MAIS FACIL DEVIDO OS LOGS!!!! -->
+
+    <Button
+        android:id="@+id/btnSmsSendTest"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textView1"
-        android:layout_alignBottom="@+id/textView1"
-        android:layout_marginLeft="16dp"
-        android:layout_toRightOf="@+id/textView1"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        android:textColor="#ffffffff"
-        android:text="@string/backgroundOn" />
+        android:layout_marginTop="120dp"
+        android:text="@string/btnSmsSendTest"
+        android:textAlignment="center"
+        android:textColor="#ffffffff" />
 
-    <RadioButton
-        android:id="@+id/btnBackgroundOff"
-        android:layout_width="wrap_content"
+    <Button
+        android:id="@+id/btnAutomatedTestHeuristic"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/btnBackgroundOn"
-        android:layout_alignBottom="@+id/btnBackgroundOn"
-        android:layout_toRightOf="@+id/btnBackgroundOn"
-         android:textSize="12sp"
-        android:textStyle="bold"
-        android:textColor="#ffffffff"
-        android:text="@string/backgroundOff" />
+        android:text="@string/automated_test_heuristic"
+        android:textAlignment="center"
+        android:textColor="#ffffffff" />
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
+    <Button
+        android:id="@+id/btnTestGps"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="18dp"
-        android:textColor="#ffffffff"
-        android:text="@string/textoAtivarBack"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:text="@string/btnTestGps"
+        android:textAlignment="center"
+        android:textColor="#ffffffff" />
 
-    <!-- TODO: NAO REMOVER O BOTAO, POIS PARA DEBUGAR A HEURISTICA DE DESMAIO EH MAIS FACIL DEVIDO OS LOGS!!!!-->
-	<Button
-	    android:id="@+id/btnAutomatedTestHeuristic"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_alignParentLeft="true"
-	    android:layout_below="@+id/btnBackgroundOn"
-	    android:layout_marginTop="27dp"
-	    android:textColor="#ffffffff"
-	    android:textAlignment="center"
-	    android:text="@string/automated_test_heuristic" />
+    <Button
+        android:id="@+id/btnShowDialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="showDialogClick"
+        android:text="@string/mostrar"
+        android:textColor="#ffffffff" />
 
-	<Button
-	    android:id="@+id/btnTestGps"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_alignParentLeft="true"
-	    android:layout_below="@+id/btnSmsSendTest"
-	    android:layout_marginTop="15dp"
-	    android:text="@string/btnTestGps"
-	    android:textAlignment="center"
-	    android:textColor="#ffffffff" />
-
-	<Button
-	    android:id="@+id/btnSmsSendTest"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_alignParentLeft="true"
-	    android:layout_below="@+id/btnAutomatedTestHeuristic"
-	    android:layout_marginTop="14dp"
-	    android:text="@string/btnSmsSendTest"
-	    android:textAlignment="center"
-	    android:textColor="#ffffffff" />
-			
-</RelativeLayout>
+</LinearLayout>

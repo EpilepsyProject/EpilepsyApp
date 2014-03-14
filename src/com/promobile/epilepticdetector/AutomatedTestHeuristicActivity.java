@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.Scanner;
 import java.util.Stack;
 
+import com.promobile.epilepticdetector.R;
+
 import android.hardware.Sensor;
 import android.os.Bundle;
 import android.os.Environment;

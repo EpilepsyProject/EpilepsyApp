@@ -1,9 +1,14 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
     <SwitchPreference 
-        android:key="pref_key_inicio"
+        android:key="pref_key_inicio" 
         android:title="Ativar" 
-        android:summaryOn="Aplicação Ativada"
-        android:summaryOff="Aplicação Desativada"
         android:switchTextOn="SIM" 
         android:switchTextOff="NÃO"/>
+    <ListPreference 
+        android:entries="@array/pref_perfis_titulo" 
+        android:entryValues="@array/pref_perfis_values" 
+        android:key="pref_key_perfis"
+         android:negativeButtonText="@null" 
+         android:positiveButtonText="@null" 
+         android:title="Perfis"/>
 </PreferenceScreen>

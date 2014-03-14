@@ -13,15 +13,11 @@
     <string name="radiobutton1">5</string>
     <string name="radiobutton2">10</string>
     <string name="alerta">Alertas</string>
-	<string name="pref_ativar_aplicacao">Ativar a aplicação</string>
-    <string name="pref_modoaviao">Modo Avião</string>
-    <string name="pref_titulo_modo_silencioso">Modo silecioso</string>
-    <string name="pref_summary_modo_silencioso">Desabilita o som e a vibração das notificações</string>
-    <string name="pref_titulo_toque">Toque</string>
-    <string name="pref_summary_toque">"Definir o toque para as notificações "</string>
-    <string name="pref_titulo_vibrar">Vibrar</string>
-    <string name="pref_titulo_alerta">Alerta</string>
-    
+    <string name="action_refresh">Atualizar</string>
+    <string name="action_check_updates">Verificar atualizações</string>
+    <string name="action_search">Buscar</string>
+    <string name="action_help">Ajuda</string>
+
     <string-array name="itens_spinner">
         <item>5 segundos</item>
         <item>10 segundos</item>
@@ -68,8 +64,11 @@
     <string name="profile2">Preciso</string>
     <string name="tempo10">10 seg</string>
     <string name="profile1">Moderado</string>
-    <string name="perfilGeral">Selecione o seu perfil...</string>
+    <string name="perfilGeral">Selecione o seu perfil&#8230;</string>
     <string name="profile">Perfis</string>
+    <string name="teste">Testes</string>
     <string name="title_activity_tipo_perfil">TipoPerfil</string>
+    <string name="tela_configuracoes">Tela configurações</string>
+    <string name="title_activity_gps_teste">GpsTesteActivity</string>
     <string name="title_activity_gps_test">Teste GPS</string>
 </resources>

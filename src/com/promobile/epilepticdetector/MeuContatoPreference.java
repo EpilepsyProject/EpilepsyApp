@@ -1,5 +1,7 @@
 package com.promobile.epilepticdetector;
 
+import com.promobile.epilepticdetector.R;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Parcel;

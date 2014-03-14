@@ -1,5 +1,9 @@
 package com.promobile.epilepticdetector;
 
+import com.promobile.epilepticdetector.R;
+
+import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
@@ -15,6 +19,7 @@ import android.view.View;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+@SuppressLint("NewApi")
 public class InicialActivity extends Activity {
 	NotificationCompat.Builder mBuilder;
 	NotificationManager mNotifyManager;
@@ -25,41 +30,28 @@ public class InicialActivity extends Activity {
 	int contSms = 0;
 
 	private PendingIntent pendingIntent;
-    private AlarmManager alarmManager;
+    @SuppressWarnings("unused")
+	private AlarmManager alarmManager;
 	private final int TIMER_MONITORAMENTO_HEURISTICA = 30; // EM milisegundos...
 
-	 @Override
+	 @SuppressLint("NewApi")
+	@Override
      public void onCreate(Bundle savedInstanceState)
      {
          super.onCreate(savedInstanceState);
          setContentView(R.layout.activity_inicial);
          
+         ActionBar actionBar = getActionBar();
+	        actionBar.setDisplayHomeAsUpEnabled(true);
+         
          alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-         
-         start = (RadioButton) findViewById(R.id.btnBackgroundOn); //botao ligar
-         stop = (RadioButton) findViewById(R.id.btnBackgroundOff); //botao desligar
-         start.setOnClickListener(new View.OnClickListener() {
-             @Override
-             public void onClick(View v) {
-            	 	start.setChecked(true);
-            	 	stop.setChecked(false);
-          	 		startSensing();
-             	 }
-             });
-         
-         
-         stop.setOnClickListener(new View.OnClickListener() {
-             @Override
-             public void onClick(View v) { 
-         	 	start.setChecked(false);
-         	 	stop.setChecked(true);
-             	stopSensing();}
-             });        
+             
          
          //TODO: NAO REMOVER O BOTAO, POIS PARA DEBUGAR A HEURISTICA DE DESMAIO EH MAIS FACIL DEVIDO OS LOGS!!!!
          findViewById(R.id.btnAutomatedTestHeuristic).setOnClickListener(new View.OnClickListener() {
     		@Override
         		public void onClick(View arg0) {
+    				Toast.makeText(getApplicationContext(), "EpilepsyApp - Testes Automatizados!", Toast.LENGTH_SHORT).show();
         			Intent intent = new Intent(InicialActivity.this, AutomatedTestHeuristicActivity.class);
         			startActivity(intent);
         		}
@@ -85,6 +77,7 @@ public class InicialActivity extends Activity {
          findViewById(R.id.btnTestGps).setOnClickListener(new View.OnClickListener() {
     		@Override
         		public void onClick(View arg) {
+    				Toast.makeText(getApplicationContext(), "EpilepsyApp - GPS e Google maps!", Toast.LENGTH_SHORT).show();
 	    			Intent intent = new Intent(InicialActivity.this, GpsTestActivity.class);
 	    			startActivity(intent);
         		}
@@ -145,4 +138,10 @@ public class InicialActivity extends Activity {
 		mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotifyManager.notify(ID, mBuilder.build());	
      }
+	
+	public void showDialogClick(View view){
+		Intent intent = new Intent(this, TelaDesmaio.class);
+		this.startActivity(intent);
+	}
+	
 }
