@@ -22,21 +22,43 @@ public class EpilepsyHeuristicModerado {
 	private long miliTimeInicial;
 	
 	private Boolean flagGyroscopeAtivado = false;
-    
-    private final int ESTADO_INICIAL = 0;
-    private final int ESTADO_1 = 1;
-    private final int ESTADO_2 = 2;
-    private final int ESTADO_3 = 3;
-    private final int ESTADO_4 = 4;
-    private int estadoAtual = ESTADO_INICIAL;
-    
-    long timestampEstado1 = 0;
-	long timestampEstado2 = 0;
-	long timestampEstado3 = 0;
-	long timestampEstado4 = 0;
-	long tempoValidacao = 0;
-	
 	private final double ACELERACAO_NORMAL_GRAVIDADE = 9.8;
+   
+    private final int CONVULSOES_ESTADO_INICIAL = 0;
+    private final int CONVULSOES_ESTADO_1 = 1;
+    private final int CONVULSOES_ESTADO_2 = 2;
+    private int convulsoesEstadoAtual = CONVULSOES_ESTADO_INICIAL;
+
+    double convulsoesPicoAceleracaoEstado1 = ACELERACAO_NORMAL_GRAVIDADE;
+    double convulsoesPicoAceleracaoEstado2 = 0;
+    
+    long convulsoesTimestampEstadoInicial = 0;
+    long convulsoesTimestampEstado1 = 0;
+	long convulsoesTimestampEstado2 = 0;
+	long convulsoesTempoValidacao = 0;
+	long convulsoesTempoValidacaoPico = 0;
+	
+	int contadorMargemErroPicosConvulsoesValidas = 0;
+	private final double LIMITE_ACELERACAO_PICO_INFERIOR_CONVULSOES = 8;
+	private final double LIMITE_ACELERACAO_PICO_SUPERIOR_CONVULSOES = 11;
+	private final double MARGEM_ERRO_AMPLITUDE_ACELERACAO_CONVULSOES = 4;
+	private final int MARGEM_ERRO_TEMPO_MINIMO_VALIDACAO_CONVULSOES = 8000; // (X/1000) segundos...
+	private final int MARGEM_ERRO_TEMPO_MINIMO_VALIDACAO_PICOS_CONVULSOES = 160; // (X/1000) segundos...
+	private final double MARGEM_ERRO_QTD_MINIMA_ESPASMOS_SEGUNDO = 2; // quantidade de espasmos por segundo.
+    
+    private final int DESMAIO_ESTADO_INICIAL = 0;
+    private final int DESMAIO_ESTADO_1 = 1;
+    private final int DESMAIO_ESTADO_2 = 2;
+    private final int DESMAIO_ESTADO_3 = 3;
+    private final int DESMAIO_ESTADO_4 = 4;
+    private int desmaioEstadoAtual = DESMAIO_ESTADO_INICIAL;
+    
+    long desmaioTimestampEstado1 = 0;
+	long desmaioTimestampEstado2 = 0;
+	long desmaioTimestampEstado3 = 0;
+	long desmaioTimestampEstado4 = 0;
+	long desmaioTempoValidacao = 0;
+	
 	double menorModuloAceleracao = ACELERACAO_NORMAL_GRAVIDADE; // Aceleracao normal da gravidade... 
 	double maiorModuloAceleracao = 0;
 	double maiorModuloGiroscopio = 0;
@@ -46,14 +68,14 @@ public class EpilepsyHeuristicModerado {
 	private final double MARGEM_ERRO_AMPLITUDE_ACELERACAO = 13;
 	private final double MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO = 0.8;
 
-	private final int MARGEN_ERRO_TEMPO_MINIMO_QUEDA_DESMAIO = 40;
-	private final int MARGEN_ERRO_TEMPO_MINIMO_VALIDACAO_DESMAIO = 1000;
-	private final int MARGEN_ERRO_TEMPO_TOTAL_VALIDACAO_DESMAIO = 6000;
+	private final int MARGEM_ERRO_TEMPO_MINIMO_QUEDA_DESMAIO = 40;
+	private final int MARGEM_ERRO_TEMPO_MINIMO_VALIDACAO_DESMAIO = 1000;
+	private final int MARGEM_ERRO_TEMPO_TOTAL_VALIDACAO_DESMAIO = 6000;
 	private final int QTD_TOTAL_AMOSTRAGEM_ACELERACAO = 60;
 	Stack<Double> arrayAmostragemAceleracao = new Stack<Double>();
 
 	private final int MARGEM_ERRO_CONTADOR_VARIACOES_DESMAIO = 5;
-	int contadoMargemErroDesmaio = 0;
+	int contadorMargemErroDesmaio = 0;
 	
 	private final int ID_EIXO_X = 1;
 	private final int ID_EIXO_Y = 2;
@@ -103,7 +125,8 @@ public class EpilepsyHeuristicModerado {
         miliTimeInicial = System.currentTimeMillis();
         
         // Inicializando variaveis do monitoramento...
-        resetarVariaveisMonitoramento();
+        resetarVariaveisMonitoramentoDesmaio();
+        resetarVariaveisMonitoramentoConvulsoes();
 
         // Inicializando o servico...
         objContext = context;
@@ -125,6 +148,7 @@ public class EpilepsyHeuristicModerado {
     public boolean monitorar(double x, double y, double z, int typeSensor) {
     	double moduloVetorAceleracao = ACELERACAO_NORMAL_GRAVIDADE;
     	double moduloVetorGiroscopio = 0;
+    	double maiorVariacaoAceleracao = 0;
 
         // Instante de tempo que o log foi gerado...
         long timestampAtualSistema = System.currentTimeMillis();
@@ -145,7 +169,7 @@ public class EpilepsyHeuristicModerado {
 	    		arrayAmostragemAceleracao.add(0, moduloVetorAceleracao);
 
 	    		// Obtendo o menor e o maior pico de aceleracao... quando a maquina de estado for iniciada.
-	    		if(estadoAtual != ESTADO_INICIAL)
+	    		if(desmaioEstadoAtual != DESMAIO_ESTADO_INICIAL)
 	    		{
 	    			// Detecta o menor pico de aceleracao
 	    			if(moduloVetorAceleracao < menorModuloAceleracao)
@@ -156,7 +180,7 @@ public class EpilepsyHeuristicModerado {
 	    			if(moduloVetorAceleracao >= maiorModuloAceleracao)
 	            	{
 	            		maiorModuloAceleracao = moduloVetorAceleracao;
-	            		timestampEstado2 = timestampAtualSistema; // atualiza o instante em que ocorreu o maior pico de aceleracao...
+	            		desmaioTimestampEstado2 = timestampAtualSistema; // atualiza o instante em que ocorreu o maior pico de aceleracao...
 	            	}
 
 	    			// Coletando as variacoes de aceleracao de cada eixo (X, Y e Z) durante a queda.
@@ -202,7 +226,7 @@ public class EpilepsyHeuristicModerado {
 	    		// Calculando os modulos resultantes dos eixos x, y e z
 	    		moduloVetorGiroscopio = moduloVetor;
 	    		
-	    		if(estadoAtual != ESTADO_INICIAL)
+	    		if(desmaioEstadoAtual != DESMAIO_ESTADO_INICIAL)
 	    		{
 	    			double moduloX = Math.abs(x);
 	    			double moduloY = Math.abs(y);
@@ -219,7 +243,7 @@ public class EpilepsyHeuristicModerado {
 	    		}
 
 	    		// Obtendo o menor e o maior pico do giroscopio... quando a maquina de estado for iniciada.
-	    		if(estadoAtual != ESTADO_INICIAL)
+	    		if(desmaioEstadoAtual != DESMAIO_ESTADO_INICIAL)
 	    		{
 	    			// Detecta o maior pico do giroscopio
 	    			if(moduloVetorGiroscopio >= maiorModuloGiroscopio)
@@ -237,60 +261,60 @@ public class EpilepsyHeuristicModerado {
 	    		}
 	    	break;
     	}
-		
+
         /********************************************************************************
          *						HEURISTICA DE DETECCAO DE DESMAIO						*
          ********************************************************************************/
-    	double maiorVariacaoAceleracao = obterMaiorVariacaoAceleracao();
+        // Obtem o modulo do maior pico de variacao do acelerometro...
+        maiorVariacaoAceleracao = obterMaiorVariacaoAceleracao();
 
-    	switch (estadoAtual) {
-			case ESTADO_1:
+        switch (desmaioEstadoAtual) {
+			case DESMAIO_ESTADO_1:
                 if(moduloVetorAceleracao >= LIMITE_ACELERACAO_PICO_SUPERIOR) // Verifica se alcancou o pico superior
             	{
                 	if(MODO_DEBUG)
-                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_1 -> ESTADO_2", Toast.LENGTH_SHORT).show();
+                		Toast.makeText(objContext, "EpilepsyApp - DESMAIO_ESTADO_1 -> DESMAIO_ESTADO_2", Toast.LENGTH_SHORT).show();
     	        	
-    	        	estadoAtual = ESTADO_2;
-    	        	timestampEstado2 = timestampAtualSistema;
+    	        	desmaioEstadoAtual = DESMAIO_ESTADO_2;
+    	        	desmaioTimestampEstado2 = timestampAtualSistema;
     	        	maiorModuloAceleracao = moduloVetorAceleracao;
             	}
     	        else if(maiorVariacaoAceleracao <= MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO) // Verificar se o sinal do acelerometro estabilizou... atraves de uma margem de erro em relacao a normal 9,8 
             	{
                 	if(MODO_DEBUG)
-                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_1 -> ESTADO_INICIAL", Toast.LENGTH_SHORT).show();
+                		Toast.makeText(objContext, "EpilepsyApp - DESMAIO_ESTADO_1 -> DESMAIO_ESTADO_INICIAL", Toast.LENGTH_SHORT).show();
     	        	
-    	        	estadoAtual = ESTADO_INICIAL;
-    	        	resetarVariaveisMonitoramento();
-            		return false;
+    	        	desmaioEstadoAtual = DESMAIO_ESTADO_INICIAL;
+    	        	resetarVariaveisMonitoramentoDesmaio();
             	}
 			break;
 			
-			case ESTADO_2:
+			case DESMAIO_ESTADO_2:
             	// Aguarda a estabilizacao do sinal do acelerometro... atraves de uma margem de erro em relacao a normal 9,8 
     	        if(maiorVariacaoAceleracao <= MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO)
     	        {
-    	        	timestampEstado3 = timestampAtualSistema;
-    	        	long tempoTotalEntrePicosQueda = timestampEstado2 - timestampEstado1;
+    	        	desmaioTimestampEstado3 = timestampAtualSistema;
+    	        	long tempoTotalEntrePicosQueda = desmaioTimestampEstado2 - desmaioTimestampEstado1;
 
     	        	// Apenas debug...
     	        	String msgText = " TEMPO_Q(" + Long.toString(tempoTotalEntrePicosQueda) + ")";
 
-    	        	if(tempoTotalEntrePicosQueda >= MARGEN_ERRO_TEMPO_MINIMO_QUEDA_DESMAIO) // Validando tempo minimo de queda...
+    	        	if(tempoTotalEntrePicosQueda >= MARGEM_ERRO_TEMPO_MINIMO_QUEDA_DESMAIO) // Validando tempo minimo de queda...
     	        	{
-    	        		estadoAtual = ESTADO_3;
+    	        		desmaioEstadoAtual = DESMAIO_ESTADO_3;
         	        	if(MODO_DEBUG)
-                    		Toast.makeText(objContext, "EpilepsyApp - ESTADO_2 -> ESTADO_3" + msgText, Toast.LENGTH_SHORT).show();
+                    		Toast.makeText(objContext, "EpilepsyApp - DESMAIO_ESTADO_2 -> DESMAIO_ESTADO_3" + msgText, Toast.LENGTH_SHORT).show();
     	        	}
     	        	else
     	        	{
-    	        		estadoAtual = ESTADO_INICIAL;
+    	        		desmaioEstadoAtual = DESMAIO_ESTADO_INICIAL;
         	        	if(MODO_DEBUG)
-                    		Toast.makeText(objContext, "EpilepsyApp - ESTADO_2 -> ESTADO_INICIAL" + msgText, Toast.LENGTH_SHORT).show();
+                    		Toast.makeText(objContext, "EpilepsyApp - DESMAIO_ESTADO_2 -> DESMAIO_ESTADO_INICIAL" + msgText, Toast.LENGTH_SHORT).show();
     	        	}
     	        }
 			break;
 			
-			case ESTADO_3:
+			case DESMAIO_ESTADO_3:
             	// Obtendo amplitude de aceleracao entre o menor pico e o maior pico...
             	double amplitudeAceleracao = maiorModuloAceleracao - menorModuloAceleracao;
             	boolean flagHabilitaEstado4 = false;
@@ -305,11 +329,11 @@ public class EpilepsyHeuristicModerado {
                 	if(MODO_DEBUG)
                 	{
                 		String msgText = " A(" + Double.toString(amplitudeAceleracao) + ") G("+Double.toString(maiorModuloGiroscopio)+")";
-                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_3 -> ESTADO_4" + msgText, Toast.LENGTH_SHORT).show();
+                		Toast.makeText(objContext, "EpilepsyApp - DESMAIO_ESTADO_3 -> DESMAIO_ESTADO_4" + msgText, Toast.LENGTH_SHORT).show();
                 	}
 
-    	        	estadoAtual = ESTADO_4;
-            		timestampEstado4 = timestampAtualSistema;
+    	        	desmaioEstadoAtual = DESMAIO_ESTADO_4;
+            		desmaioTimestampEstado4 = timestampAtualSistema;
             		
 	                if(!objRing.isPlaying()) /** Emitindo beep... para validar um possivel desmaio... **/
 		        		objRing.play();
@@ -317,34 +341,33 @@ public class EpilepsyHeuristicModerado {
             	else
             	{
                 	if(MODO_DEBUG)
-                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_3 -> ESTADO_INICIAL", Toast.LENGTH_SHORT).show();
+                		Toast.makeText(objContext, "EpilepsyApp - DESMAIO_ESTADO_3 -> DESMAIO_ESTADO_INICIAL", Toast.LENGTH_SHORT).show();
 
-    	        	estadoAtual = ESTADO_INICIAL;
-    	        	resetarVariaveisMonitoramento();
+    	        	desmaioEstadoAtual = DESMAIO_ESTADO_INICIAL;
+    	        	resetarVariaveisMonitoramentoDesmaio();
             		return false;
             	}
 			break;
 			
-			case ESTADO_4:
-            	tempoValidacao = timestampAtualSistema - timestampEstado4;
-            	if(tempoValidacao > MARGEN_ERRO_TEMPO_MINIMO_VALIDACAO_DESMAIO)
+			case DESMAIO_ESTADO_4:
+            	desmaioTempoValidacao = timestampAtualSistema - desmaioTimestampEstado4;
+            	if(desmaioTempoValidacao > MARGEM_ERRO_TEMPO_MINIMO_VALIDACAO_DESMAIO)
             	{
-    	        	if(tempoValidacao < MARGEN_ERRO_TEMPO_TOTAL_VALIDACAO_DESMAIO)
+    	        	if(desmaioTempoValidacao < MARGEM_ERRO_TEMPO_TOTAL_VALIDACAO_DESMAIO)
     	        	{
     	        		double variacaoVetorAceleracaoAtual = Math.abs(moduloVetorAceleracao - ACELERACAO_NORMAL_GRAVIDADE);
     	        		
     	        		// Verificar se está havendo alguma oscilação no acelerometro... caso contrario o cara apagou mesmo... :P
     	    	        if(variacaoVetorAceleracaoAtual > MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO)
-    	    	        	contadoMargemErroDesmaio++;
+    	    	        	contadorMargemErroDesmaio++;
     	    	        
-    	    	        if(contadoMargemErroDesmaio > MARGEM_ERRO_CONTADOR_VARIACOES_DESMAIO)
+    	    	        if(contadorMargemErroDesmaio > MARGEM_ERRO_CONTADOR_VARIACOES_DESMAIO)
     	    	        {
     	                	if(MODO_DEBUG)
-    	                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> ESTADO_INICIAL", Toast.LENGTH_SHORT).show();
+    	                		Toast.makeText(objContext, "EpilepsyApp - DESMAIO_ESTADO_4 -> DESMAIO_ESTADO_INICIAL", Toast.LENGTH_SHORT).show();
 
-    	    	        	estadoAtual = ESTADO_INICIAL;
-    	    	        	resetarVariaveisMonitoramento();
-    	    	        	return false;
+    	    	        	desmaioEstadoAtual = DESMAIO_ESTADO_INICIAL;
+    	    	        	resetarVariaveisMonitoramentoDesmaio();
     	    	        }
     	        	}
     	        	else
@@ -358,59 +381,183 @@ public class EpilepsyHeuristicModerado {
     	                	if(MODO_DEBUG)
     	                	{
     	                		String msgTexto = "ANTES(" + Integer.toString(eixoNormalAntes) + ") DEPOIS(" + Integer.toString(eixoNormalDepois) + ")";
-    	                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> " + msgTexto, Toast.LENGTH_SHORT).show();
+    	                		Toast.makeText(objContext, "EpilepsyApp - DESMAIO_ESTADO_4 -> " + msgTexto, Toast.LENGTH_SHORT).show();
     	                	}
 
     	                	if(MODO_DEBUG)
-    	                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> ESTADO_INICIAL -> DESMAIO DETECTADO(1)", Toast.LENGTH_SHORT).show();
+    	                		Toast.makeText(objContext, "EpilepsyApp - DESMAIO_ESTADO_4 -> DESMAIO_ESTADO_INICIAL -> DESMAIO DETECTADO(1)", Toast.LENGTH_SHORT).show();
 
-    	    	        	estadoAtual = ESTADO_INICIAL;
-	        	        	resetarVariaveisMonitoramento();
+    	    	        	desmaioEstadoAtual = DESMAIO_ESTADO_INICIAL;
+	        	        	resetarVariaveisMonitoramentoDesmaio();
     			        	return true; // TEM MAIORES CHANCES DE SER UM DESMAIO...
     	        		}
 
                     	if(MODO_DEBUG)
-                    		Toast.makeText(objContext, "EpilepsyApp - ESTADO_4 -> ESTADO_INICIAL -> DESMAIO DETECTADO(2)", Toast.LENGTH_SHORT).show();
+                    		Toast.makeText(objContext, "EpilepsyApp - DESMAIO_ESTADO_4 -> DESMAIO_ESTADO_INICIAL -> DESMAIO DETECTADO(2)", Toast.LENGTH_SHORT).show();
 
-	    	        	estadoAtual = ESTADO_INICIAL;
-        	        	resetarVariaveisMonitoramento();
+	    	        	desmaioEstadoAtual = DESMAIO_ESTADO_INICIAL;
+        	        	resetarVariaveisMonitoramentoDesmaio();
     	        		return true; // TEM MENORES CHANCES DE SER UM DESMAIO...
     	        	}
             	}
             	else
             	{
-            		contadoMargemErroDesmaio = 0;
+            		contadorMargemErroDesmaio = 0;
             	}
 			break;
 			
 			default: // Estado Inicial
-				estadoAtual = ESTADO_INICIAL;
+				desmaioEstadoAtual = DESMAIO_ESTADO_INICIAL;
             	if(moduloVetorAceleracao <= LIMITE_ACELERACAO_PICO_INFERIOR)
                 {
                 	if(MODO_DEBUG)
-                		Toast.makeText(objContext, "EpilepsyApp - ESTADO_INICIAL -> ESTADO_1", Toast.LENGTH_SHORT).show();
+                		Toast.makeText(objContext, "EpilepsyApp - DESMAIO_ESTADO_INICIAL -> DESMAIO_ESTADO_1", Toast.LENGTH_SHORT).show();
 
-    	        	estadoAtual = ESTADO_1;
-	            	timestampEstado1 = timestampAtualSistema;
+    	        	desmaioEstadoAtual = DESMAIO_ESTADO_1;
+	            	desmaioTimestampEstado1 = timestampAtualSistema;
 	                menorModuloAceleracao = moduloVetorAceleracao;
                 }
 			break;
 		}
+        /** FIM - HEURISTICA DE DETECCAO DE DESMAIO	**/
 		
+        /********************************************************************************
+         *						HEURISTICA DE DETECCAO DE CONVULSOES					*
+         ********************************************************************************/
+        // Obtem o modulo do maior pico de variacao do acelerometro...
+        maiorVariacaoAceleracao = obterMaiorVariacaoAceleracao();
+
+        switch (convulsoesEstadoAtual) {
+			case CONVULSOES_ESTADO_1: // BORDA DE DESCIDA...
+                // Verificar se o sinal do acelerometro estabilizou... atraves de uma margem de erro em relacao a normal 9,8 
+                if(maiorVariacaoAceleracao <= MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO)
+            	{
+                	if(MODO_DEBUG)
+                		Toast.makeText(objContext, "EpilepsyApp - CONVULSOES_ESTADO_1 -> CONVULSOES_ESTADO_INICIAL", Toast.LENGTH_SHORT).show();
+    	        	
+                	convulsoesEstadoAtual = CONVULSOES_ESTADO_INICIAL;
+                	resetarVariaveisMonitoramentoConvulsoes();
+            	}
+                else
+                {
+	                // VERIFICANDO BORDA DE DESCIDA...
+	                if(moduloVetorAceleracao <= LIMITE_ACELERACAO_PICO_INFERIOR_CONVULSOES)
+	                {
+	            		if(moduloVetorAceleracao <= convulsoesPicoAceleracaoEstado1)
+		            	{
+		            		convulsoesPicoAceleracaoEstado1 = moduloVetorAceleracao;
+		            	}
+		            	else // Significar que tem que pegar o outro pico do gráfico do acelerometro...
+		            	{
+//		            		if(MODO_DEBUG)
+//		                		Toast.makeText(objContext, "EpilepsyApp - CONVULSOES_ESTADO_1 -> CONVULSOES_ESTADO_2", Toast.LENGTH_SHORT).show();
+		            		
+		            		convulsoesEstadoAtual = CONVULSOES_ESTADO_2;
+		            		convulsoesTimestampEstado2 = timestampAtualSistema;
+		            		convulsoesPicoAceleracaoEstado2 = moduloVetorAceleracao;
+		            	}
+	                }
+                }
+			break;
+			
+			case CONVULSOES_ESTADO_2:  // BORDA DE SUBIDA...
+                // Verificar se o sinal do acelerometro estabilizou... atraves de uma margem de erro em relacao a normal 9,8 
+                if(maiorVariacaoAceleracao <= MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO)
+            	{
+                	if(MODO_DEBUG)
+                		Toast.makeText(objContext, "EpilepsyApp - CONVULSOES_ESTADO_2 -> CONVULSOES_ESTADO_INICIAL", Toast.LENGTH_SHORT).show();
+    	        	
+                	convulsoesEstadoAtual = CONVULSOES_ESTADO_INICIAL;
+                	resetarVariaveisMonitoramentoConvulsoes();
+            	}
+                else
+                {
+	                // VERIFICANDO BORDA DE SUBIDA...
+	                if(moduloVetorAceleracao >= LIMITE_ACELERACAO_PICO_SUPERIOR_CONVULSOES)
+	                {
+	                	if(moduloVetorAceleracao >= convulsoesPicoAceleracaoEstado2)
+		            	{
+		            		convulsoesPicoAceleracaoEstado2 = moduloVetorAceleracao;
+		            	}
+		            	else // Significar que tem que pegar o outro pico do gráfico do acelerometro...
+		            	{
+		            		// VERIFICANDO SINAIS CONVULSIVOS...
+		            		double convulsoesModuloAmplitudeVetorAceleracao = Math.abs(convulsoesPicoAceleracaoEstado2 - convulsoesPicoAceleracaoEstado1);
+		            		convulsoesTempoValidacaoPico = timestampAtualSistema - convulsoesTimestampEstado1;
+		            		convulsoesTempoValidacao = timestampAtualSistema - convulsoesTimestampEstadoInicial;
+	            			
+		            		if(convulsoesModuloAmplitudeVetorAceleracao >= MARGEM_ERRO_AMPLITUDE_ACELERACAO_CONVULSOES &&
+		            		   convulsoesTempoValidacaoPico >= MARGEM_ERRO_TEMPO_MINIMO_VALIDACAO_PICOS_CONVULSOES)
+		            		{
+		            			contadorMargemErroPicosConvulsoesValidas++;
+		            			if(convulsoesTempoValidacao > MARGEM_ERRO_TEMPO_MINIMO_VALIDACAO_CONVULSOES)
+		            			{
+		            				double tempoValidacaoSegudos = convulsoesTempoValidacao / 1000;
+		            				double qtdConvulsoesSegundo = contadorMargemErroPicosConvulsoesValidas / tempoValidacaoSegudos;
+		            				
+		            				if(MODO_DEBUG)
+		            					Toast.makeText(objContext, "EpilepsyApp - CONVULSOES_ESTADO_2 Espasmos/s (" + String.valueOf(qtdConvulsoesSegundo) + ")", Toast.LENGTH_SHORT).show();
+		            				
+		            				if(qtdConvulsoesSegundo >= MARGEM_ERRO_QTD_MINIMA_ESPASMOS_SEGUNDO)
+		            				{
+		            					if(MODO_DEBUG)
+		        		            		Toast.makeText(objContext, "EpilepsyApp - DESMAIO_ESTADO_2 -> DESMAIO_ESTADO_INICIAL -> CONVULSAO DETECTADA(1)", Toast.LENGTH_SHORT).show();
+		        		
+		        						convulsoesEstadoAtual = CONVULSOES_ESTADO_INICIAL;
+		        		            	resetarVariaveisMonitoramentoConvulsoes();
+		        		            	return true;
+		            				}
+		            			}
+		            			
+			            		
+		            			if(MODO_DEBUG)
+			                		Toast.makeText(objContext, "EpilepsyApp - CONVULSOES_ESTADO_2 -> CONVULSOES_ESTADO_1 (" + 
+			                				String.valueOf(contadorMargemErroPicosConvulsoesValidas) + ", " +
+			                				String.valueOf(convulsoesTempoValidacaoPico) + ", " +
+			                				String.valueOf(convulsoesTempoValidacao) + ", " +
+			                				String.valueOf(convulsoesModuloAmplitudeVetorAceleracao), Toast.LENGTH_SHORT).show();
+		            		}
+		            		
+		            		convulsoesEstadoAtual = CONVULSOES_ESTADO_1;
+		            		convulsoesTimestampEstado1 = timestampAtualSistema;
+		            		convulsoesPicoAceleracaoEstado1 = moduloVetorAceleracao;
+		            	}
+	                }
+                }
+			break;
+
+			default: // Estado Inicial
+				convulsoesEstadoAtual = CONVULSOES_ESTADO_INICIAL;
+
+                // VERIFICANDO BORDA DE DESCIDA...
+                if(moduloVetorAceleracao <= LIMITE_ACELERACAO_PICO_INFERIOR_CONVULSOES)
+                {
+//            		if(MODO_DEBUG)
+//                		Toast.makeText(objContext, "EpilepsyApp - CONVULSOES_ESTADO_INICIAL -> CONVULSOES_ESTADO_1", Toast.LENGTH_SHORT).show();
+            		
+                	convulsoesEstadoAtual = CONVULSOES_ESTADO_1;
+                	convulsoesPicoAceleracaoEstado1 = moduloVetorAceleracao;
+                	convulsoesTimestampEstadoInicial = timestampAtualSistema;
+                	convulsoesTimestampEstado1 = timestampAtualSistema;
+                }
+			break;
+		}
+        /** FIM - HEURISTICA DE DETECCAO DE CONVULSOES	**/
+
         return false;
     }
     
     /**
-     *  Esta funcao retorna a porcentagem media de variacao da aceleracao... Ex.: -0.21, 0.50, 0.01, etc
+     *  reinicializa os dados do monitoramento de demaios.
      */
-    private void resetarVariaveisMonitoramento() {
-    	timestampEstado1 = 0;
-    	timestampEstado2 = 0;
-    	timestampEstado3 = 0;
-    	timestampEstado4 = 0;
-    	tempoValidacao = 0;
+    private void resetarVariaveisMonitoramentoDesmaio() {
+    	desmaioTimestampEstado1 = 0;
+    	desmaioTimestampEstado2 = 0;
+    	desmaioTimestampEstado3 = 0;
+    	desmaioTimestampEstado4 = 0;
+    	desmaioTempoValidacao = 0;
 
-    	contadoMargemErroDesmaio = 0;
+    	contadorMargemErroDesmaio = 0;
 
     	eixoNormalAceleracaoAntesX.clear();
     	eixoNormalAceleracaoAntesY.clear();
@@ -424,6 +571,22 @@ public class EpilepsyHeuristicModerado {
     	maxVariacaoGyroscopeEixoX = 0;
     	maxVariacaoGyroscopeEixoY = 0;
     	maxVariacaoGyroscopeEixoZ = 0;
+    }
+    
+    /**
+     *  reinicializa os dados do monitoramento de convulsoes.
+     */
+    private void resetarVariaveisMonitoramentoConvulsoes() {
+    	convulsoesTimestampEstadoInicial = 0;
+    	convulsoesTimestampEstado1 = 0;
+    	convulsoesTimestampEstado2 = 0;
+    	convulsoesTempoValidacao = 0;
+    	convulsoesTempoValidacaoPico = 0;
+    	
+    	convulsoesPicoAceleracaoEstado1 = 0;
+    	convulsoesPicoAceleracaoEstado2 = 0;
+    	
+    	contadorMargemErroPicosConvulsoesValidas = 0;
     }
     
     /**
