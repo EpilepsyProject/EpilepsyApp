@@ -23,7 +23,7 @@ public class EpilepsyHeuristicService extends Service implements SensorEventList
     
     private EpilepsyHeuristic objHeuristica;
     
-    private boolean flagLogs = false;
+    private boolean flagLogs = true;
     
 	public IBinder onBind(Intent i) {
 		return null;
