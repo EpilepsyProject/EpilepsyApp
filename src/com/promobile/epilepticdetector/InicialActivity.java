@@ -18,6 +18,12 @@ import android.telephony.SmsMessage;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.Toast;
+/**
+ * Classe de Debug das funcionalidades do aplicativo
+ * [Envio SMS][GPS] [TesteAutomatizado]
+ * @author eribeiro
+ *
+ */
 
 @SuppressLint("NewApi")
 public class InicialActivity extends Activity {
@@ -138,10 +144,5 @@ public class InicialActivity extends Activity {
 		mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotifyManager.notify(ID, mBuilder.build());	
      }
-	
-	public void showDialogClick(View view){
-		Intent intent = new Intent(this, TelaDesmaio.class);
-		this.startActivity(intent);
-	}
 	
 }

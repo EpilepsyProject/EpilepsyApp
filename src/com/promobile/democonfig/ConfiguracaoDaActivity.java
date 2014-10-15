@@ -89,6 +89,7 @@ public class ConfiguracaoDaActivity extends PreferenceActivity implements OnShar
 		
 		SharedPreferences pref = getSharedPreferences("prefs_do_contato", MODE_PRIVATE);
 		
+		@SuppressWarnings("deprecation")
 		MeuContatoPreference meuContatoPreference = (MeuContatoPreference) getPreferenceScreen().findPreference("pref_key_contato"+numPref);
 		meuContatoPreference.setTitle(pref.getString("nomeKey"+numPref, desNome));
         meuContatoPreference.setSummary(pref.getString("telefoneKey"+numPref, desSummary));
@@ -110,6 +111,7 @@ public class ConfiguracaoDaActivity extends PreferenceActivity implements OnShar
 	    editor.commit();    
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -125,12 +127,14 @@ public class ConfiguracaoDaActivity extends PreferenceActivity implements OnShar
 		atualizaMeuContatoPreference(4);
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onPause() {
 	    super.onPause();
 	    getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void setupSimplePreferencesScreen() {
 		addPreferencesFromResource(R.xml.pref_general);
 		PreferenceCategory fakeHeader = new PreferenceCategory(this);

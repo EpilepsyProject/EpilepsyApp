@@ -10,7 +10,12 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.provider.ContactsContract;
-
+/**
+ * Classe reponsável por manipular a lista de contados dos dispositivo, com o objetivo de pegar
+ *  um contato e salvar na aplicação. 
+ * @author eribeiro
+ *
+ */
 public class ContatosUtil {
 
   private ContentResolver mContentResolver;
