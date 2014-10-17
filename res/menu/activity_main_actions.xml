@@ -13,17 +13,5 @@
     <item android:id="@+id/action_testes"
           android:icon="@drawable/ic_drawer"
           android:title="@string/teste"
-          android:showAsAction="ifRoom"/>
-    
-    <!-- Teste Heurística -->
-   <!--  <item android:id="@+id/action_heuristica"
-          android:icon="@drawable/ic_action_help"
-          android:title="@string/automated_test_heuristic"
-          android:showAsAction="never" />  -->
-    
-    <!-- Teste SMS -->
-  <!--   <item android:id="@+id/action_sms"
-          android:icon="@drawable/ic_action_help"
-          android:title="@string/btnSmsSendTest" 
-          android:showAsAction="never"/>  -->    
+          android:showAsAction="ifRoom"/>   
 </menu>

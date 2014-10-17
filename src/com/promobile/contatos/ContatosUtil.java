@@ -64,16 +64,13 @@ public class ContatosUtil {
         Contato contato = new Contato();
     
         // Id 
-        contato.id = c.getString(c.getColumnIndex(
-            ContactsContract.Contacts._ID));
+        contato.setId(c.getString(c.getColumnIndex(ContactsContract.Contacts._ID)));
       
         // Nome
-        contato.nome = c.getString(c.getColumnIndex(
-            ContactsContract.Contacts.DISPLAY_NAME));
+        contato.setNome(c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));
     
         // Telefones
-        contato.telefones = getTelefones(
-            contato.id);   
+        contato.setTelefones(getTelefones(contato.getId()));   
     
         contatos.add(contato);
       }

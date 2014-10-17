@@ -1,4 +1,4 @@
-package com.promobile.democonfig;
+package com.promobile.configuracoes;
 
 import java.util.List;
 
@@ -212,28 +212,28 @@ public class ConfiguracaoDaActivity extends PreferenceActivity implements OnShar
 	        if (contatos.size() > 0) {
 	        	
 	          Contato contato = contatos.get(0);
-	          if (contato.telefones.size() > 0) {
+	          if (contato.getTelefones().size() > 0) {
 	        	  switch (ConfiguracaoDaActivity.NUMTYPEPREF) {
 					case 1:
-						criarPreferenciasContato(contato.nome, contato.telefones.get(0).numero, NUMTYPEPREF);
+						criarPreferenciasContato(contato.getNome(), contato.getTelefones().get(0).numero, NUMTYPEPREF);
 					break;
 					case 2:
-						criarPreferenciasContato(contato.nome, contato.telefones.get(0).numero, NUMTYPEPREF);
+						criarPreferenciasContato(contato.getNome(), contato.getTelefones().get(0).numero, NUMTYPEPREF);
 					break;
 	
 					case 3:
-						criarPreferenciasContato(contato.nome, contato.telefones.get(0).numero, NUMTYPEPREF);
+						criarPreferenciasContato(contato.getNome(), contato.getTelefones().get(0).numero, NUMTYPEPREF);
 					break;
 					
 					case 4:
-						criarPreferenciasContato(contato.nome, contato.telefones.get(0).numero, NUMTYPEPREF);
+						criarPreferenciasContato(contato.getNome(), contato.getTelefones().get(0).numero, NUMTYPEPREF);
 					break;
 					
 					default:
 						break;
 					}
 	     
-	        	  Toast.makeText(this, "Nome: "+contato.nome+" - Telefone: "+contato.telefones.get(0).numero, Toast.LENGTH_SHORT).show();
+	        	  Toast.makeText(this, "Nome: "+contato.getNome()+" - Telefone: "+contato.getTelefones().get(0).numero, Toast.LENGTH_SHORT).show();
 	          }
 	          }
 	      }

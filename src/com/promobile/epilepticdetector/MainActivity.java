@@ -19,8 +19,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Button;
 
+import com.promobile.configuracoes.ConfiguracaoDaActivity;
 import com.promobile.contatos.Contato;
-import com.promobile.democonfig.ConfiguracaoDaActivity;
 /**
  * Esta classe é reponsável por controlar a tela principal do aplicativo.
  * @author eribeiro

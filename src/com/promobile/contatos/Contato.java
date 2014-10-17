@@ -11,19 +11,26 @@ import android.telephony.SmsManager;
 import android.widget.Toast;
 
 import com.promobile.epilepticdetector.GPSTracker;
-
+/***
+ * Classe reponsável por gerir a atuação do uso da agenda telefonica no aplicativo, uma vez que essa classe
+ * utiliza métodos criados na classe {@link ContatosUtil}, para criar os seus prórios métodos principais:
+ * <p>enviarSmsParaContatos()<br> 
+ * enviaSms(String destino)<br>
+ * ligarContato(String destino)</p>
+ * @author eribeiro
+ *
+ */
 public class Contato {    
-  public String id;
-  public String nome;
-  public List<Telefone> telefones;
+  private String id;
+  private String nome;
+  private List<Telefone> telefones;
   private  String telefone;
   
-  Context context;
-  
-  String phoneNumber;
-  GPSTracker gps;
-  Handler handler;
-  SmsManager sms;
+  private Context context;
+  private String phoneNumber;
+  private GPSTracker gps;
+  private Handler handler;
+  private SmsManager sms;
   
   public Contato(){
   }
@@ -32,24 +39,12 @@ public class Contato {
 	  this.context = context;
   }
   
-  public void setNome(String nome) {
-	this.nome = nome;
-  }
-  
-  public void setTelefone(String telefone){
-	this.telefone = telefone;
-  }
-  public String getTelefone() {
-	return telefone;
-  }
-  
-  
   /**
-   * Método responsável por enviar sms para cada contato cadastrado no aplicativo. 
+   * Método responsável por enviar sms para cada contato cadastrado na tela de configurações
+   * do aplicativo. 
    */
   public void enviarSmsParaContatos(){
-  	//Manda um sms para cada contato cadastrado na tela de configurações 
-		for (int i = 2; i <= 4; i++) {
+  	for (int i = 2; i <= 4; i++) {
 			SharedPreferences pref = context.getSharedPreferences("prefs_do_contato", Context.MODE_PRIVATE);
 			String destino = pref.getString("telefoneKey"+i, "Nda");
 			
@@ -65,6 +60,10 @@ public class Contato {
 		}
   }
   
+  /**
+   * Método responsável por enviar um sms com mensagem pré-definada para um numero passado por parametro.
+   * @param destino Uma String contendo o numero que receberá o sms.
+   */
   public void enviaSms(String destino){
 		sms = SmsManager.getDefault();
 		phoneNumber = destino;
@@ -94,12 +93,41 @@ public class Contato {
       handler.postDelayed(runnable, 100);
 	}
   
+  /**
+   * Método responsável por efetuar um ligar para um numero passado por parametro.
+   * @param destino Uma String contendo o numero que receberá a ligação.
+   */
   public void ligarContato(String destino){
   	Uri uri = Uri.parse("tel:"+ destino);
 	Intent intent = new Intent(Intent.ACTION_CALL,uri);
 	context.startActivity(intent);
   }
 
+  public void setNome(String nome) {
+	this.nome = nome;
+  }
+  public String getNome() {
+	return nome;
+}
+  public void setTelefone(String telefone){
+	this.telefone = telefone;
+  }
+  public String getTelefone() {
+	return telefone;
+  }
+  public void setId(String id) {
+	this.id = id;
+  }
+  public String getId() {
+	return id;
+  }
+  public void setTelefones(List<Telefone> telefones) {
+	this.telefones = telefones;
+  }
+  public List<Telefone> getTelefones() {
+	return telefones;
+  }
+  
   
   
 }

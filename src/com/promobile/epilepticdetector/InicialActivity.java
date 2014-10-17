@@ -83,9 +83,7 @@ public class InicialActivity extends Activity {
          findViewById(R.id.btnTestGps).setOnClickListener(new View.OnClickListener() {
     		@Override
         		public void onClick(View arg) {
-    				Toast.makeText(getApplicationContext(), "EpilepsyApp - GPS e Google maps!", Toast.LENGTH_SHORT).show();
-	    			Intent intent = new Intent(InicialActivity.this, GpsTestActivity.class);
-	    			startActivity(intent);
+    				
         		}
         	});
 	}

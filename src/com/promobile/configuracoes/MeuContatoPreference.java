@@ -1,4 +1,4 @@
-package com.promobile.democonfig;
+package com.promobile.configuracoes;
 
 import com.promobile.epilepticdetector.R;
 

@@ -8,8 +8,4 @@
     <header
         android:fragment="com.promobile.democonfig.ConfiguracaoActivity$NotificationPreferenceFragment"
         android:title="@string/pref_header_notifications" />
-    <!-- <header
-        android:fragment="com..promobile.democonfig.ConfiguracaoActivity$DataSyncPreferenceFragment"
-        android:title="@string/pref_header_data_sync" />
-	 -->
 </preference-headers>

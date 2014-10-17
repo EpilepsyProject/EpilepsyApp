@@ -50,7 +50,7 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="com.promobile.democonfig.ConfiguracaoDaActivity"
+            android:name="com.promobile.configuracoes.ConfiguracaoDaActivity"
             android:label="@string/app_name" >
         </activity>
         <activity

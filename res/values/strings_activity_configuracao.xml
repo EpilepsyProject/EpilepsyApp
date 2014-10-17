@@ -1,18 +1,5 @@
 <resources>
-
-    <string name="title_activity_configuracao">Configuraçãoes</string>
-
-    <!-- Strings related to Settings -->
-
-
-    <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact based on your message history</string>
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-
+	<string name="pref_header_general">General</string>
     <string-array name="pref_dado_alerta_titulo">
         <item>5 segundos</item>
         <item>10 segundos</item>
@@ -27,11 +14,6 @@
         <item>30</item>
         <item>60</item>
     </string-array>
-
-    <!-- Example settings for Data & Sync -->
-    <string name="pref_header_data_sync">Data &amp; sync</string>
-    <string name="pref_title_sync_frequency">Sync frequency</string>
-
     <string-array name="pref_sync_frequency_titles">
         <item>15 minutes</item>
         <item>30 minutes</item>
@@ -49,21 +31,7 @@
         <item>-1</item>
     </string-array>
 
-    <string name="pref_title_system_sync_settings">System sync settings</string>
-
-    <!-- Example settings for Notifications -->
     <string name="pref_header_notifications">Notifications</string>
-    <string name="pref_title_new_message_notifications">New message notifications</string>
-    <string name="pref_title_ringtone">Ringtone</string>
-    <string name="pref_ringtone_silent">Silent</string>
-    <string name="pref_title_vibrate">Vibrate</string>
-    <string name="pref_ativar_aplicacao">Ativar a aplicação</string>
-    <string name="pref_modoaviao">Modo Avião</string>
-    <string name="pref_titulo_modo_silencioso">Modo silecioso</string>
-    <string name="pref_summary_modo_silencioso">Desabilita o som e a vibração das notificações</string>
-    <string name="pref_titulo_toque">Toque</string>
-    <string name="pref_summary_toque">"Definir o toque para as notificações "</string>
-    <string name="pref_titulo_vibrar">Vibrar</string>
     <string-array name="pref_perfis_titulo">
         <item >Perfil Moderado</item>
         <item >Perfil Preciso</item>
