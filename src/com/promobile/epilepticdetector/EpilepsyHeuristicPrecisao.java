@@ -26,6 +26,9 @@ public class EpilepsyHeuristicPrecisao {
 	private long miliTimeInicial;
 	
 	private Boolean flagGyroscopeAtivado = false;
+	/**
+	 * CONTANTE DE ACELERACAO DA GRAVIDADE 9.8
+	 */
 	private final double ACELERACAO_NORMAL_GRAVIDADE = 9.8;
    
     private final int CONVULSOES_ESTADO_INICIAL = 0;
@@ -69,15 +72,43 @@ public class EpilepsyHeuristicPrecisao {
 	double maiorModuloAceleracao = 0;
 	double maiorModuloGiroscopio = 0;
 	
+	/**
+	 * Constante de limite do pico inferior da aceleração: 5
+	 */
 	private final double LIMITE_ACELERACAO_PICO_INFERIOR = 5;
+	/**
+	 * Constante de limite do pico superior da aceleração: 18
+	 */
 	private final double LIMITE_ACELERACAO_PICO_SUPERIOR = 18;
+	/**
+	 * Margem de erro da amplitudade da aceleracao: 14
+	 */
 	private final double MARGEM_ERRO_AMPLITUDE_ACELERACAO = 14;
+	/**
+	 * Margem de erro da amplitudade da aceleracao sinal estabilizado: 0.8
+	 */
 	private final double MARGEM_ERRO_AMOSTRAGEM_ACELERACAO_SINAL_ESTABILIZADO = 0.8;
 
+	/**
+	 * Margem de erro tempo minimo queda desmaio: 40
+	 */
 	private final int MARGEM_ERRO_TEMPO_MINIMO_QUEDA_DESMAIO = 40;
+	/**
+	 * Margem de erro tempo minimo validacao desmaio: 1000
+	 */
 	private final int MARGEM_ERRO_TEMPO_MINIMO_VALIDACAO_DESMAIO = 1000;
+	/**
+	 * Margem de erro tempo total validacao desmaio: 6000
+	 */
 	private final int MARGEM_ERRO_TEMPO_TOTAL_VALIDACAO_DESMAIO = 6000;
+	/**
+	 * Margem de erro tempo adicional na validação do desmaio: 10000
+	 */	
 	private final int MARGEM_ERRO_TEMPO_ADICIONAL_VALIDACAO_DESMAIO = 10000;
+	/**
+	 * Quantidade toal de amostragem do acelerometro
+	 */
+	
 	private final int QTD_TOTAL_AMOSTRAGEM_ACELERACAO = 60;
 	Stack<Double> arrayAmostragemAceleracao = new Stack<Double>();
 	Stack<Double> arrayTimelineAceleracao = new Stack<Double>();
@@ -90,6 +121,7 @@ public class EpilepsyHeuristicPrecisao {
 	private final int QTD_TOTAL_AMOSTRAGEM_VELOCIDADE_FINAL = 60;
 	Stack<Double> arrayVelocidadeFinal = new Stack<Double>();
 	boolean flagVelocidadeFinalAlcancada = false;
+
 
 	private final int MARGEM_ERRO_CONTADOR_VARIACOES_DESMAIO = 5;
 	int contadorMargemErroDesmaio = 0;
@@ -104,6 +136,9 @@ public class EpilepsyHeuristicPrecisao {
 	private final int ID_EIXO_Y_NEGATIVO = -1 * ID_EIXO_Y;
 	private final int ID_EIXO_Z_POSITIVO =  1 * ID_EIXO_Z;
 	private final int ID_EIXO_Z_NEGATIVO = -1 * ID_EIXO_Z;
+	/**
+	 * 	Quantidade total da amostragem do eixo de aceleracao: 100
+	 */
 	private final int QTD_TOTAL_AMOSTRAGEM_EIXO_ACELERACAO = 100;
 	
 	Stack<Double> eixoNormalAceleracaoAntesX = new Stack<Double>();
