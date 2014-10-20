@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
  
-    <!-- Configurações / will display always -->
+
     <item android:id="@+id/action_config"
           android:icon="@drawable/gear"
           android:title="@string/config"
-          android:showAsAction="ifRoom" 
-          android:actionLayout="@menu/configuracao" 
-          android:actionProviderClass="@string/config" 
-          android:actionViewClass="@string/config"/>
+           android:showAsAction="ifRoom"
+          />
     
     <item android:id="@+id/action_testes"
           android:icon="@drawable/ic_drawer"

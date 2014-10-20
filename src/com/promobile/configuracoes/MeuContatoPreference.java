@@ -1,5 +1,6 @@
 package com.promobile.configuracoes;
 
+
 import com.promobile.epilepticdetector.R;
 
 import android.content.Context;
@@ -137,16 +138,7 @@ public class MeuContatoPreference extends Preference {
             super(superState);
         }
 
-        public static final Parcelable.Creator<SavedState> CREATOR =
-                new Parcelable.Creator<SavedState>() {
-            public SavedState createFromParcel(Parcel in) {
-                return new SavedState(in);
-            }
-
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
+       
     }
 
 }

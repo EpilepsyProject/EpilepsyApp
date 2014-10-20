@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
-    <issue id="SimpleDateFormat">
+    <issue id="SimpleDateFormat" severity="ignore">
         <ignore path="src/com/promobile/epilepticdetector/AutomatedTestHeuristicActivity.java" />
+        <ignore path="src/com/promobile/epilepticdetector/EpilepsyHeuristicPrecisao.java" />
     </issue>
 </lint>

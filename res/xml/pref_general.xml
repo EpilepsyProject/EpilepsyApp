@@ -11,5 +11,5 @@
         android:negativeButtonText="@null" 
         android:positiveButtonText="@null" 
         android:defaultValue="0" 
-        android:title="Perfis"/> <!-- ATENCAO: PERFIL PADRAO EH O MODERADO -->
+        android:title="Perfis"/> 
 </PreferenceScreen>

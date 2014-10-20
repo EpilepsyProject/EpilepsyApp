@@ -7,17 +7,5 @@
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
         android:defaultValue="30" 
-        android:title="Alerta" /> <!-- ATENCAO: DEFAULT 30 segundos -->
-<!--
-    <RingtonePreference
-        android:defaultValue="content://settings/system/notification_sound"
-        android:key="notifications_new_message_ringtone"
-        android:ringtoneType="notification"
-        android:title="Toque" android:summary="@string/pref_summary_toque"/>
-
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="notifications_new_message_vibrate"
-        android:title="@string/pref_titulo_vibrar" />
-   -->
+        android:title="Alerta" />
 </PreferenceScreen>

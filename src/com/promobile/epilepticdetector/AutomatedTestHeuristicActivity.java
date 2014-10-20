@@ -8,17 +8,13 @@ import java.util.Date;
 import java.util.Scanner;
 import java.util.Stack;
 
-import com.promobile.epilepticdetector.R;
-
+import android.app.Activity;
+import android.content.Context;
 import android.hardware.Sensor;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.app.Activity;
-import android.content.Context;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
-import android.view.Display;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -247,7 +243,6 @@ public class AutomatedTestHeuristicActivity extends Activity{
     	final Stack<Double> eixoX_G = eixoXG;
     	final Stack<Double> eixoY_G = eixoYG;
     	final Stack<Double> eixoZ_G = eixoYG;
-    	final Stack<Double> eixoM_G = eixoMG;
 
     	Runnable runnable = new Runnable() {
     	    private EpilepsyHeuristic objHeuristica;

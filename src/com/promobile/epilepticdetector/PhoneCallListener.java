@@ -1,7 +1,6 @@
 package com.promobile.epilepticdetector;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;

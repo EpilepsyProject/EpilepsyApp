@@ -12,6 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="74dp"
-        android:src="@drawable/splash_tela" />
+        android:src="@drawable/splash_tela"
+        tools:ignore="ContentDescription" />
 
 </RelativeLayout>

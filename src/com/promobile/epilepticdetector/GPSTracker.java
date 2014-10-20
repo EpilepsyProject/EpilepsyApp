@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Address;
+import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
@@ -51,16 +52,17 @@ public class GPSTracker extends Service implements LocationListener{
 
             //Pega o Status do Gps
             isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
             //Peda o status do network
             isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-            if (!isGPSEnabled && !isNetworkEnabled)
-            {
-                // no network provider is enabled
+            
+            if (!isGPSEnabled && !isNetworkEnabled){
+            	LocationManager mgr = (LocationManager) getSystemService(LOCATION_SERVICE);
+            	Criteria criteria = new Criteria();
+            	String best = mgr.getBestProvider(criteria, true);
+            	//since you are using true as the second parameter, you will only get the best of providers which are enabled.
+            	location = mgr.getLastKnownLocation(best);
             }
-            else
-            {
+            else{
                 this.canGetLocation = true;
 
                 //First get location from Network Provider
@@ -71,7 +73,7 @@ public class GPSTracker extends Service implements LocationListener{
                             MIN_TIME_BW_UPDATES,
                             MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
-                    Log.d("Network", "Network");
+                    Log.d(EpilepsyHeuristicService.TAG, "Network");
 
                     if (locationManager != null)
                     {
@@ -90,7 +92,7 @@ public class GPSTracker extends Service implements LocationListener{
                                 MIN_TIME_BW_UPDATES,
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
-                        Log.d("GPS Enabled", "GPS Enabled");
+                        Log.d(EpilepsyHeuristicService.TAG, "GPS Enabled");
 
                         if (locationManager != null)
                         {
@@ -101,19 +103,15 @@ public class GPSTracker extends Service implements LocationListener{
                 }
             }
         }
-        catch (Exception e)
-        {
-            //e.printStackTrace();
+        catch (Exception e){
             Log.e("Error : Location", "Impossible to connect to LocationManager", e);
         }
 
         return location;
     }
     
-    public void updateGPSCoordinates()
-    {
-        if (location != null)
-        {
+    public void updateGPSCoordinates(){
+        if (location != null){
             latitude = location.getLatitude();
             longitude = location.getLongitude();
         }

@@ -1,7 +1,5 @@
 package com.promobile.epilepticdetector;
 
-import com.promobile.epilepticdetector.R;
-
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -13,11 +11,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.telephony.SmsManager;
-import android.telephony.SmsMessage;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.Toast;
+
+import com.promobile.contatos.Contato;
 /**
  * Classe de Debug das funcionalidades do aplicativo
  * [Envio SMS][GPS] [TesteAutomatizado]
@@ -63,18 +61,11 @@ public class InicialActivity extends Activity {
         		}
         	});
          
-         // Teste envio de SMS... :-) OBS.: EH NECESSARIO TER DOIS EMULADORES ABERTOS!!!!!!
          findViewById(R.id.btnSmsSendTest).setOnClickListener(new View.OnClickListener() {
     		@Override
         		public void onClick(View arg0) {
-    				contSms = contSms + 1;
-    			
-    				String phoneNumber = "5556";
-    				String mensagem = "Teste envio SMS numero " + Integer.toString(contSms);
-	    			
-    				SmsManager sms = SmsManager.getDefault();
-	    			sms.sendTextMessage(phoneNumber, null, mensagem, null, null);
-	    			
+					Contato contato= new Contato(getApplicationContext());
+					contato.enviarSmsParaContatos();
 	    			Toast.makeText(getApplicationContext(), "EpilepsyApp - Mensagem Enviada!", Toast.LENGTH_SHORT).show();
         		}
         	});
@@ -107,18 +98,6 @@ public class InicialActivity extends Activity {
 		showNotification();
 		toggleService();
 		//this.finish();
-	}
-	
-	private void stopSensing(){
-		Intent intent = new Intent(getApplicationContext(), EpilepsyHeuristicService.class);
-		intent.addCategory(EpilepsyHeuristicService.TAG);
-		stopService(intent);
-		mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotifyManager.cancel(ID);
-		
-		Context context = getApplicationContext();
-		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-		alarmManager.cancel(pendingIntent);
 	}
 	
 	public void showNotification(){

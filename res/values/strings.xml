@@ -71,4 +71,13 @@
     <string name="tela_configuracoes">Tela configurações</string>
     <string name="title_activity_gps_teste">GpsTesteActivity</string>
     <string name="title_activity_gps_test">Teste GPS</string>
+    <string name="txt_chave_teste">Chave Teste</string>
+    <string name="txt_tempo">Tempo</string>
+    <string name="txt_valor_x_ace">txtValorX</string>
+    <string name="txt_valor_y_ace">txtValorY</string>
+    <string name="txt_valor_z_ace">txtValorZ</string>
+    <string name="txt_valor_x_giro">txtValorXGiro</string>
+    <string name="txt_valor_y_giro">txtValorYGiro</string>
+    <string name="txt_valor_z_giro">txtValorZGiro</string>
+    <string name="txt_valor_vetor">txtValorVetor</string>
 </resources>

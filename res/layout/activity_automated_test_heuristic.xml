@@ -15,74 +15,69 @@
     <Button
         android:id="@+id/btnStartTest"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/btnStartTest"
+        android:layout_height="wrap_content"   
         android:layout_marginBottom="10dp"
         android:text="@string/btnStartTest"
-        android:textAlignment="center"
         android:textColor="#ffffffff" />
 
     <TextView
         android:id="@+id/txtChaveTeste"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ChaveTeste" />
+        android:text="@string/txt_chave_teste" />
 
     <TextView
         android:id="@+id/txtValorTimer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Timer" />
+        android:text="@string/txt_tempo" />
 
     <TextView
         android:id="@+id/txtValorX"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="txtValorX" />
+        android:text="@string/txt_valor_x_ace" />
 
     <TextView
         android:id="@+id/txtValorY"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="txtValorY" />
+        android:text="@string/txt_valor_y_ace" />
 
     <TextView
         android:id="@+id/txtValorZ"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="txtValorZ" />
+        android:text="@string/txt_valor_z_ace" />
 
     <TextView
         android:id="@+id/txtValorXG"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="txtValorXG" />
+        android:text="@string/txt_valor_x_giro" />
 
     <TextView
         android:id="@+id/txtValorYG"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="txtValorYG" />
+        android:text="@string/txt_valor_y_giro" />
 
     <TextView
         android:id="@+id/txtValorZG"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="txtValorZG" />
+        android:text="@string/txt_valor_z_giro" />
 
     <TextView
         android:id="@+id/txtValorVetor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="txtValorVetor" />
+        android:text="@string/txt_valor_vetor" />
 
     <TextView
         android:id="@+id/text_view_status"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_marginTop="30px"
-        android:text="text_view_status"
         android:background="#C3C3C3" />
     
 </LinearLayout>

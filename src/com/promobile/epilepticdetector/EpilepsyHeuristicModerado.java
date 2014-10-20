@@ -9,7 +9,6 @@ import java.util.Stack;
 
 import android.content.Context;
 import android.hardware.Sensor;
-import android.hardware.SensorEvent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;

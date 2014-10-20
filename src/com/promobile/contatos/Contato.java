@@ -8,8 +8,10 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Handler;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.promobile.epilepticdetector.EpilepsyHeuristicService;
 import com.promobile.epilepticdetector.GPSTracker;
 /***
  * Classe reponsável por gerir a atuação do uso da agenda telefonica no aplicativo, uma vez que essa classe
@@ -44,20 +46,22 @@ public class Contato {
    * do aplicativo. 
    */
   public void enviarSmsParaContatos(){
-  	for (int i = 2; i <= 4; i++) {
-			SharedPreferences pref = context.getSharedPreferences("prefs_do_contato", Context.MODE_PRIVATE);
-			String destino = pref.getString("telefoneKey"+i, "Nda");
-			
-			if(!destino.equals("Nda")){
-				enviaSms(destino);
-			}
-		}
+  	for (int i = 2; i <= 4; i++) {  		
+  		
 		SharedPreferences pref = context.getSharedPreferences("prefs_do_contato", Context.MODE_PRIVATE);
-		String destino = pref.getString("telefoneKey"+1, "Nda");
+		String destino = pref.getString("telefoneKey"+i, "Nda");
 		
 		if(!destino.equals("Nda")){
-			ligarContato(destino);
+			enviaSms(destino);
 		}
+		Log.d(EpilepsyHeuristicService.TAG, "[Contato] nome: "+destino );
+	}
+	SharedPreferences pref = context.getSharedPreferences("prefs_do_contato", Context.MODE_PRIVATE);
+	String destino = pref.getString("telefoneKey"+1, "Nda");
+	
+	if(!destino.equals("Nda")){
+		ligarContato(destino);
+	}
   }
   
   /**

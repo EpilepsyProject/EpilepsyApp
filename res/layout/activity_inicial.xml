@@ -16,7 +16,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="120dp"
         android:text="@string/btnSmsSendTest"
-        android:textAlignment="center"
         android:textColor="#ffffffff" />
 
     <Button
@@ -24,7 +23,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/automated_test_heuristic"
-        android:textAlignment="center"
         android:textColor="#ffffffff" />
 
     <Button
@@ -32,7 +30,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/btnTestGps"
-        android:textAlignment="center"
         android:textColor="#ffffffff" />
 
 </LinearLayout>
